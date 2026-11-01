@@ -90,6 +90,28 @@ enum ScoreRecommendation {
   STRONG_NO
 }
 
+enum OfferStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  SENT
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  EXPIRED
+}
+
+enum ApprovalType {
+  REQUISITION
+  OFFER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // -------------------------
 // EMPLOYEE
 // -------------------------
@@ -106,6 +128,9 @@ model Employee {
   panelMemberships        PanelMember[]
   interviewParticipations InterviewParticipant[]
   scorecards              Scorecard[]
+  approvals       Approval[]              @relation("ApprovalApprover")
+  stageChanges    ApplicationStageEvent[] @relation("StageChangedBy")
+  auditLogs       AuditLog[]               @relation("AuditActor")
 
   hiringManagerProfile HiringManager?
 }
@@ -144,6 +169,8 @@ model Requisition {
   updatedAt      DateTime          @updatedAt
   skillRequirements SkillRequirement[]
   interviewPanels   InterviewPanel[]
+  evaluationCriteria EvaluationCriterion[]
+  approvals          Approval[]
 
   hiringManager HiringManager @relation(fields: [hiringManagerId], references: [hiringManagerId], onDelete: Restrict)
   applications  Application[]
@@ -183,6 +210,8 @@ model Application {
   appliedAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   interviews Interview[]
+  offers      Offer[]
+  stageEvents ApplicationStageEvent[]
 
   candidate   Candidate   @relation(fields: [candidateId], references: [candidateId], onDelete: Restrict)
   requisition Requisition @relation(fields: [requisitionId], references: [requisitionId], onDelete: Restrict)
@@ -325,9 +354,107 @@ model Scorecard {
   recommendation      ScoreRecommendation
   comments            String?
   submittedAt         DateTime            @default(now())
+  items ScorecardItem[]
 
   interview Interview @relation(fields: [interviewId], references: [interviewId], onDelete: Restrict)
   reviewer  Employee  @relation(fields: [reviewerId], references: [employeeId], onDelete: Restrict)
 
   @@unique([interviewId, reviewerId])
+}
+model EvaluationCriterion {
+  criterionId  String   @id @default(cuid())
+  requisitionId String
+  name         String
+  description  String?
+  category     String
+  weight       Decimal  @db.Decimal(5, 2)
+  isRequired   Boolean  @default(true)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  requisition Requisition     @relation(fields: [requisitionId], references: [requisitionId], onDelete: Cascade)
+  scorecardItems ScorecardItem[]
+
+  @@index([requisitionId])
+}
+
+model ScorecardItem {
+  itemId      String  @id @default(cuid())
+  scorecardId String
+  criterionId String
+  score       Decimal @db.Decimal(4, 2)
+  comments    String?
+
+  scorecard Scorecard           @relation(fields: [scorecardId], references: [scorecardId], onDelete: Cascade)
+  criterion EvaluationCriterion @relation(fields: [criterionId], references: [criterionId])
+
+  @@unique([scorecardId, criterionId])
+}
+
+model Offer {
+  offerId       String      @id @default(cuid())
+  applicationId String
+  version       Int         @default(1)
+  baseSalary    Decimal     @db.Decimal(12, 2)
+  bonus         Decimal?    @db.Decimal(12, 2)
+  currency      String      @default("INR")
+  status        OfferStatus @default(DRAFT)
+  createdAt     DateTime    @default(now())
+  sentAt        DateTime?
+  respondedAt   DateTime?
+
+  application Application @relation(fields: [applicationId], references: [applicationId], onDelete: Cascade)
+  approvals   Approval[]
+
+  @@unique([applicationId, version])
+  @@index([status])
+}
+
+model Approval {
+  approvalId   String         @id @default(cuid())
+  offerId      String?
+  requisitionId String?
+  approverId   String
+  approvalType ApprovalType
+  status       ApprovalStatus @default(PENDING)
+  comments     String?
+  requestedAt  DateTime       @default(now())
+  decidedAt    DateTime?
+
+  offer       Offer?       @relation(fields: [offerId], references: [offerId], onDelete: Cascade)
+  requisition Requisition? @relation(fields: [requisitionId], references: [requisitionId], onDelete: Cascade)
+  approver    Employee     @relation("ApprovalApprover", fields: [approverId], references: [employeeId])
+
+  @@index([status])
+  @@index([approverId])
+}
+
+model ApplicationStageEvent {
+  eventId      String   @id @default(cuid())
+  applicationId String
+  fromStage    String?
+  toStage      String
+  changedById  String?
+  reason       String?
+  changedAt    DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [applicationId], onDelete: Cascade)
+  changedBy   Employee?   @relation("StageChangedBy", fields: [changedById], references: [employeeId])
+
+  @@index([applicationId, changedAt])
+}
+
+model AuditLog {
+  auditLogId String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  actor Employee? @relation("AuditActor", fields: [actorId], references: [employeeId])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
 }
