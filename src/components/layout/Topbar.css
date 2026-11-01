@@ -1,0 +1,80 @@
+.topbar {
+  height: var(--topbar-height);
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.breadcrumb {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.breadcrumb span {
+  color: var(--color-text-muted);
+}
+
+.breadcrumb strong {
+  font-weight: 600;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  width: 260px;
+  background: #f5f6f3;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+}
+
+.search-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 11px;
+}
+
+.search-box kbd {
+  color: #8a94a4;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.notification-button {
+  position: relative;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--color-text-primary);
+}
+
+.notification-dot {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  background: #e47a66;
+  border-radius: 50%;
+}
+
+.topbar-date {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: var(--color-text-secondary);
+}

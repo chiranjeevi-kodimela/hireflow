@@ -1,0 +1,14 @@
+.app-layout {
+  min-height: 100vh;
+}
+
+.main-section {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+}
+
+.page-content {
+  padding: 34px 36px;
+  max-width: 1600px;
+  margin: 0 auto;
+}

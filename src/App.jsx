@@ -1,10 +1,11 @@
+import MainLayout from './components/layout/MainLayout';
 
 function App() {
   return (
-    <div>
-      <h1>HireFlow</h1>
-      <p>Recruitment Management Platform</p>
-    </div>
+    <MainLayout>
+      <h1>Welcome to HireFlow</h1>
+      <p>Your recruitment workspace is ready.</p>
+    </MainLayout>
   );
 }
 

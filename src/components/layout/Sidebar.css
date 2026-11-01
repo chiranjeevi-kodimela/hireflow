@@ -1,0 +1,165 @@
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--color-sidebar);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 18px 16px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Manrope", sans-serif;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  padding: 0 8px;
+}
+
+.brand-symbol {
+  width: 32px;
+  height: 32px;
+  background: #75d6b0;
+  color: #151c2c;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 19px;
+}
+
+.workspace-switcher {
+  margin-top: 38px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #222d40;
+  border: 1px solid #344056;
+  border-radius: 12px;
+}
+
+.workspace-avatar,
+.profile-avatar {
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #d9eee5;
+  color: #176c54;
+  font-weight: 700;
+}
+
+.workspace-switcher p,
+.sidebar-profile p {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.workspace-switcher span,
+.sidebar-profile small {
+  color: #aab5c7;
+  font-size: 11px;
+}
+
+.switcher-arrow {
+  margin-left: auto;
+}
+
+.sidebar-navigation {
+  margin-top: 34px;
+  flex: 1;
+}
+
+.nav-group {
+  margin-bottom: 30px;
+}
+
+.nav-section-title {
+  color: #8290a6;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  margin: 0 10px 12px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 12px;
+  margin: 4px 0;
+  border-radius: 9px;
+  color: #b5bfd0;
+  text-decoration: none;
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+
+.nav-item:hover {
+  background: #26344a;
+  color: #ffffff;
+}
+
+.nav-item.active {
+  background: #29483f;
+  color: #8be0ba;
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 17px;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.sidebar-help {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 8px;
+  border-bottom: 1px solid #344056;
+  margin-bottom: 16px;
+}
+
+.sidebar-help > span {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #657187;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.sidebar-help p {
+  font-size: 11px;
+}
+
+.sidebar-help small {
+  color: #aab5c7;
+  font-size: 10px;
+}
+
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 2px;
+}
+
+.profile-menu {
+  margin-left: auto;
+  color: #aab5c7;
+  font-size: 20px;
+}
