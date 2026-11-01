@@ -1,0 +1,38 @@
+
+:root {
+  /* Brand */
+  --color-brand: #16866b;
+  --color-brand-dark: #106b56;
+  --color-brand-light: #ddf3e9;
+
+  /* Surfaces */
+  --color-background: #f4f5f2;
+  --color-surface: #ffffff;
+  --color-sidebar: #151c2c;
+
+  /* Text */
+  --color-text-primary: #172033;
+  --color-text-secondary: #64748b;
+  --color-text-muted: #94a3b8;
+
+  /* Status */
+  --color-success: #16866b;
+  --color-warning: #d9a441;
+  --color-danger: #d65c5c;
+  --color-info: #5689c9;
+
+  /* Borders */
+  --color-border: #e5e9e5;
+
+  /* Layout */
+  --sidebar-width: 250px;
+  --topbar-height: 72px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 20px rgba(23, 32, 51, 0.04);
+}
