@@ -1,3 +1,4 @@
+const requisitionRoutes = require("./routes/requisitionRoutes");
 require("dotenv").config();
 
 const express = require("express");
@@ -33,7 +34,7 @@ app.use(notFound);
 
 // Centralized error handler
 app.use(errorHandler);
-
+app.use("/api/requisitions", requisitionRoutes);
 // Start server
 const PORT = process.env.PORT || 5000;
 
