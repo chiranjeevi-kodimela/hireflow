@@ -54,6 +54,42 @@ enum ApplicationStatus {
   HIRED
 }
 
+
+enum AvailabilityStatus {
+  AVAILABLE
+  UNAVAILABLE
+  BOOKED
+}
+
+enum InterviewType {
+  TECHNICAL
+  MANAGERIAL
+  HR
+  SCREENING
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+  NO_SHOW
+}
+
+enum ParticipantRole {
+  LEAD
+  PANELIST
+  OBSERVER
+}
+
+enum ScoreRecommendation {
+  STRONG_YES
+  YES
+  MAYBE
+  NO
+  STRONG_NO
+}
+
 // -------------------------
 // EMPLOYEE
 // -------------------------
@@ -66,6 +102,10 @@ model Employee {
   role       EmployeeRole
   isActive   Boolean      @default(true)
   createdAt  DateTime     @default(now())
+  availabilities          Availability[]
+  panelMemberships        PanelMember[]
+  interviewParticipations InterviewParticipant[]
+  scorecards              Scorecard[]
 
   hiringManagerProfile HiringManager?
 }
@@ -102,6 +142,8 @@ model Requisition {
   status         RequisitionStatus @default(DRAFT)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
+  skillRequirements SkillRequirement[]
+  interviewPanels   InterviewPanel[]
 
   hiringManager HiringManager @relation(fields: [hiringManagerId], references: [hiringManagerId], onDelete: Restrict)
   applications  Application[]
@@ -140,6 +182,7 @@ model Application {
   status        ApplicationStatus @default(ACTIVE)
   appliedAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
+  interviews Interview[]
 
   candidate   Candidate   @relation(fields: [candidateId], references: [candidateId], onDelete: Restrict)
   requisition Requisition @relation(fields: [requisitionId], references: [requisitionId], onDelete: Restrict)
@@ -147,4 +190,144 @@ model Application {
   @@unique([candidateId, requisitionId])
   @@index([currentStage])
   @@index([status])
+}
+
+
+// -------------------------
+// SKILL REQUIREMENTS
+// -------------------------
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+model SkillRequirement {
+  skillRequirementId String     @id
+  requisitionId      String
+  skillName          String
+  minimumLevel       SkillLevel
+  isMandatory        Boolean    @default(true)
+  weight             Decimal    @db.Decimal(5, 2)
+  createdAt          DateTime   @default(now())
+
+  requisition Requisition @relation(fields: [requisitionId], references: [requisitionId], onDelete: Restrict)
+
+  @@index([requisitionId])
+}
+
+// -------------------------
+// INTERVIEW PANEL
+// -------------------------
+
+model InterviewPanel {
+  panelId       String   @id
+  requisitionId String
+  panelName     String
+  description   String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  requisition Requisition @relation(fields: [requisitionId], references: [requisitionId], onDelete: Restrict)
+  members     PanelMember[]
+  interviews  Interview[]
+
+  @@index([requisitionId])
+}
+
+// -------------------------
+// PANEL MEMBERS
+// -------------------------
+
+model PanelMember {
+  panelMemberId String   @id
+  panelId       String
+  employeeId    String
+  assignedAt    DateTime @default(now())
+
+  panel    InterviewPanel @relation(fields: [panelId], references: [panelId], onDelete: Restrict)
+  employee Employee       @relation(fields: [employeeId], references: [employeeId], onDelete: Restrict)
+
+  @@unique([panelId, employeeId])
+}
+
+// -------------------------
+// INTERVIEWER AVAILABILITY
+// -------------------------
+
+model Availability {
+  availabilityId String             @id
+  interviewerId  String
+  startTime      DateTime
+  endTime        DateTime
+  status         AvailabilityStatus @default(AVAILABLE)
+  createdAt      DateTime           @default(now())
+
+  interviewer Employee @relation(fields: [interviewerId], references: [employeeId], onDelete: Restrict)
+
+  @@index([interviewerId, startTime, endTime])
+}
+
+// -------------------------
+// INTERVIEW
+// -------------------------
+
+model Interview {
+  interviewId  String          @id
+  applicationId String
+  panelId      String
+  startTime    DateTime
+  endTime      DateTime
+  interviewType InterviewType
+  status       InterviewStatus @default(SCHEDULED)
+  meetingLink  String?
+  createdAt    DateTime        @default(now())
+
+  application  Application          @relation(fields: [applicationId], references: [applicationId], onDelete: Restrict)
+  panel        InterviewPanel       @relation(fields: [panelId], references: [panelId], onDelete: Restrict)
+  participants InterviewParticipant[]
+  scorecards   Scorecard[]
+
+  @@index([applicationId])
+  @@index([panelId, startTime, endTime])
+}
+
+// -------------------------
+// INTERVIEW PARTICIPANTS
+// -------------------------
+
+model InterviewParticipant {
+  participantId String          @id
+  interviewId   String
+  employeeId    String
+  role          ParticipantRole
+
+  interview Interview @relation(fields: [interviewId], references: [interviewId], onDelete: Restrict)
+  employee  Employee  @relation(fields: [employeeId], references: [employeeId], onDelete: Restrict)
+
+  @@unique([interviewId, employeeId])
+  @@index([employeeId])
+}
+
+// -------------------------
+// SCORECARD
+// -------------------------
+
+model Scorecard {
+  scorecardId         String              @id
+  interviewId         String
+  reviewerId          String
+  technicalScore      Decimal             @db.Decimal(3, 2)
+  communicationScore  Decimal             @db.Decimal(3, 2)
+  problemSolvingScore Decimal             @db.Decimal(3, 2)
+  recommendation      ScoreRecommendation
+  comments            String?
+  submittedAt         DateTime            @default(now())
+
+  interview Interview @relation(fields: [interviewId], references: [interviewId], onDelete: Restrict)
+  reviewer  Employee  @relation(fields: [reviewerId], references: [employeeId], onDelete: Restrict)
+
+  @@unique([interviewId, reviewerId])
 }
