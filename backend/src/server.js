@@ -29,12 +29,12 @@ app.get("/api/health", async (req, res, next) => {
   }
 });
 
+app.use("/api/requisitions", requisitionRoutes);
 // Handle unknown routes
 app.use(notFound);
 
 // Centralized error handler
 app.use(errorHandler);
-app.use("/api/requisitions", requisitionRoutes);
 // Start server
 const PORT = process.env.PORT || 5000;
 

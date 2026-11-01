@@ -1,6 +1,9 @@
 const errorHandler = (err, req, res, next) => {
-    void next;
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  const statusCode = err.statusCode || 500;
 
   res.status(statusCode).json({
     success: false,
