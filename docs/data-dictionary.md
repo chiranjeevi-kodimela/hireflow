@@ -23,15 +23,18 @@ Represents an approved job opening within an organization.
 
 Represents an employee responsible for a requisition.
 
-| Field             | Type     | Required | Constraints / Description |
-| ----------------- | -------- | -------- | ------------------------- |
-| hiring_manager_id | String   | Yes      | Primary key               |
-| full_name         | String   | Yes      | Manager's name            |
-| email             | String   | Yes      | Unique, valid email       |
-| department        | String   | Yes      | Manager's department      |
-| designation       | String   | Yes      | Job designation           |
-| is_active         | Boolean  | Yes      | Defaults to true          |
-| created_at        | DateTime | Yes      | Record creation timestamp |
+| Field             | Type     | Required | Constraints / Description      |
+| ----------------- | -------- | -------- | ------------------------------ |
+| hiring_manager_id | String   | Yes      | Primary key                    |
+| employee_id       | String   | Yes      | Unique foreign key to Employee |
+| full_name         | String   | Yes      | Manager's name                 |
+| email             | String   | Yes      | Unique, valid email            |
+| department        | String   | Yes      | Manager's department           |
+| designation       | String   | Yes      | Job designation                |
+| is_active         | Boolean  | Yes      | Defaults to true               |
+| created_at        | DateTime | Yes      | Record creation timestamp      |
+
+**Relationship:** One Employee can have zero or one HiringManager profile.
 
 ## 3. Candidate
 
@@ -63,7 +66,11 @@ Connects a candidate to a requisition.
 | applied_at     | DateTime | Yes      | Application submission timestamp                                                 |
 | updated_at     | DateTime | Yes      | Last update timestamp                                                            |
 
-**Constraint:** A candidate can apply to a particular requisition only once.
+**Constraints:**
+
+- A candidate can apply to a particular requisition only once.
+- Candidate and requisition must exist before an application is created.
+- Stage transitions must follow the defined workflow rules.
 
 ## 5. SkillRequirement
 
@@ -83,9 +90,11 @@ Defines the skills and expected proficiency for a requisition.
 
 ---
 
+# Workflow Entities
+
 ## 6. InterviewPanel
 
-Represents a group of interviewers assigned to an interview process.
+Represents a group of interviewers assigned to a requisition.
 
 | Field          | Type     | Required | Constraints / Description   |
 | -------------- | -------- | -------- | --------------------------- |
@@ -109,6 +118,12 @@ Stores the available time slots of an interviewer.
 | status          | Enum     | Yes      | AVAILABLE, UNAVAILABLE, BOOKED        |
 | created_at      | DateTime | Yes      | Creation timestamp                    |
 
+**Rules:**
+
+- Availability periods must have valid start and end times.
+- Interview scheduling must check interviewer availability.
+- Overlapping availability records should be handled consistently.
+
 ## 8. Interview
 
 Represents a scheduled interview for an application.
@@ -130,7 +145,7 @@ Represents a scheduled interview for an application.
 - Interviewers must be available during the scheduled slot.
 - An interviewer cannot be booked for overlapping interviews.
 - Withdrawn or rejected applications cannot receive new interviews.
-- Rescheduling must preserve the previous scheduling history.
+- Rescheduling must preserve previous scheduling history.
 
 ## 9. Scorecard
 
@@ -153,6 +168,7 @@ Stores structured feedback from an interviewer.
 - One reviewer can submit only one scorecard per interview.
 - Scorecards must be submitted before the application advances beyond the relevant interview stage.
 - Scores must remain within the 1–5 range.
+- Evaluation criteria must be relevant to the requisition and interview type.
 
 ## 10. Offer
 
@@ -172,8 +188,9 @@ Represents a job offer made to a candidate.
 **Rules:**
 
 - Offered salary must be checked against the requisition's approved salary band.
-- An offer must receive the required approvals before being sent.
-- Offer status changes must be recorded in the audit history.
+- An offer must receive required approvals before being sent.
+- Offer status changes must be recorded in audit history.
+- Multiple historical offers may exist, but only one active offer is allowed per application.
 
 ## 11. Approval
 
@@ -195,9 +212,9 @@ Tracks approval decisions for requisitions and offers.
 
 ---
 
-## 12. Supporting Entities
+# Supporting Entities
 
-### Employee
+## 12. Employee
 
 Represents an internal employee, including interviewers, approvers and administrators.
 
@@ -209,9 +226,9 @@ Represents an internal employee, including interviewers, approvers and administr
 | department  | String   | Yes      | Department                                       |
 | role        | Enum     | Yes      | HR, HIRING_MANAGER, INTERVIEWER, APPROVER, ADMIN |
 | is_active   | Boolean  | Yes      | Defaults to true                                 |
-| created_at  | DateTime | Yes      | Creation timestamp                               |
+| created_at  | DateTime | Yes      | Record creation timestamp                        |
 
-### PanelMember
+## 13. PanelMember
 
 Connects employees to interview panels.
 
@@ -224,7 +241,7 @@ Connects employees to interview panels.
 
 **Constraint:** An employee can be assigned to a panel only once.
 
-### InterviewParticipant
+## 14. InterviewParticipant
 
 Connects individual interviewers to scheduled interviews.
 
@@ -237,7 +254,7 @@ Connects individual interviewers to scheduled interviews.
 
 **Constraint:** An employee can participate in an interview only once.
 
-### ApplicationStageEvent
+## 15. ApplicationStageEvent
 
 Maintains the complete history of application stage transitions.
 
@@ -253,7 +270,7 @@ Maintains the complete history of application stage transitions.
 
 **Rule:** Stage history is append-only. Existing events must not be overwritten.
 
-### AuditLog
+## 16. AuditLog
 
 Records important system actions for traceability.
 
@@ -267,3 +284,20 @@ Records important system actions for traceability.
 | old_value   | JSON     | No       | Previous values                                     |
 | new_value   | JSON     | No       | Updated values                                      |
 | created_at  | DateTime | Yes      | Event timestamp                                     |
+
+---
+
+# Global Database Constraints
+
+1. Every entity must have a unique primary key.
+2. Every foreign key must reference an existing record.
+3. Candidate email and employee email must be unique.
+4. Candidate-requisition combinations must be unique.
+5. All dates must follow valid chronological order.
+6. Salary values must be non-negative and consistent with approved bands.
+7. Interview start time must be earlier than end time.
+8. Interviewers cannot have overlapping scheduled interviews.
+9. Application stage transitions must follow defined business rules.
+10. Historical events must not be silently overwritten or deleted.
+11. Approval records must reference exactly one target entity.
+12. Synthetic anomaly records must carry explicit ground-truth labels and must not be confused with valid baseline records.
