@@ -1,6 +1,6 @@
 const requisitionRoutes = require("./routes/requisitionRoutes");
 require("dotenv").config();
-
+const candidateRoutes = require("./routes/candidateRoutes");
 const express = require("express");
 const cors = require("cors");
 const prisma = require("./config/database");
@@ -28,7 +28,8 @@ app.get("/api/health", async (req, res, next) => {
     next(error);
   }
 });
-
+app.use("/api/requisitions", requisitionRoutes);
+app.use("/api/candidates", candidateRoutes);
 app.use("/api/requisitions", requisitionRoutes);
 // Handle unknown routes
 app.use(notFound);
