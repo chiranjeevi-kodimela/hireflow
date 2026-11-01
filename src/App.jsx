@@ -1,11 +1,18 @@
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import MainLayout from './components/layout/MainLayout';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
-    <MainLayout>
-      <h1>Welcome to HireFlow</h1>
-      <p>Your recruitment workspace is ready.</p>
-    </MainLayout>
+    <BrowserRouter>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+        </Routes>
+      </MainLayout>
+    </BrowserRouter>
   );
 }
 

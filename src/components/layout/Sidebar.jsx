@@ -1,6 +1,6 @@
 
 import './Sidebar.css';
-
+import { NavLink } from 'react-router-dom';
 const navigation = [
     {
         section: 'WORKSPACE', items: [
@@ -46,14 +46,14 @@ function Sidebar() {
                         <p className="nav-section-title">{group.section}</p>
 
                         {group.items.map((item) => (
-                            <a
-                                href={item.path}
+                            <NavLink
+                                to={item.path}
                                 className={`nav-item ${item.path === '/' ? 'active' : ''}`}
                                 key={item.label}
                             >
                                 <span className="nav-icon">{item.icon}</span>
                                 <span>{item.label}</span>
-                            </a>
+                            </NavLink>
                         ))}
                     </div>
                 ))}

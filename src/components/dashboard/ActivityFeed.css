@@ -1,0 +1,55 @@
+.activity-card {
+  background: var(--color-surface);
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.activity-list {
+  margin-top: 25px;
+}
+
+.activity-item {
+  display: flex;
+  gap: 13px;
+  padding-bottom: 21px;
+  position: relative;
+}
+
+.activity-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 38px;
+  bottom: 0;
+  border-left: 1px dashed #dce3df;
+}
+
+.activity-icon {
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #e7f3ec;
+  color: #16866b;
+}
+
+.activity-details p {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.activity-details strong {
+  color: var(--color-text-primary);
+}
+
+.activity-details span {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  margin-top: 4px;
+}
