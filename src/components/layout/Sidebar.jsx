@@ -3,23 +3,26 @@ import './Sidebar.css';
 import { NavLink } from 'react-router-dom';
 const navigation = [
     {
-        section: 'WORKSPACE', items: [
+        section: 'WORKSPACE',
+        items: [
             { label: 'Overview', icon: '◫', path: '/' },
-            { label: 'Candidates', icon: '◎', path: '/candidates' },
+            { label: 'Candidates', icon: '◉', path: '/candidates' },
             { label: 'Jobs', icon: '▤', path: '/jobs' },
             { label: 'Interviews', icon: '▦', path: '/interviews' },
-        ]
+        ],
     },
     {
-        section: 'INSIGHTS', items: [
+        section: 'INSIGHTS',
+        items: [
             { label: 'Analytics', icon: '⌁', path: '/analytics' },
-        ]
+        ],
     },
     {
-        section: 'MANAGEMENT', items: [
-            { label: 'Evaluations', icon: '☷', path: '/evaluations' },
+        section: 'MANAGEMENT',
+        items: [
+            { label: 'Evaluations', icon: '⚒', path: '/evaluations' },
             { label: 'Offers', icon: '✉', path: '/offers' },
-        ]
+        ],
     },
 ];
 
@@ -48,7 +51,10 @@ function Sidebar() {
                         {group.items.map((item) => (
                             <NavLink
                                 to={item.path}
-                                className={`nav-item ${item.path === '/' ? 'active' : ''}`}
+                                end={item.path === '/'}
+                                className={({ isActive }) =>
+                                    `nav-item ${isActive ? 'active' : ''}`
+                                }
                                 key={item.label}
                             >
                                 <span className="nav-icon">{item.icon}</span>

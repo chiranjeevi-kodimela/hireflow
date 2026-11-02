@@ -1,0 +1,273 @@
+.requisitions-page {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.requisitions-header,
+.list-heading,
+.form-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.requisitions-header {
+  margin-bottom: 28px;
+}
+
+.page-eyebrow {
+  color: var(--color-brand);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  margin-bottom: 9px;
+}
+
+.requisitions-header h1 {
+  color: var(--color-text-primary);
+  font-size: 27px;
+  letter-spacing: -0.8px;
+}
+
+.page-description,
+.list-heading p,
+.form-heading p {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  margin-top: 7px;
+}
+
+.primary-button,
+.secondary-button {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 17px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary-button {
+  background: var(--color-brand);
+  color: white;
+}
+
+.primary-button:hover {
+  background: var(--color-brand-dark);
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  background: #f1f3f1;
+  color: var(--color-text-primary);
+}
+
+.requisition-form-card,
+.requisition-list-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 22px;
+}
+
+.form-heading,
+.list-heading {
+  margin-bottom: 23px;
+}
+
+.form-heading h2,
+.list-heading h2 {
+  color: var(--color-text-primary);
+  font-size: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: white;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.form-grid input:focus,
+.form-grid select:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(22, 134, 107, 0.09);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.record-count {
+  background: var(--color-brand-light);
+  color: var(--color-brand-dark);
+  border-radius: 20px;
+  padding: 6px 11px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.requisition-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.requisition-table th {
+  padding: 13px 12px;
+  color: var(--color-text-muted);
+  background: #f8faf8;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.requisition-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.requisition-table td strong {
+  display: block;
+  color: var(--color-text-primary);
+  font-size: 12px;
+}
+
+.requisition-table td small {
+  display: block;
+  margin-top: 5px;
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.status-draft {
+  color: #64748b;
+  background: #eef1f4;
+}
+
+.status-pending_approval {
+  color: #946515;
+  background: #fff3d8;
+}
+
+.status-open {
+  color: #147653;
+  background: #e0f5e9;
+}
+
+.status-on_hold {
+  color: #93651c;
+  background: #fff3d8;
+}
+
+.status-closed,
+.status-cancelled {
+  color: #a34444;
+  background: #fbe8e8;
+}
+
+.text-button {
+  border: 0;
+  background: transparent;
+  color: var(--color-brand-dark);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.text-button:hover {
+  text-decoration: underline;
+}
+
+.muted-action {
+  color: var(--color-text-muted);
+}
+
+.empty-state {
+  padding: 35px 10px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.notice {
+  padding: 12px 15px;
+  margin-bottom: 18px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+
+.error-notice {
+  background: #fbe8e8;
+  color: #a34444;
+}
+
+.success-notice {
+  background: #e0f5e9;
+  color: #147653;
+}
+
+@media (max-width: 700px) {
+  .requisitions-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .requisition-form-card,
+  .requisition-list-card {
+    padding: 16px;
+  }
+}
