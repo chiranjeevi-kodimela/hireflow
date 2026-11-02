@@ -1,29 +1,35 @@
+import {
+    UserPlus,
+    CalendarCheck,
+    CheckCircle2,
+    FileText,
+    Activity
+} from 'lucide-react';
 
-import { UserPlus, CalendarCheck, CheckCircle2 } from 'lucide-react';
 import './ActivityFeed.css';
 
-const activities = [
-    {
-        name: 'Rahul Sharma',
-        action: 'moved to technical interview',
-        time: '10 minutes ago',
-        icon: CalendarCheck,
-    },
-    {
-        name: 'Priya Reddy',
-        action: 'was added to the talent pool',
-        time: '35 minutes ago',
-        icon: UserPlus,
-    },
-    {
-        name: 'Arjun Kumar',
-        action: 'received an evaluation',
-        time: '1 hour ago',
-        icon: CheckCircle2,
-    },
-];
+const icons = {
+    Candidate: UserPlus,
+    Interview: CalendarCheck,
+    Scorecard: CheckCircle2,
+    Offer: FileText,
+    Application: Activity,
+    Requisition: FileText,
+};
 
-function ActivityFeed() {
+function formatTime(date) {
+    const seconds = Math.floor(
+        (Date.now() - new Date(date).getTime()) / 1000
+    );
+
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+
+    return `${Math.floor(seconds / 86400)} days ago`;
+}
+
+function ActivityFeed({ activities = [] }) {
     return (
         <section className="activity-card">
             <div className="section-heading">
@@ -34,25 +40,36 @@ function ActivityFeed() {
             </div>
 
             <div className="activity-list">
-                {activities.map((activity) => {
-                    const Icon = activity.icon;
+                {activities.length === 0 ? (
+                    <p>No recent activity available.</p>
+                ) : (
+                    activities.map((activity) => {
+                        const Icon = icons[activity.entityType] || Activity;
 
-                    return (
-                        <div className="activity-item" key={activity.name}>
-                            <div className="activity-icon">
-                                <Icon size={17} />
-                            </div>
+                        return (
+                            <div
+                                className="activity-item"
+                                key={activity.auditLogId}
+                            >
+                                <div className="activity-icon">
+                                    <Icon size={17} />
+                                </div>
 
-                            <div className="activity-details">
-                                <p>
-                                    <strong>{activity.name}</strong>
-                                    {' '}{activity.action}
-                                </p>
-                                <span>{activity.time}</span>
+                                <div className="activity-details">
+                                    <p>
+                                        <strong>{activity.entityType}</strong>
+                                        {' — '}
+                                        {activity.action.replaceAll('_', ' ').toLowerCase()}
+                                    </p>
+
+                                    <span>
+                                        {formatTime(activity.createdAt)}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })
+                )}
             </div>
         </section>
     );

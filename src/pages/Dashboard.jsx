@@ -1,13 +1,36 @@
-
+import { useEffect, useState } from 'react';
 import { Plus, ArrowUpRight } from 'lucide-react';
 
 import StatCard from '../components/dashboard/StatCard';
 import HiringPipeline from '../components/dashboard/HiringPipeline';
 import ActivityFeed from '../components/dashboard/ActivityFeed';
 
+import { getDashboardSummary } from '../services/dashboardService';
+
 import './Dashboard.css';
 
 function Dashboard() {
+    const [dashboardData, setDashboardData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        async function loadDashboard() {
+            try {
+                const data = await getDashboardSummary();
+                setDashboardData(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadDashboard();
+    }, []);
+
+    const metrics = dashboardData?.metrics;
+
     return (
         <div className="dashboard">
             <div className="dashboard-header">
@@ -29,58 +52,68 @@ function Dashboard() {
                 </button>
             </div>
 
-            <div className="dashboard-stats">
-                <StatCard
-                    type="candidates"
-                    title="Total candidates"
-                    value="248"
-                    change="+12.8%"
-                    description="vs last month"
-                />
+            {loading && <p>Loading dashboard data...</p>}
 
-                <StatCard
-                    type="jobs"
-                    title="Open positions"
-                    value="12"
-                    change="+3"
-                    description="new this month"
-                />
+            {error && <p className="dashboard-error">{error}</p>}
 
-                <StatCard
-                    type="interviews"
-                    title="Interviews scheduled"
-                    value="36"
-                    change="+8.2%"
-                    description="vs last month"
-                />
+            {!loading && !error && metrics && (
+                <>
+                    <div className="dashboard-stats">
+                        <StatCard
+                            type="candidates"
+                            title="Total candidates"
+                            value={metrics.totalCandidates}
+                            change="Live"
+                            description="in database"
+                        />
 
-                <StatCard
-                    type="hired"
-                    title="Successful hires"
-                    value="18"
-                    change="+15.4%"
-                    description="vs last month"
-                />
-            </div>
+                        <StatCard
+                            type="jobs"
+                            title="Open positions"
+                            value={metrics.openRequisitions}
+                            change="Live"
+                            description="currently open"
+                        />
 
-            <div className="dashboard-main-grid">
-                <HiringPipeline />
-                <ActivityFeed />
-            </div>
+                        <StatCard
+                            type="interviews"
+                            title="Interviews scheduled"
+                            value={metrics.scheduledInterviews}
+                            change="Live"
+                            description="currently scheduled"
+                        />
 
-            <div className="dashboard-bottom">
-                <div className="bottom-heading">
-                    <h3>Recruitment snapshot</h3>
-                    <span>
-                        View detailed analytics <ArrowUpRight size={14} />
-                    </span>
-                </div>
+                        <StatCard
+                            type="hired"
+                            title="Successful hires"
+                            value={metrics.successfulHires}
+                            change="Live"
+                            description="completed hires"
+                        />
+                    </div>
 
-                <p>
-                    Your recruitment workspace is active. Monitor candidate
-                    progression and keep your hiring teams aligned.
-                </p>
-            </div>
+                    <div className="dashboard-main-grid">
+                        <HiringPipeline />
+                        <ActivityFeed
+                            activities={dashboardData.recentActivity}
+                        />
+                    </div>
+
+                    <div className="dashboard-bottom">
+                        <div className="bottom-heading">
+                            <h3>Recruitment snapshot</h3>
+                            <span>
+                                View detailed analytics <ArrowUpRight size={14} />
+                            </span>
+                        </div>
+
+                        <p>
+                            Your recruitment workspace is active. Monitor candidate
+                            progression and keep your hiring teams aligned.
+                        </p>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
