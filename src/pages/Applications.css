@@ -146,3 +146,55 @@
     width: 100%;
   }
 }
+
+.stage-action-button {
+  padding: 7px 12px;
+  border: 1px solid var(--brand, #16866b);
+  border-radius: 6px;
+  background: white;
+  color: var(--brand, #16866b);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stage-update-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stage-update-form input,
+.stage-update-form select,
+.stage-update-form textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--border, #e5e9e5);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.stage-update-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.stage-form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.stage-form-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--brand, #16866b);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stage-form-actions .stage-cancel-button {
+  background: #e9ecef;
+  color: #334155;
+}

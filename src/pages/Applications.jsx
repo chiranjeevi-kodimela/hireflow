@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import {
     getApplications,
     createApplication,
+    updateApplicationStage,
 } from '../services/applicationService';
 import { getCandidates } from '../services/candidateService';
 import { getRequisitions } from '../services/requisitionService';
@@ -21,6 +22,11 @@ function Applications() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    const [selectedApplication, setSelectedApplication] = useState(null);
+    const [nextStage, setNextStage] = useState('');
+    const [stageReason, setStageReason] = useState('');
+    const [updatingStage, setUpdatingStage] = useState(false);
+
     async function loadData() {
         try {
             setError('');
@@ -32,14 +38,8 @@ function Applications() {
                     getRequisitions(),
                 ]);
 
-            setApplications(
-                Array.isArray(applicationData) ? applicationData : []
-            );
-
-            setCandidates(
-                Array.isArray(candidateData) ? candidateData : []
-            );
-
+            setApplications(Array.isArray(applicationData) ? applicationData : []);
+            setCandidates(Array.isArray(candidateData) ? candidateData : []);
             setRequisitions(
                 (Array.isArray(requisitionData) ? requisitionData : [])
                     .filter((item) => item.status === 'OPEN')
@@ -65,14 +65,8 @@ function Applications() {
 
                 if (ignore) return;
 
-                setApplications(
-                    Array.isArray(applicationData) ? applicationData : []
-                );
-
-                setCandidates(
-                    Array.isArray(candidateData) ? candidateData : []
-                );
-
+                setApplications(Array.isArray(applicationData) ? applicationData : []);
+                setCandidates(Array.isArray(candidateData) ? candidateData : []);
                 setRequisitions(
                     (Array.isArray(requisitionData) ? requisitionData : [])
                         .filter((item) => item.status === 'OPEN')
@@ -117,6 +111,49 @@ function Applications() {
             setSaving(false);
         }
     }
+
+    async function handleStageUpdate(event) {
+        event.preventDefault();
+
+        if (!selectedApplication || !nextStage || !stageReason.trim()) {
+            setError('Select a stage and provide a reason.');
+            return;
+        }
+
+        try {
+            setUpdatingStage(true);
+            setError('');
+            setSuccess('');
+
+            await updateApplicationStage(
+                selectedApplication.applicationId,
+                {
+                    toStage: nextStage,
+                    reason: stageReason.trim(),
+                }
+            );
+
+            setSelectedApplication(null);
+            setNextStage('');
+            setStageReason('');
+            setSuccess('Application stage updated successfully.');
+
+            await loadData();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setUpdatingStage(false);
+        }
+    }
+
+    const availableStages = {
+        APPLIED: ['SCREENING', 'REJECTED', 'WITHDRAWN'],
+        SCREENING: ['TECHNICAL', 'REJECTED', 'WITHDRAWN'],
+        TECHNICAL: ['MANAGERIAL', 'REJECTED', 'WITHDRAWN'],
+        MANAGERIAL: ['HR', 'REJECTED', 'WITHDRAWN'],
+        HR: ['OFFER', 'REJECTED', 'WITHDRAWN'],
+        OFFER: ['HIRED', 'REJECTED', 'WITHDRAWN'],
+    };
 
     if (loading) {
         return <div className="applications-page">Loading applications...</div>;
@@ -177,10 +214,75 @@ function Applications() {
                         {saving ? 'Creating...' : 'Create Application'}
                     </button>
                 </form>
-
-                {error && <p className="application-error">{error}</p>}
-                {success && <p className="application-success">{success}</p>}
             </div>
+
+            {selectedApplication && (
+                <div className="application-form-card">
+                    <h2>Update Application Stage</h2>
+
+                    <p>
+                        {selectedApplication.candidate?.fullName} —{' '}
+                        {selectedApplication.requisition?.title}
+                    </p>
+
+                    <form onSubmit={handleStageUpdate} className="stage-update-form">
+                        <div className="form-group">
+                            <label>Current Stage</label>
+                            <input
+                                value={selectedApplication.currentStage}
+                                disabled
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>New Stage</label>
+                            <select
+                                value={nextStage}
+                                onChange={(e) => setNextStage(e.target.value)}
+                                required
+                            >
+                                <option value="">Select next stage</option>
+                                {(availableStages[selectedApplication.currentStage] || [])
+                                    .map((stage) => (
+                                        <option key={stage} value={stage}>
+                                            {stage}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Reason for Change</label>
+                            <textarea
+                                value={stageReason}
+                                onChange={(e) => setStageReason(e.target.value)}
+                                placeholder="Explain why this stage is changing..."
+                                required
+                            />
+                        </div>
+
+                        <div className="stage-form-actions">
+                            <button type="submit" disabled={updatingStage}>
+                                {updatingStage ? 'Updating...' : 'Confirm Update'}
+                            </button>
+
+                            <button
+                                type="button"
+                                className="stage-cancel-button"
+                                onClick={() => {
+                                    setSelectedApplication(null);
+                                    setError('');
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
+
+            {error && <p className="application-error">{error}</p>}
+            {success && <p className="application-success">{success}</p>}
 
             <div className="application-list-card">
                 <div className="application-list-header">
@@ -198,6 +300,7 @@ function Applications() {
                                 <th>Current Stage</th>
                                 <th>Status</th>
                                 <th>Applied On</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
@@ -227,12 +330,32 @@ function Applications() {
                                             ? new Date(application.appliedAt).toLocaleDateString()
                                             : '-'}
                                     </td>
+
+                                    <td>
+                                        {application.status === 'ACTIVE' ? (
+                                            <button
+                                                type="button"
+                                                className="stage-action-button"
+                                                onClick={() => {
+                                                    setSelectedApplication(application);
+                                                    setNextStage('');
+                                                    setStageReason('');
+                                                    setError('');
+                                                    setSuccess('');
+                                                }}
+                                            >
+                                                Update Stage
+                                            </button>
+                                        ) : (
+                                            <span>Closed</span>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
 
                             {applications.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" className="empty-applications">
+                                    <td colSpan="7" className="empty-applications">
                                         No applications found.
                                     </td>
                                 </tr>

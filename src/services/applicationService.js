@@ -32,3 +32,9 @@ export async function createApplication(payload) {
 export async function getApplicationById(id) {
   return request(`/applications/${id}`);
 }
+export async function updateApplicationStage(applicationId, payload) {
+  return request(`/applications/${applicationId}/stage`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
