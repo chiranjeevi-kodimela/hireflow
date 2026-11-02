@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-11-02T09:30:30.586Z",
+  "recordCounts": {
+    "employees": 31,
+    "requisitions": 201,
+    "candidates": 5001,
+    "applications": 8000,
+    "interviewPanels": 200,
+    "interviews": 2000,
+    "participants": 4000,
+    "scorecards": 2000,
+    "scorecardItems": 8001,
+    "evaluationCriteria": 805,
+    "offers": 101,
+    "approvals": 1500,
+    "stageEvents": 10402
+  },
+  "integrityIssues": [],
+  "detectedAnomalies": [
+    {
+      "type": "OFFER_EXCEEDS_SALARY_BAND",
+      "entityId": "cmvz23fdg0007f8v073r6w50y"
+    },
+    {
+      "type": "INTERVIEWER_DOUBLE_BOOKED",
+      "count": 1,
+      "examples": [
+        "INT-2026-000590|INT-2026-002674"
+      ]
+    },
+    {
+      "type": "WITHDRAWN_CANDIDATE_STILL_SCHEDULED",
+      "entityId": "APP-SYN-CAND-000626-REQ-2026-900073",
+      "relatedEntityId": "INT-2026-001707"
+    },
+    {
+      "type": "IRRELEVANT_EVALUATION_CRITERION",
+      "entityId": "SCORE-INT-2026-000001-SYN-EMP-000019",
+      "relatedEntityId": "cmvz23ff2000ff8v00f58xh7i"
+    },
+    {
+      "type": "ADVANCEMENT_WITHOUT_REVIEW",
+      "entityId": "APP-SYN-CAND-002796-REQ-2026-900047"
+    }
+  ],
+  "groundTruthResults": [
+    {
+      "anomalyId": "ANOMALY-001",
+      "type": "ADVANCEMENT_WITHOUT_REVIEW",
+      "detected": true
+    },
+    {
+      "anomalyId": "ANOMALY-002",
+      "type": "INTERVIEWER_DOUBLE_BOOKED",
+      "detected": true
+    },
+    {
+      "anomalyId": "ANOMALY-003",
+      "type": "OFFER_EXCEEDS_SALARY_BAND",
+      "detected": true
+    },
+    {
+      "anomalyId": "ANOMALY-004",
+      "type": "WITHDRAWN_CANDIDATE_STILL_SCHEDULED",
+      "detected": true
+    },
+    {
+      "anomalyId": "ANOMALY-005",
+      "type": "IRRELEVANT_EVALUATION_CRITERION",
+      "detected": true
+    }
+  ],
+  "summary": {
+    "integrityChecksPassed": true,
+    "integrityIssueCount": 0,
+    "detectedAnomalyTypes": 5,
+    "groundTruthCases": 5,
+    "groundTruthCasesDetected": 5
+  }
+}
