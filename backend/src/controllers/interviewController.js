@@ -1,7 +1,7 @@
 const { createInterview,
         cancelInterview,
         rescheduleInterview,
-        getAllInterviews,
+        completeInterview
  } = require("../services/interviewService");
 
 const create = async (req, res, next) => {
@@ -17,9 +17,6 @@ const create = async (req, res, next) => {
   }
 };
 
-const {
-  completeInterview,
-} = require("../services/interviewService");
 
 const complete = async (req, res, next) => {
   try {

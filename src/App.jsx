@@ -7,6 +7,7 @@ import Candidates from './pages/Candidates';
 import Applications from './pages/Applications';
 import Interviews from './pages/Interviews';
 import Availability from "./pages/Availability";
+import Evaluations from "./pages/Evaluations";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/candidates" element={<Candidates />} />
           <Route path="/interviews" element={<Interviews />} />
           <Route path="/availability" element={<Availability />} />
+          <Route path="/evaluations" element={<Evaluations />} />
           <Route path="/applications" element={<Applications />} />
         </Routes>
       </MainLayout>
