@@ -139,10 +139,13 @@ const createInterview = async (data) => {
   try {
     return await prisma.$transaction(
       async (tx) => {
-        for (const employeeId of participantIds) {
+        // Observers do not require availability.
+        for (const participant of participants) {
+          if (participant.role === "OBSERVER") continue;
+
           const availability = await tx.availability.findFirst({
             where: {
-              interviewerId: employeeId,
+              interviewerId: participant.employeeId,
               status: "AVAILABLE",
               startTime: { lte: start },
               endTime: { gte: end },
@@ -151,7 +154,7 @@ const createInterview = async (data) => {
 
           if (!availability) {
             const error = new Error(
-              `Participant ${employeeId} is not available for this time slot`,
+              `Participant ${participant.employeeId} is not available for this time slot`,
             );
             error.statusCode = 409;
             throw error;
@@ -165,7 +168,12 @@ const createInterview = async (data) => {
             endTime: { gt: start },
             participants: {
               some: {
-                employeeId: { in: participantIds },
+                employeeId: {
+                  in: participants
+                    .filter((p) => p.role !== "OBSERVER")
+                    .map((p) => p.employeeId),
+                },
+                role: { not: "OBSERVER" },
               },
             },
           },
@@ -302,6 +310,7 @@ const completeInterview = async (interviewId, data) => {
     });
   });
 };
+
 const cancelInterview = async (interviewId, data) => {
   const { cancelledById, reason } = data;
 
@@ -370,6 +379,7 @@ const cancelInterview = async (interviewId, data) => {
     });
   });
 };
+
 const rescheduleInterview = async (interviewId, data) => {
   const { rescheduledById, startTime, endTime, reason } = data;
 
@@ -395,131 +405,138 @@ const rescheduleInterview = async (interviewId, data) => {
     throw error;
   }
 
-  return prisma.$transaction(
-    async (tx) => {
-      const interview = await tx.interview.findUnique({
-        where: { interviewId },
-        include: { participants: true },
-      });
-
-      if (!interview) {
-        const error = new Error("Interview not found");
-        error.statusCode = 404;
-        throw error;
-      }
-
-      if (interview.status !== "SCHEDULED") {
-        const error = new Error("Only scheduled interviews can be rescheduled");
-        error.statusCode = 409;
-        throw error;
-      }
-
-      const participant = interview.participants.find(
-        (item) =>
-          item.employeeId === rescheduledById && item.role !== "OBSERVER",
-      );
-
-      if (!participant) {
-        const error = new Error(
-          "Only assigned interviewers can reschedule this interview",
-        );
-        error.statusCode = 403;
-        throw error;
-      }
-
-      for (const item of interview.participants) {
-        if (item.role === "OBSERVER") continue;
-
-        const available = await tx.availability.findFirst({
-          where: {
-            interviewerId: item.employeeId,
-            status: "AVAILABLE",
-            startTime: { lte: newStart },
-            endTime: { gte: newEnd },
-          },
+  try {
+    return await prisma.$transaction(
+      async (tx) => {
+        const interview = await tx.interview.findUnique({
+          where: { interviewId },
+          include: { participants: true },
         });
 
-        if (!available) {
+        if (!interview) {
+          const error = new Error("Interview not found");
+          error.statusCode = 404;
+          throw error;
+        }
+
+        if (interview.status !== "SCHEDULED") {
           const error = new Error(
-            `Interviewer ${item.employeeId} is not available at the requested time`,
+            "Only scheduled interviews can be rescheduled",
           );
           error.statusCode = 409;
           throw error;
         }
-      }
 
-      const conflict = await tx.interview.findFirst({
-        where: {
-          interviewId: { not: interviewId },
-          status: "SCHEDULED",
-          startTime: { lt: newEnd },
-          endTime: { gt: newStart },
-          participants: {
-            some: {
-              employeeId: {
-                in: interview.participants
-                  .filter((item) => item.role !== "OBSERVER")
-                  .map((item) => item.employeeId),
+        const participant = interview.participants.find(
+          (item) =>
+            item.employeeId === rescheduledById && item.role !== "OBSERVER",
+        );
+
+        if (!participant) {
+          const error = new Error(
+            "Only assigned interviewers can reschedule this interview",
+          );
+          error.statusCode = 403;
+          throw error;
+        }
+
+        const activeParticipants = interview.participants.filter(
+          (item) => item.role !== "OBSERVER",
+        );
+
+        for (const item of activeParticipants) {
+          const available = await tx.availability.findFirst({
+            where: {
+              interviewerId: item.employeeId,
+              status: "AVAILABLE",
+              startTime: { lte: newStart },
+              endTime: { gte: newEnd },
+            },
+          });
+
+          if (!available) {
+            const error = new Error(
+              `Interviewer ${item.employeeId} is not available at the requested time`,
+            );
+            error.statusCode = 409;
+            throw error;
+          }
+        }
+
+        const conflict = await tx.interview.findFirst({
+          where: {
+            interviewId: { not: interviewId },
+            status: "SCHEDULED",
+            startTime: { lt: newEnd },
+            endTime: { gt: newStart },
+            participants: {
+              some: {
+                employeeId: {
+                  in: activeParticipants.map((item) => item.employeeId),
+                },
+                role: { not: "OBSERVER" },
               },
             },
           },
-        },
-      });
+        });
 
-      if (conflict) {
-        const error = new Error(
-          "An interviewer already has another interview at this time",
-        );
-        error.statusCode = 409;
-        throw error;
-      }
+        if (conflict) {
+          const error = new Error(
+            "An interviewer already has another interview at this time",
+          );
+          error.statusCode = 409;
+          throw error;
+        }
 
-      await tx.interview.update({
-        where: { interviewId },
-        data: {
-          startTime: newStart,
-          endTime: newEnd,
-        },
-      });
-
-      await tx.auditLog.create({
-        data: {
-          actorId: rescheduledById,
-          action: "INTERVIEW_RESCHEDULED",
-          entityType: "Interview",
-          entityId: interviewId,
-          details: {
-            reason: reason.trim(),
-            previousStartTime: interview.startTime,
-            previousEndTime: interview.endTime,
-            newStartTime: newStart,
-            newEndTime: newEnd,
+        await tx.interview.update({
+          where: { interviewId },
+          data: {
+            startTime: newStart,
+            endTime: newEnd,
           },
-        },
-      });
+        });
 
-      return tx.interview.findUnique({
-        where: { interviewId },
-        include: { participants: true, application: true },
-      });
-    },
-    { isolationLevel: "Serializable" },
-  );
+        await tx.auditLog.create({
+          data: {
+            actorId: rescheduledById,
+            action: "INTERVIEW_RESCHEDULED",
+            entityType: "Interview",
+            entityId: interviewId,
+            details: {
+              reason: reason.trim(),
+              previousStartTime: interview.startTime,
+              previousEndTime: interview.endTime,
+              newStartTime: newStart,
+              newEndTime: newEnd,
+            },
+          },
+        });
+
+        return tx.interview.findUnique({
+          where: { interviewId },
+          include: { participants: true, application: true },
+        });
+      },
+      { isolationLevel: "Serializable" },
+    );
+  } catch (error) {
+    if (error.code === "P2034") {
+      const conflictError = new Error(
+        "Scheduling conflict detected. Please retry.",
+      );
+      conflictError.statusCode = 409;
+      throw conflictError;
+    }
+    throw error;
+  }
 };
+
 const getAllInterviews = async (filters = {}) => {
   const where = {};
 
-  if (filters.status) {
-    where.status = filters.status;
-  }
-
-  if (filters.interviewType) {
-    where.interviewType = filters.interviewType;
-  }
-
-  if (filters.applicationId) {
-    where.applicationId = filters.applicationId;
-  }
+  if (filters.status) where.status = filters.status;
+  if (filters.interviewType) where.interviewType = filters.interviewType;
+  if (filters.applicationId) where.applicationId = filters.applicationId;
 
   return prisma.interview.findMany({
     where,
@@ -543,4 +560,11 @@ const getAllInterviews = async (filters = {}) => {
     },
   });
 };
-module.exports = { createInterview, completeInterview, cancelInterview, rescheduleInterview, getAllInterviews };
+
+module.exports = {
+  createInterview,
+  completeInterview,
+  cancelInterview,
+  rescheduleInterview,
+  getAllInterviews,
+};
