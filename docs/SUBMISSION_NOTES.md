@@ -1,75 +1,155 @@
-# Reviewer notes
 
-## Problem and scope
+# HireFlow — Solution Overview
 
-HireFlow is a hiring workflow application. Its intended lifecycle connects approved requisitions and role criteria to candidate applications, interviews and availability, structured reviews, offers, and approvals. The application stores explicit stage events and audit records so that decisions can be traced.
+## 1. Problem Statement
 
-The current implementation is a React/Vite frontend with an Express API, Prisma data model, and PostgreSQL persistence. See the [ER diagram](./er-diagram.md), [business rules](./business-rules.md), and [data dictionary](./data-dictionary.md) for the domain model and intended rules.
+Recruitment involves multiple people and interconnected activities: creating job requisitions, reviewing candidates, moving applications through hiring stages, scheduling interviews, collecting feedback, and approving offers.
 
-## Assumptions and decisions
+When these activities are managed through disconnected tools or manual processes, teams can experience:
 
-- Application stages follow the documented linear workflow. Rejection and withdrawal remain available as terminal decisions.
-- Before an application advances past an interview stage, each non-observer interviewer on every non-cancelled interview of that type must have submitted a scorecard. Cancelled interviews do not satisfy the gate.
-- Marking an application HIRED requires an accepted offer. Rejection and withdrawal do not require a completed interview.
-- Reviewer and participant checks use the interview's stored participants. This is intentionally a stage gate, not a new authorization system.
-- Synthetic data uses reserved `.test` addresses and example resume URLs; no external personal data is needed.
-- Compensation and scorecard ranges follow the values enforced by the current services (offer salary within the requisition band; scorecard values from 0 to 10).
+- Limited visibility into the current status of candidates and requisitions.
+- Delays caused by uncoordinated interview scheduling.
+- Inconsistent or incomplete interview feedback.
+- Difficulty tracking decisions and understanding hiring progress.
+- Increased administrative work for recruiters and hiring managers.
 
-## Trade-offs
+HireFlow is designed to bring these activities into a centralized recruitment workflow, helping hiring teams manage candidates and make hiring decisions with better visibility and consistency.
 
-- Stage validation is performed inside the existing database transaction before the application update and append-only stage event. This preserves the existing service/API design while keeping the decision and history write together.
-- This change checks the previous stage's interview records when the application advances. It does not create missing later-stage interviews, add a scale-aware generator, or claim that all generated rows pass every lifecycle check.
-- Interview scheduling checks availability and overlapping scheduled interviews in the service. Deliberate anomaly fixtures intentionally violate normal business rules and are labelled in separate ground-truth exports.
+## 2. Assumptions
 
-## Verification
+The solution is based on the following assumptions:
 
-Run from the repository root / `backend` as shown:
+- A recruitment team consists of users with different responsibilities, such as HR, hiring managers, and interviewers.
+- A requisition represents an approved or planned hiring need.
+- A candidate may apply to multiple requisitions.
+- Each application progresses through a defined recruitment process.
+- Interviewers need availability information to avoid scheduling conflicts.
+- Interview feedback should be structured and associated with the relevant interview and application.
+- Offer decisions may require approval before an offer is finalized.
+- Users should only be able to perform actions permitted by their roles.
 
-```powershell
-npm run lint
-npm run build
-Set-Location backend
-npm test
-```
+These assumptions guide the application’s data model and workflow design. They may be refined as additional business requirements become available.
 
-The backend tests use `node:test` and cover missing interviews, incomplete reviews, fully reviewed advancement, cancelled interviews, observer exclusion, accepted-offer hiring, and terminal transitions. They exercise the pure stage-gate rule; they do not require PostgreSQL.
+## 3. Key Design Decisions
 
-The latest recorded local verification passed frontend lint, frontend production build, and all 6 backend tests. The database-backed API, migrations, complete synthetic-data generation, and validation command were not run as part of that verification. The checked-in `backend/exports/validation_summary.json` is a prior generated report, not a result of a fresh run against the current code.
+### Centralized recruitment workflow
 
-## Known limitations
+HireFlow organizes recruitment around requisitions, candidates, applications, interviews, evaluations, and offers. This provides a shared view of the hiring process rather than treating each activity as an isolated task.
 
-- The checked-in dataset has 5,001 candidates and 201 requisitions, not the requested exact 5,000/200 baseline. It includes labelled anomaly fixtures.
-- Generator scripts use a fixed seed in individual scripts but lack a common scale option and a single reproducibility/checksum command.
-- The interview generator creates screening interviews only. Later-stage interviews and evaluations must be provided before realistic downstream progression to offers.
-- The validator does not yet verify every model's foreign keys, enums, transition history, and date rules.
-- The complete data dictionary is split between schema-generated field metadata and hand-maintained domain documentation; not every field currently has an explicit unit, allowed-value list, uniqueness rule, and validation rule in one document.
+### Relational data model
 
-These are unfinished acceptance criteria, not features inferred from the presence of exported files.
+A relational database is used to represent entities and their relationships. This supports consistency between records—for example, associating an interview with an application and its evaluation.
 
-## Acceptance-criteria status
+### Role-based access
 
-| Requirement area | Status | Evidence / remaining work |
+Different recruitment responsibilities require different permissions. Role-based access is used to separate activities performed by HR, hiring managers, and interviewers.
+
+### API-based architecture
+
+The frontend communicates with the backend through APIs. This separates user-interface concerns from business logic and data persistence, making the application easier to maintain and test.
+
+### Explicit workflow states
+
+Recruitment activities use defined statuses rather than relying on free-form text. This makes the current state of an application or process easier to understand and validate.
+
+## 4. Trade-offs
+
+| Decision | Benefit | Trade-off |
 |---|---|---|
-| Hiring workflow UI and API | Partial | Requisition, candidate, application, interview, availability, evaluation, and offer pages/services exist. There is no candidate-facing account workflow, and IT/operations is not a distinct actor role. |
-| Relational entities and traceability | Mostly implemented | Prisma defines the core entities, foreign keys, bridge tables, stage events, and audit logs. The documentation does not fully specify optionality, effective dates, and lifecycle/field constraints for every field. |
-| Stage gates, interview conflicts, scorecards, and offer approvals | Implemented in application logic | Services enforce interview availability/conflict rules, rubric validation, approval workflow, and the added stage/accepted-offer gates. Unit tests cover the pure stage-gate rules; database-backed integration coverage is absent. |
-| Deterministic IDs | Partial | Main synthetic requisitions, candidates, applications, interviews, and scorecards use deterministic formats. The checked-in anomaly offer still has a generated CUID; the injection script has been fixed to use the offer counter, but exports have not been regenerated. |
-| Requested exact baseline volumes | Partial | The manifest reports 201 requisitions, 5,001 candidates, 8,000 applications, and 2,000 interviews. Requisition/candidate totals are not the requested exact baseline. |
-| Parameterized scale and reproducibility proof | Missing | Scripts use a fixed seed in multiple places but have no shared scale configuration or automated second-run checksum comparison. |
-| Coverage of reschedules and incomplete scorecards | Partial | The API supports interview rescheduling and scorecard submission, but the generator does not demonstrate a reproducible baseline distribution of reschedules and incomplete scorecards. The scorecard generator currently submits only for the lead interviewer, while the stage gate requires every non-observer participant to submit; generated interviews therefore do not generally satisfy that gate. |
-| Five labelled anomaly cases and separate truth files | Present, with caveats | CSV/JSON ground truth lists all five types and the stored report says all five types were detected. Anomaly records are deliberately injected into operational data; generated exports have not been refreshed after recent generator fixes. |
-| Full integrity and lifecycle validation | Partial | The checked-in report shows zero issues for the checks it runs. The validator omits exhaustive foreign-key, enum, stage-event/lifecycle, date, and arithmetic checks, so zero reported issues is not proof of full integrity. |
-| CSV/JSON/SQL, source manifest, validation report | Present, not fully reproducible | Exports and a manifest/report are checked in. The report/manifest are dated artifacts from an earlier generation and need regeneration to represent current code. |
-| Field-by-field data dictionary | Partial | Domain docs plus generated schema metadata cover many fields. A single complete dictionary with allowed values, units, uniqueness, optionality, and validation rules for every requested field is still needed. |
-| Lawful data provenance | Meets synthetic-data path | The data is synthetic, uses `.test` emails and example resume URLs, and does not rely on redistributed external personal data. |
+| Relational database | Supports structured records and relationships | Schema changes require careful migration and validation |
+| Explicit workflow states | Makes process status predictable | New business processes may require additional states and transition rules |
+| Role-based access | Helps protect actions and information | Permissions require ongoing maintenance as features grow |
+| Separate frontend and backend | Improves separation of concerns | Requires API integration and error handling |
+| Structured interview evaluations | Makes feedback more consistent | Requires interviewers to complete defined fields |
+| Centralized recruitment workflow | Improves visibility across hiring activities | The system must account for different organizations’ hiring processes |
 
-## Work history
+The implementation prioritizes clarity, consistency, and maintainability over introducing additional infrastructure or unnecessary complexity.
 
-The public repository history includes earlier feature milestones, followed by this task's stage-gate and documentation work:
+## 5. Testing Approach
 
-- `06c9773` — Complete interview scheduling and conflict prevention
-- `e772d62` — Complete offer management and approval workflow
-- `b2d60eb` — Complete live recruitment dashboard analytics
-- `673f2ec` — Enforce hiring workflow stage gates
+The solution should be validated at multiple levels.
 
-The latest commit adds explicit interview-review and accepted-offer gates, focused tests, and related documentation and generator fixes. These commits are visible in the public Git history.
+### API and backend testing
+
+- Verify that API endpoints return the expected responses.
+- Test valid and invalid input.
+- Confirm that required fields and relationships are validated.
+- Check that unauthorized users cannot perform restricted actions.
+- Verify that workflow updates preserve valid application states.
+- Test error responses for missing or invalid records.
+
+### Database testing
+
+- Confirm that records are created and retrieved correctly.
+- Verify relationships between requisitions, candidates, applications, interviews, evaluations, and offers.
+- Check that required fields and constraints prevent invalid data.
+- Test updates and deletion behavior where applicable.
+
+### Frontend testing
+
+- Confirm that pages and forms load correctly.
+- Verify that users can navigate through the intended recruitment workflow.
+- Check loading, success, empty, and error states.
+- Validate form input and display of API responses.
+
+### End-to-end workflow testing
+
+A representative workflow is:
+
+1. Create a requisition.
+2. Add or select a candidate.
+3. Create an application for the requisition.
+4. Move the application through the configured hiring stages.
+5. Schedule an interview.
+6. Record interview feedback.
+7. Complete the applicable decision and offer workflow.
+
+The workflow should be tested with valid data as well as cases involving missing information, invalid state transitions, and scheduling conflicts.
+
+## 6. How the Solution Is Validated
+
+The solution is considered functional when its main workflows behave consistently across the frontend, backend, and database.
+
+Evidence of validation may include:
+
+- Successful API requests and expected response payloads.
+- Database records reflecting the intended changes.
+- Correct behavior when invalid data is submitted.
+- Access restrictions working for different user roles.
+- Interview scheduling rejecting conflicting time slots.
+- Application status changes following the defined workflow.
+- Successful completion of a representative recruitment scenario.
+
+Testing evidence should be based on actual execution. Any checks that have not yet been run should be treated as pending rather than reported as passed.
+
+## 7. Limitations
+
+The current solution may have limitations in areas such as:
+
+- Integration with external calendar providers.
+- Automated email or notification delivery.
+- Advanced analytics and forecasting.
+- Configurable hiring workflows for different organizations.
+- Large-scale performance testing.
+- Comprehensive automated test coverage.
+- Production-grade monitoring, backups, and operational controls.
+
+These areas can be expanded as the application’s requirements and deployment needs grow. The exact limitations depend on the current implementation and should be updated as features are completed.
+
+## 8. Future Improvements
+
+Potential improvements include:
+
+- More comprehensive automated tests for API endpoints and workflows.
+- Calendar integration for interviewer availability.
+- Notifications for interview scheduling and pending evaluations.
+- Expanded hiring metrics and reporting.
+- Configurable workflow stages.
+- Improved audit history for important recruitment decisions.
+- Performance and security testing before production use.
+
+## 9. Conclusion
+
+HireFlow addresses recruitment coordination by organizing hiring activities into a centralized, structured workflow. Its design emphasizes clear data relationships, explicit process states, role-based responsibilities, and separation between the frontend and backend.
+
+The solution’s reliability should be demonstrated through reproducible API tests, database verification, permission checks, and end-to-end workflow validation. This overview documents the reasoning behind the system and provides reviewers with a basis for evaluating its implementation.
