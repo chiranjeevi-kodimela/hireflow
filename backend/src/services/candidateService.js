@@ -1,5 +1,5 @@
 const prisma = require("../config/database");
-
+const { generateId } = require("../utils/idGenerator");
 const createCandidate = async (data) => {
   const {
     fullName,
@@ -59,7 +59,7 @@ const createCandidate = async (data) => {
   try {
     return await prisma.candidate.create({
       data: {
-        candidateId: `CAND-${Date.now()}`,
+        candidateId: await generateId("candidate", "CAND"),
         fullName: fullName.trim(),
         email: normalizedEmail,
         phone: phone?.trim() || null,

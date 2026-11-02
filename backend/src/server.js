@@ -30,7 +30,7 @@ app.get("/api/health", async (req, res, next) => {
 });
 app.use("/api/requisitions", requisitionRoutes);
 app.use("/api/candidates", candidateRoutes);
-app.use("/api/requisitions", requisitionRoutes);
+
 // Handle unknown routes
 app.use(notFound);
 

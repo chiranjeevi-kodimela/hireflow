@@ -1,4 +1,4 @@
-const { randomUUID } = require("crypto");
+const { generateId } = require("../utils/idGenerator");
 const prisma = require("../config/database");
 
 const createRequisition = async (data) => {
@@ -73,7 +73,7 @@ const createRequisition = async (data) => {
 
   return prisma.requisition.create({
     data: {
-      requisitionId: randomUUID(),
+      requisitionId: await generateId("requisition", "REQ", 2026),
       title: title.trim(),
       department: department.trim(),
       location: location.trim(),

@@ -458,3 +458,12 @@ model AuditLog {
   @@index([entityType, entityId])
   @@index([createdAt])
 }
+// -------------------------
+// DETERMINISTIC ID COUNTERS
+// -------------------------
+
+model IdCounter {
+  name      String   @id
+  value     Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
