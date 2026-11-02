@@ -9,7 +9,13 @@ async function request(endpoint, options = {}) {
     },
   });
 
-  const result = await response.json();
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("The server returned an invalid response.");
+  }
 
   if (!response.ok || !result.success) {
     throw new Error(result.message || "Request failed");
@@ -39,21 +45,21 @@ export async function createInterview(payload) {
 }
 
 export async function completeInterview(id, payload) {
-  return request(`/interviews/${id}/complete`, {
+  return request(`/interviews/${encodeURIComponent(id)}/complete`, {
     method: "PATCH",
     body: JSON.stringify(payload),
   });
 }
 
 export async function cancelInterview(id, payload) {
-  return request(`/interviews/${id}/cancel`, {
+  return request(`/interviews/${encodeURIComponent(id)}/cancel`, {
     method: "PATCH",
     body: JSON.stringify(payload),
   });
 }
 
 export async function rescheduleInterview(id, payload) {
-  return request(`/interviews/${id}/reschedule`, {
+  return request(`/interviews/${encodeURIComponent(id)}/reschedule`, {
     method: "PATCH",
     body: JSON.stringify(payload),
   });
