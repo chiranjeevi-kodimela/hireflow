@@ -7,6 +7,7 @@ const prisma = require("./config/database");
 const applicationRoutes = require("./routes/applicationRoutes");
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
+const interviewRoutes = require("./routes/interviewRoutes");
 const availabilityRoutes = require("./routes/availabilityRoutes");
 const applicationStageRoutes = require("./routes/applicationStageRoutes");
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/candidates", candidateRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/applications", applicationStageRoutes);
 app.use("/api/availability", availabilityRoutes);
+app.use("/api/interviews", interviewRoutes);
 // Handle unknown routes
 app.use(notFound);
 
