@@ -1,0 +1,113 @@
+.analytics-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.analytics-page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.analytics-page-heading h1 {
+  margin-top: 7px;
+  font-family: "Manrope", sans-serif;
+  font-size: 25px;
+}
+
+.analytics-page-heading p {
+  margin-top: 7px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.analytics-page-heading .analytics-live-label {
+  padding-bottom: 4px;
+}
+
+.analytics-page-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.analytics-page-metric-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-text-secondary);
+}
+
+.analytics-page-metric-label svg {
+  color: var(--color-brand);
+}
+
+.analytics-page-outcomes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 23px 16px;
+}
+
+.analytics-page-outcomes > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.analytics-page-outcomes span,
+.analytics-page-outcomes small {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.analytics-page-outcomes strong {
+  font-family: "Manrope", sans-serif;
+  font-size: 23px;
+}
+
+.analytics-page-note,
+.analytics-page-empty {
+  margin-top: 18px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.analytics-page-state {
+  padding: 28px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.analytics-page-error {
+  color: var(--color-danger);
+}
+
+.analytics-page-error button {
+  margin-top: 12px;
+  padding: 8px 12px;
+  color: #fff;
+  background: var(--color-brand);
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 1000px) {
+  .analytics-page-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .analytics-page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .analytics-page-metrics {
+    gap: 9px;
+  }
+}

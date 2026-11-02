@@ -1,13 +1,28 @@
 
 import './Topbar.css';
+import { useLocation } from 'react-router-dom';
+
+const pageTitles = {
+    '/': 'Overview',
+    '/jobs': 'Jobs',
+    '/candidates': 'Candidates',
+    '/interviews': 'Interviews',
+    '/availability': 'Availability',
+    '/applications': 'Applications',
+    '/analytics': 'Analytics',
+    '/evaluations': 'Evaluations',
+    '/offers': 'Offers',
+};
 
 function Topbar() {
+    const { pathname } = useLocation();
+
     return (
         <header className="topbar">
             <div className="breadcrumb">
                 <span>Workspace</span>
                 <span className="breadcrumb-separator">/</span>
-                <strong>Overview</strong>
+                <strong>{pageTitles[pathname] || 'Overview'}</strong>
             </div>
 
             <div className="topbar-actions">

@@ -9,6 +9,7 @@ import Interviews from './pages/Interviews';
 import Availability from "./pages/Availability";
 import Evaluations from "./pages/Evaluations";
 import Offers from "./pages/Offers";
+import Analytics from "./pages/Analytics";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/evaluations" element={<Evaluations />} />
           <Route path="/offers" element={<Offers />} />
           <Route path="/applications" element={<Applications />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Routes>
       </MainLayout>
     </BrowserRouter>
