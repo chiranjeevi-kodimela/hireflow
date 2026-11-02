@@ -46,6 +46,23 @@ The latest recorded local verification passed frontend lint, frontend production
 
 These are unfinished acceptance criteria, not features inferred from the presence of exported files.
 
+## Acceptance-criteria status
+
+| Requirement area | Status | Evidence / remaining work |
+|---|---|---|
+| Hiring workflow UI and API | Partial | Requisition, candidate, application, interview, availability, evaluation, and offer pages/services exist. There is no candidate-facing account workflow, and IT/operations is not a distinct actor role. |
+| Relational entities and traceability | Mostly implemented | Prisma defines the core entities, foreign keys, bridge tables, stage events, and audit logs. The documentation does not fully specify optionality, effective dates, and lifecycle/field constraints for every field. |
+| Stage gates, interview conflicts, scorecards, and offer approvals | Implemented in application logic | Services enforce interview availability/conflict rules, rubric validation, approval workflow, and the added stage/accepted-offer gates. Unit tests cover the pure stage-gate rules; database-backed integration coverage is absent. |
+| Deterministic IDs | Partial | Main synthetic requisitions, candidates, applications, interviews, and scorecards use deterministic formats. The checked-in anomaly offer still has a generated CUID; the injection script has been fixed to use the offer counter, but exports have not been regenerated. |
+| Requested exact baseline volumes | Partial | The manifest reports 201 requisitions, 5,001 candidates, 8,000 applications, and 2,000 interviews. Requisition/candidate totals are not the requested exact baseline. |
+| Parameterized scale and reproducibility proof | Missing | Scripts use a fixed seed in multiple places but have no shared scale configuration or automated second-run checksum comparison. |
+| Coverage of reschedules and incomplete scorecards | Partial | The API supports interview rescheduling and scorecard submission, but the generator does not demonstrate a reproducible baseline distribution of reschedules and incomplete scorecards. The scorecard generator currently submits only for the lead interviewer, while the stage gate requires every non-observer participant to submit; generated interviews therefore do not generally satisfy that gate. |
+| Five labelled anomaly cases and separate truth files | Present, with caveats | CSV/JSON ground truth lists all five types and the stored report says all five types were detected. Anomaly records are deliberately injected into operational data; generated exports have not been refreshed after recent generator fixes. |
+| Full integrity and lifecycle validation | Partial | The checked-in report shows zero issues for the checks it runs. The validator omits exhaustive foreign-key, enum, stage-event/lifecycle, date, and arithmetic checks, so zero reported issues is not proof of full integrity. |
+| CSV/JSON/SQL, source manifest, validation report | Present, not fully reproducible | Exports and a manifest/report are checked in. The report/manifest are dated artifacts from an earlier generation and need regeneration to represent current code. |
+| Field-by-field data dictionary | Partial | Domain docs plus generated schema metadata cover many fields. A single complete dictionary with allowed values, units, uniqueness, optionality, and validation rules for every requested field is still needed. |
+| Lawful data provenance | Meets synthetic-data path | The data is synthetic, uses `.test` emails and example resume URLs, and does not rely on redistributed external personal data. |
+
 ## Work history
 
 The public repository history includes earlier feature milestones, followed by this task's stage-gate and documentation work:
