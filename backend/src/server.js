@@ -11,6 +11,7 @@ const interviewRoutes = require("./routes/interviewRoutes");
 const scorecardRoutes = require("./routes/scorecardRoutes");
 const offerRoutes = require("./routes/offerRoutes");
 const approvalRoutes = require("./routes/approvalRoutes");
+const requisitionApprovalRoutes = require("./routes/requisitionApprovalRoutes");
 const availabilityRoutes = require("./routes/availabilityRoutes");
 const applicationStageRoutes = require("./routes/applicationStageRoutes");
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/interviews", interviewRoutes);
 app.use("/api/scorecards", scorecardRoutes);
 app.use("/api/offers", offerRoutes);
 app.use("/api/approvals", approvalRoutes);
+app.use("/api/requisition-approvals", requisitionApprovalRoutes);
 // Handle unknown routes
 app.use(notFound);
 

@@ -3,14 +3,8 @@ const prisma = require("../config/database");
 const decideApproval = async (approvalId, data) => {
   const { approverId, decision, comments } = data;
 
-  if (
-    !approvalId ||
-    !approverId ||
-    !["APPROVED", "REJECTED"].includes(decision)
-  ) {
-    const error = new Error(
-      "Valid approval ID, approver ID and decision are required",
-    );
+  if (!approverId || !["APPROVED", "REJECTED"].includes(decision)) {
+    const error = new Error("Valid approver ID and decision are required");
     error.statusCode = 400;
     throw error;
   }
@@ -18,11 +12,10 @@ const decideApproval = async (approvalId, data) => {
   return prisma.$transaction(async (tx) => {
     const approval = await tx.approval.findUnique({
       where: { approvalId },
-      include: { offer: true },
     });
 
-    if (!approval || approval.approvalType !== "OFFER" || !approval.offer) {
-      const error = new Error("Offer approval not found");
+    if (!approval) {
+      const error = new Error("Approval not found");
       error.statusCode = 404;
       throw error;
     }
@@ -34,18 +27,12 @@ const decideApproval = async (approvalId, data) => {
     }
 
     if (approval.status !== "PENDING") {
-      const error = new Error("This approval has already been decided");
+      const error = new Error("Approval has already been decided");
       error.statusCode = 409;
       throw error;
     }
 
-    if (approval.offer.status !== "PENDING_APPROVAL") {
-      const error = new Error("Offer is no longer awaiting approval");
-      error.statusCode = 409;
-      throw error;
-    }
-
-    const result = await tx.approval.updateMany({
+    const update = await tx.approval.updateMany({
       where: { approvalId, status: "PENDING" },
       data: {
         status: decision,
@@ -54,57 +41,125 @@ const decideApproval = async (approvalId, data) => {
       },
     });
 
-    if (result.count !== 1) {
+    if (update.count !== 1) {
       const error = new Error("Approval was already updated");
       error.statusCode = 409;
       throw error;
     }
 
-    if (decision === "REJECTED") {
-      await tx.approval.updateMany({
-        where: {
-          offerId: approval.offerId,
-          status: "PENDING",
-        },
-        data: {
-          status: "REJECTED",
-          comments: "Offer rejected by another approver",
-          decidedAt: new Date(),
-        },
+    let entityId;
+    let newStatus;
+
+    if (approval.approvalType === "OFFER" && approval.offerId) {
+      entityId = approval.offerId;
+
+      const offer = await tx.offer.findUnique({
+        where: { offerId: entityId },
       });
 
-      await tx.offer.update({
-        where: { offerId: approval.offerId },
-        data: { status: "REJECTED" },
-      });
-    } else {
-      const pendingCount = await tx.approval.count({
-        where: {
-          offerId: approval.offerId,
-          status: "PENDING",
-        },
-      });
+      if (!offer || offer.status !== "PENDING_APPROVAL") {
+        const error = new Error("Offer is not awaiting approval");
+        error.statusCode = 409;
+        throw error;
+      }
 
-      if (pendingCount === 0) {
+      if (decision === "REJECTED") {
+        await tx.approval.updateMany({
+          where: { offerId: entityId, status: "PENDING" },
+          data: {
+            status: "REJECTED",
+            comments: "Offer rejected by another approver",
+            decidedAt: new Date(),
+          },
+        });
+
+        newStatus = "REJECTED";
+      } else {
+        const pending = await tx.approval.count({
+          where: { offerId: entityId, status: "PENDING" },
+        });
+
+        newStatus = pending === 0 ? "APPROVED" : "PENDING_APPROVAL";
+      }
+
+      if (newStatus !== "PENDING_APPROVAL") {
         await tx.offer.update({
-          where: { offerId: approval.offerId },
-          data: { status: "APPROVED" },
+          where: { offerId: entityId },
+          data: { status: newStatus },
         });
       }
+    } else if (
+      approval.approvalType === "REQUISITION" &&
+      approval.requisitionId
+    ) {
+      entityId = approval.requisitionId;
+
+      const requisition = await tx.requisition.findUnique({
+        where: { requisitionId: entityId },
+      });
+
+      if (!requisition || requisition.status !== "PENDING_APPROVAL") {
+        const error = new Error("Requisition is not awaiting approval");
+        error.statusCode = 409;
+        throw error;
+      }
+
+      if (decision === "REJECTED") {
+        await tx.approval.updateMany({
+          where: {
+            requisitionId: entityId,
+            status: "PENDING",
+          },
+          data: {
+            status: "REJECTED",
+            comments: "Requisition rejected by another approver",
+            decidedAt: new Date(),
+          },
+        });
+
+        newStatus = "DRAFT";
+      } else {
+        const pending = await tx.approval.count({
+          where: {
+            requisitionId: entityId,
+            status: "PENDING",
+          },
+        });
+
+        newStatus = pending === 0 ? "OPEN" : "PENDING_APPROVAL";
+      }
+
+      if (newStatus !== "PENDING_APPROVAL") {
+        await tx.requisition.update({
+          where: { requisitionId: entityId },
+          data: { status: newStatus },
+        });
+      }
+    } else {
+      const error = new Error("Unsupported approval type");
+      error.statusCode = 400;
+      throw error;
     }
 
     await tx.auditLog.create({
       data: {
         actorId: approverId,
-        action: `OFFER_${decision}`,
-        entityType: "Offer",
-        entityId: approval.offerId,
-        details: { approvalId, decision, comments: comments || null },
+        action: `${approval.approvalType}_${decision}`,
+        entityType: approval.approvalType === "OFFER" ? "Offer" : "Requisition",
+        entityId,
+        details: { approvalId, decision, newStatus },
       },
     });
 
-    return tx.offer.findUnique({
-      where: { offerId: approval.offerId },
+    if (approval.approvalType === "OFFER") {
+      return tx.offer.findUnique({
+        where: { offerId: entityId },
+        include: { approvals: true },
+      });
+    }
+
+    return tx.requisition.findUnique({
+      where: { requisitionId: entityId },
       include: { approvals: true },
     });
   });
