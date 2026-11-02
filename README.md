@@ -83,6 +83,10 @@ The checked-in validation report currently has no detected integrity issues and 
 
 The five deliberate anomaly labels are recorded separately in `backend/exports/ground_truth.csv` and `backend/exports/ground_truth.json`. See [the business rules](./docs/business-rules.md), [the data dictionary](./docs/data-dictionary.md), [the ER diagram](./docs/er-diagram.md), and [the backend-generated schema dictionary](./backend/docs/DATA_DICTIONARY.md) for workflow, relationships, and data details.
 
+## Submission context
+
+See [reviewer notes](./docs/SUBMISSION_NOTES.md) for assumptions, implementation decisions, trade-offs, verification evidence, work history, and known limitations. See [AI usage and prompt history](./docs/AI_USAGE.md) for the prompt summary, disclosure of AI assistance, and what was validated.
+
 ## Data provenance
 
 The checked-in dataset is synthetic and uses reserved `.test` email addresses and example resume URLs. No external candidate or employee data is required to run the application.
