@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     getCompletedInterviews,
     getEvaluationCriteria,
@@ -12,17 +12,23 @@ function Evaluations() {
     const [selectedInterviewId, setSelectedInterviewId] = useState("");
     const [criteria, setCriteria] = useState([]);
     const [reviewerId, setReviewerId] = useState("");
+
     const [technicalScore, setTechnicalScore] = useState(5);
     const [communicationScore, setCommunicationScore] = useState(5);
     const [problemSolvingScore, setProblemSolvingScore] = useState(5);
+
     const [items, setItems] = useState({});
     const [comments, setComments] = useState("");
+
     const [loading, setLoading] = useState(true);
     const [criteriaLoading, setCriteriaLoading] = useState(false);
     const [saving, setSaving] = useState(false);
+
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [submittedScorecard, setSubmittedScorecard] = useState(null);
+
+    const criteriaRequestId = useRef(0);
 
     useEffect(() => {
         let ignore = false;
@@ -30,7 +36,10 @@ function Evaluations() {
         const loadInterviews = async () => {
             try {
                 const data = await getCompletedInterviews();
-                if (!ignore) setInterviews(data);
+
+                if (!ignore) {
+                    setInterviews(data || []);
+                }
             } catch (err) {
                 if (!ignore) setError(err.message);
             } finally {
@@ -49,55 +58,85 @@ function Evaluations() {
         (interview) => interview.interviewId === selectedInterviewId
     );
 
-    useEffect(() => {
-        if (!selectedInterview) return;
-
-        let ignore = false;
-
-        const loadCriteria = async () => {
-            setCriteriaLoading(true);
-            setError("");
-            setCriteria([]);
-            setItems({});
-            setReviewerId("");
-
-            try {
-                const requisitionId =
-                    selectedInterview.application?.requisitionId;
-
-                if (!requisitionId) {
-                    throw new Error("Requisition information is missing for this interview.");
-                }
-
-                const data = await getEvaluationCriteria(requisitionId);
-
-                if (!ignore) {
-                    setCriteria(data || []);
-                }
-            } catch (err) {
-                if (!ignore) setError(err.message);
-            } finally {
-                if (!ignore) setCriteriaLoading(false);
-            }
-        };
-
-        loadCriteria();
-
-        return () => {
-            ignore = true;
-        };
-    }, [selectedInterview]);
-
     const participants = (selectedInterview?.participants || []).filter(
         (participant) => participant.role !== "OBSERVER"
     );
+
+    const getCandidateName = (interview) => {
+        const candidate = interview?.application?.candidate;
+
+        return (
+            candidate?.fullName ||
+            candidate?.name ||
+            [candidate?.firstName, candidate?.lastName].filter(Boolean).join(" ") ||
+            "Candidate"
+        );
+    };
+
+    const getParticipantName = (participant) =>
+        participant.employee?.fullName ||
+        participant.employee?.name ||
+        participant.employeeId;
+
+    const handleInterviewChange = async (interviewId) => {
+        const requestId = ++criteriaRequestId.current;
+
+        setSelectedInterviewId(interviewId);
+        setCriteria([]);
+        setItems({});
+        setReviewerId("");
+        setComments("");
+
+        setTechnicalScore(5);
+        setCommunicationScore(5);
+        setProblemSolvingScore(5);
+
+        setError("");
+        setSuccess("");
+        setSubmittedScorecard(null);
+
+        if (!interviewId) {
+            setCriteriaLoading(false);
+            return;
+        }
+
+        const interview = interviews.find(
+            (item) => item.interviewId === interviewId
+        );
+
+        const requisitionId = interview?.application?.requisitionId;
+
+        if (!requisitionId) {
+            setError("Requisition information is missing for this interview.");
+            setCriteriaLoading(false);
+            return;
+        }
+
+        setCriteriaLoading(true);
+
+        try {
+            const data = await getEvaluationCriteria(requisitionId);
+
+            if (requestId === criteriaRequestId.current) {
+                setCriteria(data || []);
+            }
+        } catch (err) {
+            if (requestId === criteriaRequestId.current) {
+                setError(err.message);
+            }
+        } finally {
+            if (requestId === criteriaRequestId.current) {
+                setCriteriaLoading(false);
+            }
+        }
+    };
 
     const handleScoreChange = (criterionId, score) => {
         setItems((previous) => ({
             ...previous,
             [criterionId]: {
+                ...previous[criterionId],
                 score: Number(score),
-                comments: previous[criterionId]?.comments || "",
             },
         }));
     };
@@ -106,7 +145,7 @@ function Evaluations() {
         setItems((previous) => ({
             ...previous,
             [criterionId]: {
-                score: previous[criterionId]?.score ?? 5,
+                ...previous[criterionId],
                 comments: value,
             },
         }));
@@ -114,9 +153,14 @@ function Evaluations() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
         setError("");
         setSuccess("");
-        setSubmittedScorecard(null);
+
+        if (submittedScorecard) {
+            setError("An evaluation has already been submitted for this interview.");
+            return;
+        }
 
         if (!selectedInterviewId || !reviewerId) {
             setError("Select an interview and reviewer.");
@@ -126,12 +170,12 @@ function Evaluations() {
         const missingCriteria = criteria.filter(
             (criterion) =>
                 criterion.isRequired &&
-                items[criterion.criterionId]?.score === undefined
+                typeof items[criterion.criterionId]?.score !== "number"
         );
 
         if (missingCriteria.length > 0) {
             setError(
-                `Complete required criteria: ${missingCriteria
+                `Rate all required criteria: ${missingCriteria
                     .map((criterion) => criterion.name)
                     .join(", ")}`
             );
@@ -139,11 +183,14 @@ function Evaluations() {
         }
 
         const evaluationItems = criteria
-            .filter((criterion) => items[criterion.criterionId])
+            .filter(
+                (criterion) =>
+                    typeof items[criterion.criterionId]?.score === "number"
+            )
             .map((criterion) => ({
                 criterionId: criterion.criterionId,
                 score: items[criterion.criterionId].score,
-                comments: items[criterion.criterionId].comments,
+                comments: items[criterion.criterionId].comments || "",
             }));
 
         if (evaluationItems.length === 0) {
@@ -172,12 +219,6 @@ function Evaluations() {
             setSaving(false);
         }
     };
-
-    const getCandidateName = (interview) =>
-        interview?.application?.candidate?.name || "Candidate";
-
-    const getParticipantName = (participant) =>
-        participant.employee?.name || participant.employeeId;
 
     return (
         <div className="evaluations-page">
@@ -209,11 +250,7 @@ function Evaluations() {
                         <select
                             id="interview"
                             value={selectedInterviewId}
-                            onChange={(event) => {
-                                setSelectedInterviewId(event.target.value);
-                                setSuccess("");
-                                setSubmittedScorecard(null);
-                            }}
+                            onChange={(event) => handleInterviewChange(event.target.value)}
                         >
                             <option value="">Choose an interview</option>
                             {interviews.map((interview) => (
@@ -232,212 +269,213 @@ function Evaluations() {
             </section>
 
             {selectedInterview && (
-                <section className="evaluation-card">
-                    <h2>Interview Details</h2>
+                <>
+                    <section className="evaluation-card">
+                        <h2>Interview Details</h2>
 
-                    <div className="evaluation-details">
-                        <div>
-                            <span>Candidate</span>
-                            <strong>{getCandidateName(selectedInterview)}</strong>
+                        <div className="evaluation-details">
+                            <div>
+                                <span>Candidate</span>
+                                <strong>{getCandidateName(selectedInterview)}</strong>
+                            </div>
+                            <div>
+                                <span>Interview Type</span>
+                                <strong>{selectedInterview.interviewType}</strong>
+                            </div>
+                            <div>
+                                <span>Interview ID</span>
+                                <strong>{selectedInterview.interviewId}</strong>
+                            </div>
                         </div>
-                        <div>
-                            <span>Interview type</span>
-                            <strong>{selectedInterview.interviewType}</strong>
-                        </div>
-                        <div>
-                            <span>Interview ID</span>
-                            <strong>{selectedInterview.interviewId}</strong>
-                        </div>
-                    </div>
-                </section>
-            )}
+                    </section>
 
-            {selectedInterview && (
-                <section className="evaluation-card">
-                    <h2>Structured Scorecard</h2>
-                    <p className="evaluation-subtitle">
-                        Rate each category from 0 to 10 and provide rubric feedback.
-                    </p>
-
-                    {criteriaLoading ? (
-                        <p>Loading evaluation criteria...</p>
-                    ) : criteria.length === 0 ? (
-                        <p className="evaluation-empty">
-                            No active evaluation criteria found for this requisition.
+                    <section className="evaluation-card">
+                        <h2>Structured Scorecard</h2>
+                        <p className="evaluation-subtitle">
+                            Rate each criterion from 0 to 10. Required criteria must be rated.
                         </p>
-                    ) : (
-                        <form onSubmit={handleSubmit}>
-                            <div className="evaluation-form-group">
-                                <label htmlFor="reviewer">Reviewer</label>
-                                <select
-                                    id="reviewer"
-                                    value={reviewerId}
-                                    onChange={(event) => setReviewerId(event.target.value)}
-                                    required
-                                >
-                                    <option value="">Select assigned interviewer</option>
-                                    {participants.map((participant) => (
-                                        <option
-                                            key={participant.employeeId}
-                                            value={participant.employeeId}
-                                        >
-                                            {getParticipantName(participant)}
-                                            {" — "}
-                                            {participant.role}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
 
-                            <h3 className="evaluation-section-title">
-                                Overall Categories
-                            </h3>
-
-                            <div className="category-score-grid">
+                        {criteriaLoading ? (
+                            <p>Loading evaluation criteria...</p>
+                        ) : criteria.length === 0 ? (
+                            <p className="evaluation-empty">
+                                No active evaluation criteria found for this requisition.
+                            </p>
+                        ) : (
+                            <form onSubmit={handleSubmit}>
                                 <div className="evaluation-form-group">
-                                    <label htmlFor="technicalScore">
-                                        Technical Score: {technicalScore}/10
-                                    </label>
-                                    <input
-                                        id="technicalScore"
-                                        type="range"
-                                        min="0"
-                                        max="10"
-                                        step="1"
-                                        value={technicalScore}
-                                        onChange={(event) =>
-                                            setTechnicalScore(event.target.value)
-                                        }
-                                    />
-                                </div>
-
-                                <div className="evaluation-form-group">
-                                    <label htmlFor="communicationScore">
-                                        Communication: {communicationScore}/10
-                                    </label>
-                                    <input
-                                        id="communicationScore"
-                                        type="range"
-                                        min="0"
-                                        max="10"
-                                        step="1"
-                                        value={communicationScore}
-                                        onChange={(event) =>
-                                            setCommunicationScore(event.target.value)
-                                        }
-                                    />
-                                </div>
-
-                                <div className="evaluation-form-group">
-                                    <label htmlFor="problemSolvingScore">
-                                        Problem Solving: {problemSolvingScore}/10
-                                    </label>
-                                    <input
-                                        id="problemSolvingScore"
-                                        type="range"
-                                        min="0"
-                                        max="10"
-                                        step="1"
-                                        value={problemSolvingScore}
-                                        onChange={(event) =>
-                                            setProblemSolvingScore(event.target.value)
-                                        }
-                                    />
-                                </div>
-                            </div>
-
-                            <h3 className="evaluation-section-title">
-                                Evaluation Criteria
-                            </h3>
-
-                            <div className="criteria-list">
-                                {criteria.map((criterion) => (
-                                    <div
-                                        className="criterion-item"
-                                        key={criterion.criterionId}
+                                    <label htmlFor="reviewer">Reviewer</label>
+                                    <select
+                                        id="reviewer"
+                                        value={reviewerId}
+                                        onChange={(event) => setReviewerId(event.target.value)}
+                                        required
                                     >
-                                        <div className="criterion-header">
-                                            <div>
-                                                <strong>{criterion.name}</strong>
-                                                <p>
-                                                    {criterion.description ||
-                                                        "Evaluate the candidate against this criterion."}
-                                                </p>
-                                            </div>
+                                        <option value="">Select assigned interviewer</option>
+                                        {participants.map((participant) => (
+                                            <option
+                                                key={participant.employeeId}
+                                                value={participant.employeeId}
+                                            >
+                                                {getParticipantName(participant)} — {participant.role}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                                            <span className="criterion-weight">
-                                                Weight: {Number(criterion.weight)}
-                                            </span>
-                                        </div>
+                                <h3 className="evaluation-section-title">
+                                    Overall Categories
+                                </h3>
 
-                                        <div className="criterion-controls">
-                                            <label>
-                                                Score:{" "}
-                                                {items[criterion.criterionId]?.score ?? "Not rated"}
-                                                /10
-                                            </label>
-
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max="10"
-                                                step="1"
-                                                value={
-                                                    items[criterion.criterionId]?.score ?? 5
-                                                }
-                                                onChange={(event) =>
-                                                    handleScoreChange(
-                                                        criterion.criterionId,
-                                                        event.target.value
-                                                    )
-                                                }
-                                            />
-
-                                            <input
-                                                type="text"
-                                                placeholder="Optional criterion feedback"
-                                                value={
-                                                    items[criterion.criterionId]?.comments || ""
-                                                }
-                                                onChange={(event) =>
-                                                    handleItemCommentChange(
-                                                        criterion.criterionId,
-                                                        event.target.value
-                                                    )
-                                                }
-                                            />
-                                        </div>
-
-                                        {criterion.isRequired && (
-                                            <span className="required-label">
-                                                Required
-                                            </span>
-                                        )}
+                                <div className="category-score-grid">
+                                    <div className="evaluation-form-group">
+                                        <label htmlFor="technicalScore">
+                                            Technical Score: {technicalScore}/10
+                                        </label>
+                                        <input
+                                            id="technicalScore"
+                                            type="range"
+                                            min="0"
+                                            max="10"
+                                            value={technicalScore}
+                                            onChange={(event) =>
+                                                setTechnicalScore(event.target.value)
+                                            }
+                                        />
                                     </div>
-                                ))}
-                            </div>
 
-                            <div className="evaluation-form-group overall-comments">
-                                <label htmlFor="comments">Overall Feedback</label>
-                                <textarea
-                                    id="comments"
-                                    rows="4"
-                                    value={comments}
-                                    onChange={(event) => setComments(event.target.value)}
-                                    placeholder="Add your overall interview feedback..."
-                                />
-                            </div>
+                                    <div className="evaluation-form-group">
+                                        <label htmlFor="communicationScore">
+                                            Communication: {communicationScore}/10
+                                        </label>
+                                        <input
+                                            id="communicationScore"
+                                            type="range"
+                                            min="0"
+                                            max="10"
+                                            value={communicationScore}
+                                            onChange={(event) =>
+                                                setCommunicationScore(event.target.value)
+                                            }
+                                        />
+                                    </div>
 
-                            <button
-                                type="submit"
-                                className="evaluation-submit"
-                                disabled={saving || criteriaLoading}
-                            >
-                                {saving ? "Submitting..." : "Submit Evaluation"}
-                            </button>
-                        </form>
-                    )}
-                </section>
+                                    <div className="evaluation-form-group">
+                                        <label htmlFor="problemSolvingScore">
+                                            Problem Solving: {problemSolvingScore}/10
+                                        </label>
+                                        <input
+                                            id="problemSolvingScore"
+                                            type="range"
+                                            min="0"
+                                            max="10"
+                                            value={problemSolvingScore}
+                                            onChange={(event) =>
+                                                setProblemSolvingScore(event.target.value)
+                                            }
+                                        />
+                                    </div>
+                                </div>
+
+                                <h3 className="evaluation-section-title">
+                                    Evaluation Criteria
+                                </h3>
+
+                                <div className="criteria-list">
+                                    {criteria.map((criterion) => {
+                                        const item = items[criterion.criterionId];
+                                        const rated = typeof item?.score === "number";
+
+                                        return (
+                                            <div
+                                                className="criterion-item"
+                                                key={criterion.criterionId}
+                                            >
+                                                <div className="criterion-header">
+                                                    <div>
+                                                        <strong>{criterion.name}</strong>
+                                                        <p>
+                                                            {criterion.description ||
+                                                                "Evaluate the candidate against this criterion."}
+                                                        </p>
+                                                    </div>
+
+                                                    <span className="criterion-weight">
+                                                        Weight: {Number(criterion.weight)}
+                                                    </span>
+                                                </div>
+
+                                                <div className="criterion-controls">
+                                                    <label>
+                                                        Score: {rated ? `${item.score}/10` : "Not rated"}
+                                                    </label>
+
+                                                    <input
+                                                        type="range"
+                                                        min="0"
+                                                        max="10"
+                                                        value={rated ? item.score : 5}
+                                                        onChange={(event) =>
+                                                            handleScoreChange(
+                                                                criterion.criterionId,
+                                                                event.target.value
+                                                            )
+                                                        }
+                                                    />
+
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Optional criterion feedback"
+                                                        value={item?.comments || ""}
+                                                        onChange={(event) =>
+                                                            handleItemCommentChange(
+                                                                criterion.criterionId,
+                                                                event.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+
+                                                {criterion.isRequired && (
+                                                    <span className="required-label">
+                                                        Required
+                                                    </span>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="evaluation-form-group overall-comments">
+                                    <label htmlFor="comments">Overall Feedback</label>
+                                    <textarea
+                                        id="comments"
+                                        rows="4"
+                                        value={comments}
+                                        onChange={(event) => setComments(event.target.value)}
+                                        placeholder="Add your overall interview feedback..."
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="evaluation-submit"
+                                    disabled={
+                                        saving ||
+                                        criteriaLoading ||
+                                        Boolean(submittedScorecard)
+                                    }
+                                >
+                                    {saving
+                                        ? "Submitting..."
+                                        : submittedScorecard
+                                            ? "Evaluation Submitted"
+                                            : "Submit Evaluation"}
+                                </button>
+                            </form>
+                        )}
+                    </section>
+                </>
             )}
 
             {submittedScorecard && (
@@ -448,15 +486,17 @@ function Evaluations() {
                         <div>
                             <span>Weighted Score</span>
                             <strong>
-                                {submittedScorecard.weightedScore?.toFixed(2) ?? "—"}/10
+                                {Number(submittedScorecard.weightedScore).toFixed(2)}/10
                             </strong>
                         </div>
+
                         <div>
                             <span>Recommendation</span>
                             <strong>
                                 {submittedScorecard.recommendation?.replaceAll("_", " ")}
                             </strong>
                         </div>
+
                         <div>
                             <span>Scorecard ID</span>
                             <strong>{submittedScorecard.scorecardId}</strong>
