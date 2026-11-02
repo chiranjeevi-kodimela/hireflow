@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Plus,  BriefcaseBusiness,  } from "lucide-react";
+import { Plus, BriefcaseBusiness } from "lucide-react";
 
 import StatCard from "../components/dashboard/StatCard";
 import HiringPipeline from "../components/dashboard/HiringPipeline";
@@ -36,7 +36,9 @@ function AnalyticsBar({ label, count, total }) {
             <div className="analytics-bar-track">
                 <div
                     className="analytics-bar-fill"
-                    style={{ width: `${Math.max(percentage, count > 0 ? 1 : 0)}%` }}
+                    style={{
+                        width: `${Math.max(percentage, count > 0 ? 1 : 0)}%`,
+                    }}
                 />
             </div>
         </div>
@@ -89,7 +91,12 @@ function Dashboard() {
         return <div className="dashboard">No dashboard data available.</div>;
     }
 
-    const { metrics, pipeline, recentActivity, analytics } = dashboardData;
+    const {
+        metrics,
+        pipeline,
+        recentActivity,
+        analytics,
+    } = dashboardData;
 
     const funnelTotal = analytics.hiringFunnel.reduce(
         (sum, item) => sum + item.count,
@@ -102,6 +109,7 @@ function Dashboard() {
     );
 
     const offerMetrics = analytics.offers;
+    const interviewMetrics = analytics.interviews;
 
     return (
         <div className="dashboard">
@@ -111,7 +119,9 @@ function Dashboard() {
                         RECRUITMENT OVERVIEW
                     </span>
                     <h1>Good morning, Admin.</h1>
-                    <p>Here's what's happening across your hiring operations.</p>
+                    <p>
+                        Here's what's happening across your hiring operations.
+                    </p>
                 </div>
 
                 <button
@@ -125,6 +135,7 @@ function Dashboard() {
                 </button>
             </div>
 
+            {/* Main statistics */}
             <div className="dashboard-stats">
                 <StatCard
                     type="candidates"
@@ -159,18 +170,25 @@ function Dashboard() {
                 />
             </div>
 
+            {/* Pipeline and activity */}
             <div className="dashboard-main-grid">
                 <HiringPipeline pipeline={pipeline} />
                 <ActivityFeed activities={recentActivity} />
             </div>
 
+            {/* Recruitment analytics */}
             <section className="analytics-section">
                 <div className="analytics-section-heading">
                     <div>
-                        <span className="dashboard-eyebrow">PERFORMANCE</span>
+                        <span className="dashboard-eyebrow">
+                            PERFORMANCE
+                        </span>
                         <h2>Recruitment analytics</h2>
                     </div>
-                    <span className="analytics-live-label">Live database metrics</span>
+
+                    <span className="analytics-live-label">
+                        Live database metrics
+                    </span>
                 </div>
 
                 <div className="analytics-metric-grid">
@@ -200,13 +218,17 @@ function Dashboard() {
                 </div>
             </section>
 
+            {/* Hiring funnel and offer performance */}
             <div className="analytics-two-column">
                 <section className="analytics-panel">
                     <div className="analytics-panel-heading">
                         <div>
                             <h3>Hiring funnel</h3>
-                            <p>Applications grouped by their current stage</p>
+                            <p>
+                                Applications grouped by their current stage
+                            </p>
                         </div>
+
                         <span>{formatNumber(funnelTotal)} records</span>
                     </div>
 
@@ -234,13 +256,15 @@ function Dashboard() {
                         <div>
                             <span>Approval rate</span>
                             <strong>{offerMetrics.approvalRate}%</strong>
-                            <small>{offerMetrics.approved} approved decisions</small>
+                            <small>Approved decisions</small>
                         </div>
 
                         <div>
-                            <span>Rejection rate</span>
-                            <strong>{offerMetrics.rejectionRate}%</strong>
-                            <small>{offerMetrics.rejected} rejected offers</small>
+                            <span>Approval rejection rate</span>
+                            <strong>
+                                {offerMetrics.approvalRejectionRate}%
+                            </strong>
+                            <small>Rejected approval decisions</small>
                         </div>
 
                         <div>
@@ -258,6 +282,29 @@ function Dashboard() {
                 </section>
             </div>
 
+            {/* Interview status */}
+            <section className="analytics-panel">
+                <div className="analytics-panel-heading">
+                    <div>
+                        <h3>Interview status</h3>
+                        <p>Current interview distribution</p>
+                    </div>
+                </div>
+
+                <div className="offer-performance-grid">
+                    {Object.entries(interviewMetrics).map(([status, count]) => (
+                        <div key={status}>
+                            <span>
+                                {status.replace(/([A-Z])/g, " $1")}
+                            </span>
+                            <strong>{formatNumber(count)}</strong>
+                            <small>Interviews</small>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Requisition and stage duration */}
             <div className="analytics-two-column">
                 <section className="analytics-panel">
                     <div className="analytics-panel-heading">
@@ -265,18 +312,21 @@ function Dashboard() {
                             <h3>Requisition status</h3>
                             <p>Distribution of all requisitions</p>
                         </div>
+
                         <span>{formatNumber(requisitionTotal)} total</span>
                     </div>
 
                     <div className="analytics-bars">
-                        {Object.entries(analytics.requisitions).map(([status, count]) => (
-                            <AnalyticsBar
-                                key={status}
-                                label={status.replace(/([A-Z])/g, " $1")}
-                                count={count}
-                                total={requisitionTotal}
-                            />
-                        ))}
+                        {Object.entries(analytics.requisitions).map(
+                            ([status, count]) => (
+                                <AnalyticsBar
+                                    key={status}
+                                    label={status.replace(/([A-Z])/g, " $1")}
+                                    count={count}
+                                    total={requisitionTotal}
+                                />
+                            )
+                        )}
                     </div>
                 </section>
 
@@ -290,23 +340,37 @@ function Dashboard() {
 
                     <div className="stage-duration-list">
                         {analytics.averageStageDuration.map((item) => (
-                            <div className="stage-duration-item" key={item.stage}>
+                            <div
+                                className="stage-duration-item"
+                                key={item.stage}
+                            >
                                 <div>
                                     <strong>{item.stage}</strong>
-                                    <small>{formatNumber(item.applications)} recorded intervals</small>
+                                    <small>
+                                        {formatNumber(item.applications)} recorded
+                                        intervals
+                                    </small>
                                 </div>
+
                                 <span>{item.averageDays} days</span>
                             </div>
                         ))}
+
+                        {analytics.averageStageDuration.length === 0 && (
+                            <p>No stage duration data available.</p>
+                        )}
                     </div>
                 </section>
             </div>
 
+            {/* Hiring manager performance */}
             <section className="analytics-panel manager-panel">
                 <div className="analytics-panel-heading">
                     <div>
                         <h3>Hiring-manager performance</h3>
-                        <p>Applications and hires across assigned requisitions</p>
+                        <p>
+                            Applications and hires across assigned requisitions
+                        </p>
                     </div>
                 </div>
 
@@ -330,22 +394,34 @@ function Dashboard() {
                                     <td>{formatNumber(manager.hires)}</td>
                                 </tr>
                             ))}
+
+                            {analytics.hiringManagers.length === 0 && (
+                                <tr>
+                                    <td colSpan="4">
+                                        No hiring-manager data available.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
             </section>
 
+            {/* Bottom summary */}
             <div className="dashboard-bottom">
                 <div className="bottom-heading">
                     <h3>Recruitment snapshot</h3>
+
                     <span>
                         <BriefcaseBusiness size={14} />
                         Hiring operations
                     </span>
                 </div>
+
                 <p>
-                    Monitor application progression, offer decisions, requisition
-                    distribution, and hiring-manager performance from one workspace.
+                    Monitor application progression, interview activity,
+                    offer decisions, requisition distribution, and
+                    hiring-manager performance from one workspace.
                 </p>
             </div>
         </div>

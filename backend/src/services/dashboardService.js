@@ -4,7 +4,7 @@ const getDashboardSummary = async () => {
   const [
     totalCandidates,
     requisitionCounts,
-    scheduledInterviews,
+    interviewStatusCounts,
     successfulHires,
     recentActivity,
     applicationStageCounts,
@@ -20,8 +20,9 @@ const getDashboardSummary = async () => {
       _count: { _all: true },
     }),
 
-    prisma.interview.count({
-      where: { status: "SCHEDULED" },
+    prisma.interview.groupBy({
+      by: ["status"],
+      _count: { _all: true },
     }),
 
     prisma.application.count({
@@ -115,6 +116,9 @@ const getDashboardSummary = async () => {
     offerApprovalCounts.map((item) => [item.status, item._count._all]),
   );
 
+  const interviewStatus = Object.fromEntries(
+    interviewStatusCounts.map((item) => [item.status, item._count._all]),
+  );
   // Existing dashboard pipeline.
   const pipeline = {
     stages: {
@@ -129,7 +133,7 @@ const getDashboardSummary = async () => {
     },
   };
 
-  pipeline.totalApplications = Object.values(pipeline.stages).reduce(
+  pipeline.totalApplications = Object.values(stageCounts).reduce(
     (total, count) => total + count,
     0,
   );
@@ -171,8 +175,8 @@ const getDashboardSummary = async () => {
         hiringDurations.push(days);
       }
     }
+    let currentStage = events.length ? "APPLIED" : application.currentStage;
 
-    let currentStage = "APPLIED";
     let stageEnteredAt = application.appliedAt;
 
     for (const event of events) {
@@ -231,7 +235,7 @@ const getDashboardSummary = async () => {
     ? Number(((approvedApprovals / decidedApprovals) * 100).toFixed(1))
     : 0;
 
-  const offerRejectionRate = decidedApprovals
+  const approvalRejectionRate = decidedApprovals
     ? Number(((rejectedApprovals / decidedApprovals) * 100).toFixed(1))
     : 0;
 
@@ -263,7 +267,7 @@ const getDashboardSummary = async () => {
     metrics: {
       totalCandidates,
       openRequisitions: requisitionStatus.OPEN || 0,
-      scheduledInterviews,
+      scheduledInterviews: interviewStatus.SCHEDULED || 0,
       successfulHires,
     },
 
@@ -295,8 +299,16 @@ const getDashboardSummary = async () => {
         accepted: offerStatus.ACCEPTED || 0,
         rejected: offerStatus.REJECTED || 0,
         approvalRate: offerApprovalRate,
-        rejectionRate: offerRejectionRate,
+        approvalRejectionRate,
         pendingApprovals: approvalStatus.PENDING || 0,
+      },
+
+      interviews: {
+        scheduled: interviewStatus.SCHEDULED || 0,
+        completed: interviewStatus.COMPLETED || 0,
+        cancelled: interviewStatus.CANCELLED || 0,
+        rescheduled: interviewStatus.RESCHEDULED || 0,
+        noShow: interviewStatus.NO_SHOW || 0,
       },
 
       hiringManagers: managerPerformance,
