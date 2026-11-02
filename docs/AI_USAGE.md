@@ -1,36 +1,52 @@
-# AI assistance and prompt history
-
-## Tool disclosure
-
-This submission was developed with AI assistance through Copilot SDK in VS Code. AI assistance was used to inspect the repository, compare its implementation with the requested workflow, propose and implement code and documentation changes, and run the listed checks.
-
-AI assistance was substantial for the stage-gate implementation, its tests, the generator changes, and this reviewer documentation. No external LLM, web dataset, or third-party service was used to generate or send candidate data. The dataset is synthetic.
-
-## Prompt and task history
-
-The original prompts were not saved as a verbatim transcript in the repository. The entries below are a **reconstructed summary of work themes**, based on the public commit sequence and the work requested for this submission. They are not quoted prompts and should not be read as an exact conversation log.
-
-1. **Build the hiring workflow:** Implement and connect requisition, candidate, application, and application-stage management. The commit history records the corresponding API/UI milestones (`c22b823`, `090c74b`, `1d11968`, `9175d58`, `6dc9902`).
-2. **Add interview scheduling and evaluation:** Build interviewer availability, interview management, conflict checks, and structured scorecards (`60ea162`, `d196f22`, `a9dca71`, `f952207`, `63f0205`, `c736018`, `1c45213`, `06c9773`).
-3. **Complete offers and measurable reporting:** Add offer approvals and recruitment dashboard analytics (`a1ebf29`, `e772d62`, `63bb1e6`, `b2d60eb`).
-4. **Review workflow completeness and document submission:** Compare the implementation with the hiring and synthetic-data requirements, enforce missing stage-review/accepted-offer gates, add tests, and document setup, limitations, and AI assistance (`673f2ec`, `e629292`).
-
-This reconstructed history intentionally does not invent exact user wording. For a submission that requires verbatim prompts, retain and submit the actual conversation transcript separately.
-
-## What AI accelerated
-
-- Repository inventory and comparison of existing backend, frontend, schema, generator, and documentation against the requested requirements.
-- Identifying that ordinary stage updates did not enforce interview-review gates or require an accepted offer before HIRED.
-- Implementing the gate helper, integrating it into the transactional stage service, and creating focused unit tests.
-- Fixing the generated dictionary's unnamed model headings, aligning a generator's offer selection with stage gates, and adding context for reviewers.
-
-## What was reviewed and validated
-
-The AI assistant inspected the existing stage, interview, scorecard, offer, generator, schema, and documentation paths; added six tests for stage-gate behavior; ran the backend test suite; ran frontend lint and production build; and checked the final diff for whitespace errors before publishing.
-
-These checks were performed by the AI assistant in the coding session. No separate human code review is recorded here. A reviewer should inspect the linked commits and independently assess the code and remaining limitations. The automated tests are focused unit tests, not integration tests against PostgreSQL.
-
-## Related public changes
-
-- [Stage gates and related code/tests/docs](https://github.com/chiranjeevi-kodimela/hireflow/commit/673f2ec)
-- [Reviewer notes](./SUBMISSION_NOTES.md)
+HireFlow — AI Use & Prompt History
+Project submission companion document
+1. Scope and evidence note
+This report describes an AI-assisted development workflow for HireFlow, a recruitment workflow application. Repository: https://github.com/chiranjeevi-kodimela/hireflow
+Evidence limitation: a complete commit-by-commit repository history was not available for inspection while preparing this draft. The prompt examples below are representative entries based on the project requirements and development topics—not a verbatim transcript of every prompt actually sent to an LLM. Verify and edit them before submission. Do not present them as an exact chat log unless you confirm them against your actual records.
+2. Representative prompt history (verify before submission)
+Planning and requirements decomposition
+Prompt (representative): “Break this recruitment workflow specification into backend modules, entities, business rules, and an implementation sequence. Keep it aligned with the acceptance criteria.”
+How it helped: AI helped structure the specification into smaller tasks and surface dependencies between requisitions, applications, interviews, evaluations, and offers.
+Schema and relationships
+Prompt (representative): “Review this Prisma schema against the recruitment requirements. Check primary keys, foreign keys, relations, lifecycle states, and support for traceable history.”
+How it helped: AI was used as a schema-review assistant. I needed to compare suggestions against the actual schema and application behavior instead of accepting them automatically.
+Backend module implementation
+Prompt (representative): “Help implement this backend module using the current project structure and conventions. Identify the files to change and preserve existing API patterns.”
+How it helped: AI accelerated repetitive scaffolding and helped reason about route/controller/service boundaries. I remained responsible for integration and resolving errors.
+Workflow rules and validation
+Prompt (representative): “Help implement stage-transition validation and required-review gates. Identify invalid transitions and return useful errors without silently rewriting history.”
+How it helped: AI helped enumerate states and exception paths. The server-side guards and rejection behavior needed to be verified in the actual application.
+Interview scheduling
+Prompt (representative): “Review this interview scheduling logic for interviewer availability and overlapping bookings. Suggest a conflict check and edge cases to test.”
+How it helped: AI accelerated reasoning about time overlap and boundary cases. I needed to validate scenarios and confirm conflicting schedules could not be saved.
+React frontend
+Prompt (representative): “Help build this React/Vite screen with the existing components and API. Include loading, empty, and error states, and match the current data model.”
+How it helped: AI assisted with component structure and UI states. I reviewed workflow fit and API request/response shapes.
+Debugging
+Prompt (representative): “Analyze this exact error and surrounding code. Explain likely causes, propose the smallest correction, and give verification steps.”
+How it helped: AI helped narrow debugging hypotheses. I applied and tested fixes rather than treating a suggestion as confirmed.
+Test design
+Prompt (representative): “Create test cases for valid and invalid workflow paths, including missing review, schedule overlap, incomplete scorecard, withdrawn candidate, and offer-band violations.”
+How it helped: AI helped create a broader test checklist. I needed to run tests against the implementation and not claim proposed tests as passed.
+README and setup
+Prompt (representative): “Draft README instructions for environment setup, database preparation, running frontend/backend, and tests. Use only commands supported by this repository.”
+How it helped: AI accelerated drafting. Commands, environment variable names, and setup steps had to be checked against project files.
+3. Where AI accelerated my work
+•	Decomposing a large business specification into manageable implementation tasks.
+•	Drafting repetitive code patterns, examples, validation approaches, and documentation.
+•	Exploring exception paths and turning requirements into test scenarios.
+•	Interpreting error messages and suggesting focused debugging experiments.
+•	Providing a second perspective on code and data-model decisions.
+4. Where I relied heavily on AI
+I relied most on AI for rapid iteration: drafting code patterns, explaining unfamiliar implementation details, suggesting design alternatives, and preparing checklists. This reduced blank-page work and helped me move across backend, frontend, and documentation. AI output was a proposal, not proof that a feature was correct, secure, integrated, or complete.
+5. What I personally reviewed, changed, or validated
+•	Reviewed generated code against the repository structure, naming, and data model.
+•	Changed suggestions that did not fit requirements or existing implementation.
+•	Checked API paths, payload shapes, database relations, and frontend/backend integration.
+•	Investigated runtime or compile errors and confirmed fixes by rerunning relevant commands or workflows.
+•	Reviewed business rules and exception behavior: stage gates, scheduling conflicts, scorecard completeness, and offer approvals.
+•	Validated only tests and behavior actually run; unexecuted tests remain pending rather than being claimed as passed.
+•	Checked README/setup claims against the repository before submission.
+6. Responsible-use statement
+I used LLMs as development assistants for planning, code suggestions, debugging, review, and documentation. I retained responsibility for the final implementation and for checking alignment with the business requirements. I did not treat generated output as authoritative without review. This report must be edited to reflect the exact tools, prompts, commits, and validation steps I personally used and completed.
+Repository: https://github.com/chiranjeevi-kodimela/hireflow
