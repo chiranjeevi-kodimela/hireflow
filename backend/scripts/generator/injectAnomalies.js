@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const prisma = require("../../src/config/database");
+const { generateId } = require("../../src/utils/idGenerator");
 
 const run = async () => {
   try {
@@ -188,6 +189,7 @@ const run = async () => {
 
     const excessiveOffer = await prisma.offer.create({
       data: {
+        offerId: await generateId("offer", "OFF", 2026),
         applicationId: existingOffer.applicationId,
         version: existingOffer.version + 1,
         baseSalary: excessiveSalary,

@@ -4,7 +4,7 @@ Generated from the Prisma database schema.
 
 This document describes the database entities, field types, constraints, and relationships.
 
-## undefined
+## Employee
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -24,7 +24,7 @@ This document describes the database entities, field types, constraints, and rel
 | auditLogs | AuditLog | Yes | Relation: AuditLog (one-to-many) |
 | hiringManagerProfile | HiringManager | No | Relation: HiringManager (related record) |
 
-## undefined
+## HiringManager
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -36,7 +36,7 @@ This document describes the database entities, field types, constraints, and rel
 | employee | Employee | Yes | Relation: Employee (related record); Foreign key: employeeId |
 | requisitions | Requisition | Yes | Relation: Requisition (one-to-many) |
 
-## undefined
+## Requisition
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -59,7 +59,7 @@ This document describes the database entities, field types, constraints, and rel
 | hiringManager | HiringManager | Yes | Relation: HiringManager (related record); Foreign key: hiringManagerId |
 | applications | Application | Yes | Relation: Application (one-to-many) |
 
-## undefined
+## Candidate
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -74,7 +74,7 @@ This document describes the database entities, field types, constraints, and rel
 | createdAt | DateTime | Yes |  |
 | applications | Application | Yes | Relation: Application (one-to-many) |
 
-## undefined
+## Application
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -91,7 +91,7 @@ This document describes the database entities, field types, constraints, and rel
 | candidate | Candidate | Yes | Relation: Candidate (related record); Foreign key: candidateId |
 | requisition | Requisition | Yes | Relation: Requisition (related record); Foreign key: requisitionId |
 
-## undefined
+## SkillRequirement
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -104,7 +104,7 @@ This document describes the database entities, field types, constraints, and rel
 | createdAt | DateTime | Yes |  |
 | requisition | Requisition | Yes | Relation: Requisition (related record); Foreign key: requisitionId |
 
-## undefined
+## InterviewPanel
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -118,7 +118,7 @@ This document describes the database entities, field types, constraints, and rel
 | members | PanelMember | Yes | Relation: PanelMember (one-to-many) |
 | interviews | Interview | Yes | Relation: Interview (one-to-many) |
 
-## undefined
+## PanelMember
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -129,7 +129,7 @@ This document describes the database entities, field types, constraints, and rel
 | panel | InterviewPanel | Yes | Relation: InterviewPanel (related record); Foreign key: panelId |
 | employee | Employee | Yes | Relation: Employee (related record); Foreign key: employeeId |
 
-## undefined
+## Availability
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -141,7 +141,7 @@ This document describes the database entities, field types, constraints, and rel
 | createdAt | DateTime | Yes |  |
 | interviewer | Employee | Yes | Relation: Employee (related record); Foreign key: interviewerId |
 
-## undefined
+## Interview
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -159,7 +159,7 @@ This document describes the database entities, field types, constraints, and rel
 | participants | InterviewParticipant | Yes | Relation: InterviewParticipant (one-to-many) |
 | scorecards | Scorecard | Yes | Relation: Scorecard (one-to-many) |
 
-## undefined
+## InterviewParticipant
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -170,7 +170,7 @@ This document describes the database entities, field types, constraints, and rel
 | interview | Interview | Yes | Relation: Interview (related record); Foreign key: interviewId |
 | employee | Employee | Yes | Relation: Employee (related record); Foreign key: employeeId |
 
-## undefined
+## Scorecard
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -187,7 +187,7 @@ This document describes the database entities, field types, constraints, and rel
 | interview | Interview | Yes | Relation: Interview (related record); Foreign key: interviewId |
 | reviewer | Employee | Yes | Relation: Employee (related record); Foreign key: reviewerId |
 
-## undefined
+## EvaluationCriterion
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -203,7 +203,7 @@ This document describes the database entities, field types, constraints, and rel
 | requisition | Requisition | Yes | Relation: Requisition (related record); Foreign key: requisitionId |
 | scorecardItems | ScorecardItem | Yes | Relation: ScorecardItem (one-to-many) |
 
-## undefined
+## ScorecardItem
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -215,7 +215,7 @@ This document describes the database entities, field types, constraints, and rel
 | scorecard | Scorecard | Yes | Relation: Scorecard (related record); Foreign key: scorecardId |
 | criterion | EvaluationCriterion | Yes | Relation: EvaluationCriterion (related record); Foreign key: criterionId |
 
-## undefined
+## Offer
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -232,7 +232,7 @@ This document describes the database entities, field types, constraints, and rel
 | application | Application | Yes | Relation: Application (related record); Foreign key: applicationId |
 | approvals | Approval | Yes | Relation: Approval (one-to-many) |
 
-## undefined
+## Approval
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -249,7 +249,7 @@ This document describes the database entities, field types, constraints, and rel
 | requisition | Requisition | No | Relation: Requisition (related record); Foreign key: requisitionId |
 | approver | Employee | Yes | Relation: Employee (related record); Foreign key: approverId |
 
-## undefined
+## ApplicationStageEvent
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -263,7 +263,7 @@ This document describes the database entities, field types, constraints, and rel
 | application | Application | Yes | Relation: Application (related record); Foreign key: applicationId |
 | changedBy | Employee | No | Relation: Employee (related record); Foreign key: changedById |
 
-## undefined
+## AuditLog
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|
@@ -276,7 +276,7 @@ This document describes the database entities, field types, constraints, and rel
 | createdAt | DateTime | Yes |  |
 | actor | Employee | No | Relation: Employee (related record); Foreign key: actorId |
 
-## undefined
+## IdCounter
 
 | Field | Type | Required | Key / Relationship |
 |---|---|---|---|

@@ -68,7 +68,7 @@ Stage gate requirements:
 - Each interviewer can submit one scorecard per interview.
 - A scorecard must reference an existing interview and reviewer.
 - Reviewers must be assigned participants in that interview.
-- Technical, communication and problem-solving scores must be between 1 and 5.
+- Technical, communication and problem-solving scores must be between 0 and 10.
 - Every completed interview must have the required scorecards.
 - Evaluation criteria must be relevant to the requisition and interview type.
 - A candidate cannot advance beyond an interview stage until the required evaluations are submitted.

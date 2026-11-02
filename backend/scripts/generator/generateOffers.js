@@ -1,7 +1,4 @@
 const prisma = require("../../src/config/database");
-const {
-  updateApplicationStage,
-} = require("../../src/services/applicationStageService");
 const { createOffer } = require("../../src/services/offerService");
 const { decideApproval } = require("../../src/services/approvalService");
 
@@ -9,14 +6,6 @@ const MAX_OFFERS = 100;
 
 const run = async () => {
   try {
-    const hr = await prisma.employee.findFirst({
-      where: { role: "HR", isActive: true },
-    });
-
-    if (!hr) {
-      throw new Error("No active HR employee found");
-    }
-
     const scorecards = await prisma.scorecard.findMany({
       where: {
         recommendation: {
@@ -28,7 +17,7 @@ const run = async () => {
             application: {
               is: {
                 status: "ACTIVE",
-                currentStage: "SCREENING",
+                currentStage: "OFFER",
                 candidateId: { startsWith: "CAND-" },
                 requisitionId: { startsWith: "REQ-2026-" },
               },
@@ -53,6 +42,12 @@ const run = async () => {
 
     console.log(`Qualified candidates found: ${scorecards.length}`);
 
+    if (scorecards.length === 0) {
+      throw new Error(
+        "No qualified applications are at OFFER stage. Complete the required interview reviews first.",
+      );
+    }
+
     let offersCreated = 0;
     let offersApproved = 0;
     let skipped = 0;
@@ -62,16 +57,6 @@ const run = async () => {
       const requisition = application.requisition;
 
       try {
-        const stages = ["TECHNICAL", "MANAGERIAL", "HR", "OFFER"];
-
-        for (const stage of stages) {
-          await updateApplicationStage(application.applicationId, {
-            toStage: stage,
-            changedById: hr.employeeId,
-            reason: `Synthetic progression based on positive screening recommendation: ${scorecard.recommendation}`,
-          });
-        }
-
         const minSalary = Number(requisition.minSalary);
         const maxSalary = Number(requisition.maxSalary);
 

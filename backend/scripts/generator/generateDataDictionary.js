@@ -23,8 +23,8 @@ This document describes the database entities, field types, constraints, and rel
 
 `;
 
-    for (const model of Object.values(models)) {
-      markdown += `## ${model.name}\n\n`;
+    for (const [modelName, model] of Object.entries(models)) {
+      markdown += `## ${modelName}\n\n`;
       markdown += `| Field | Type | Required | Key / Relationship |\n`;
       markdown += `|---|---|---|---|\n`;
 

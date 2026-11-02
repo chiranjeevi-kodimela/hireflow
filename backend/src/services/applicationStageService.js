@@ -1,4 +1,8 @@
 const prisma = require("../config/database");
+const {
+  getRequiredInterviewType,
+  getStageGateError,
+} = require("./applicationStageRules");
 
 const allowedNextStages = {
   APPLIED: ["SCREENING"],
@@ -89,6 +93,41 @@ const updateApplicationStage = async (applicationId, data) => {
       );
       error.statusCode = 400;
       throw error;
+    }
+
+    if (isNormalTransition) {
+      const requiredInterviewType = getRequiredInterviewType(toStage);
+      const interviews = requiredInterviewType
+        ? await tx.interview.findMany({
+            where: {
+              applicationId,
+              interviewType: requiredInterviewType,
+              status: { not: "CANCELLED" },
+            },
+            include: {
+              participants: { select: { employeeId: true, role: true } },
+              scorecards: { select: { reviewerId: true } },
+            },
+          })
+        : [];
+      const acceptedOffer =
+        toStage === "HIRED"
+          ? await tx.offer.findFirst({
+              where: { applicationId, status: "ACCEPTED" },
+              select: { offerId: true },
+            })
+          : null;
+      const gateError = getStageGateError(
+        toStage,
+        interviews,
+        Boolean(acceptedOffer),
+      );
+
+      if (gateError) {
+        const error = new Error(gateError);
+        error.statusCode = 409;
+        throw error;
+      }
     }
 
     if (changedById) {

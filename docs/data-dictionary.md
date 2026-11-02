@@ -156,9 +156,9 @@ Stores structured feedback from an interviewer.
 | scorecard_id          | String   | Yes      | Primary key. Format: SCORE-<interview-id>-<reviewer-id> |
 | interview_id          | String   | Yes      | Foreign key to Interview                                |
 | reviewer_id           | String   | Yes      | Foreign key to Employee                                 |
-| technical_score       | Decimal  | Yes      | Score from 1 to 5                                       |
-| communication_score   | Decimal  | Yes      | Score from 1 to 5                                       |
-| problem_solving_score | Decimal  | Yes      | Score from 1 to 5                                       |
+| technical_score       | Decimal  | Yes      | Score from 0 to 10                                       |
+| communication_score   | Decimal  | Yes      | Score from 0 to 10                                       |
+| problem_solving_score | Decimal  | Yes      | Score from 0 to 10                                       |
 | recommendation        | Enum     | Yes      | STRONG_YES, YES, MAYBE, NO, STRONG_NO                   |
 | comments              | String   | No       | Interviewer feedback                                    |
 | submitted_at          | DateTime | Yes      | Submission timestamp                                    |
@@ -181,7 +181,7 @@ Represents a job offer made to a candidate.
 | offered_salary | Decimal  | Yes      | Must be greater than 0                                                          |
 | currency       | String   | Yes      | Example: INR                                                                    |
 | joining_date   | Date     | Yes      | Proposed joining date                                                           |
-| status         | Enum     | Yes      | DRAFT, PENDING_APPROVAL, APPROVED, SENT, ACCEPTED, DECLINED, EXPIRED, WITHDRAWN |
+| status         | Enum     | Yes      | DRAFT, PENDING_APPROVAL, APPROVED, SENT, ACCEPTED, REJECTED, EXPIRED, WITHDRAWN |
 | created_at     | DateTime | Yes      | Creation timestamp                                                              |
 | updated_at     | DateTime | Yes      | Last update timestamp                                                           |
 
