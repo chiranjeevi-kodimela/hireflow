@@ -1,12 +1,11 @@
 const prisma = require("../config/database");
 
-// Get active employees who can participate in interviews
 const getEmployees = async () => {
   return prisma.employee.findMany({
     where: {
       isActive: true,
       role: {
-        in: ["INTERVIEWER", "HIRING_MANAGER", "HR", "ADMIN"],
+        in: ["INTERVIEWER", "HIRING_MANAGER", "HR", "ADMIN", "APPROVER"],
       },
     },
     select: {
@@ -15,14 +14,12 @@ const getEmployees = async () => {
       email: true,
       department: true,
       role: true,
+      isActive: true,
     },
-    orderBy: {
-      fullName: "asc",
-    },
+    orderBy: { fullName: "asc" },
   });
 };
 
-// Get active interview panels and their members
 const getInterviewPanels = async (requisitionId) => {
   return prisma.interviewPanel.findMany({
     where: {
@@ -52,13 +49,10 @@ const getInterviewPanels = async (requisitionId) => {
         },
       },
     },
-    orderBy: {
-      panelName: "asc",
-    },
+    orderBy: { panelName: "asc" },
   });
 };
 
-// Get active evaluation criteria for a requisition
 const getEvaluationCriteria = async (requisitionId) => {
   if (!requisitionId) {
     const error = new Error("requisitionId is required");
@@ -71,9 +65,7 @@ const getEvaluationCriteria = async (requisitionId) => {
       requisitionId,
       isActive: true,
     },
-    orderBy: {
-      name: "asc",
-    },
+    orderBy: { name: "asc" },
   });
 };
 

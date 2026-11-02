@@ -9,7 +9,13 @@ async function request(endpoint, options = {}) {
     },
   });
 
-  const result = await response.json();
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("The server returned an invalid response.");
+  }
 
   if (!response.ok || !result.success) {
     throw new Error(result.message || "Request failed");
@@ -18,24 +24,44 @@ async function request(endpoint, options = {}) {
   return result.data;
 }
 
-export async function getOffers() {
+export function getOffers() {
   return request("/offers");
 }
 
-export async function createOffer(payload) {
+export function createOffer(payload) {
   return request("/offers", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
-export async function decideApproval(approvalId, payload) {
-  return request(`/approvals/${approvalId}/decision`, {
+export function decideApproval(approvalId, payload) {
+  return request(`/approvals/${encodeURIComponent(approvalId)}/decision`, {
     method: "PATCH",
     body: JSON.stringify(payload),
   });
 }
 
-export async function getEmployees() {
+export function sendOffer(offerId) {
+  return request(`/offers/${encodeURIComponent(offerId)}/send`, {
+    method: "PATCH",
+  });
+}
+
+export function respondToOffer(offerId, payload) {
+  return request(`/offers/${encodeURIComponent(offerId)}/respond`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function withdrawOffer(offerId, reason) {
+  return request(`/offers/${encodeURIComponent(offerId)}/withdraw`, {
+    method: "PATCH",
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export function getEmployees() {
   return request("/employees");
 }

@@ -1,9 +1,13 @@
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     createOffer,
     decideApproval,
     getOffers,
     getEmployees,
+    sendOffer,
+    respondToOffer,
+    withdrawOffer,
 } from "../services/offerService";
 import { getApplications } from "../services/applicationService";
 import "./Offers.css";
@@ -18,10 +22,19 @@ const money = (value) =>
 const statusClass = (status = "") =>
     `offer-status offer-status--${status.toLowerCase().replaceAll("_", "-")}`;
 
+const ACTIVE_STATUSES = [
+    "DRAFT",
+    "PENDING_APPROVAL",
+    "APPROVED",
+    "SENT",
+    "ACCEPTED",
+];
+
 export default function Offers() {
     const [offers, setOffers] = useState([]);
     const [applications, setApplications] = useState([]);
     const [employees, setEmployees] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
@@ -31,9 +44,8 @@ export default function Offers() {
     const [baseSalary, setBaseSalary] = useState("");
     const [bonus, setBonus] = useState("");
 
-    const [approverId, setApproverId] = useState("");
-    const [comments, setComments] = useState("");
     const [activeApproval, setActiveApproval] = useState(null);
+    const [comments, setComments] = useState("");
 
     const loadData = useCallback(async () => {
         setLoading(true);
@@ -74,9 +86,7 @@ export default function Offers() {
                 if (cancelled) return;
 
                 setOffers(Array.isArray(offerData) ? offerData : []);
-                setApplications(
-                    Array.isArray(applicationData) ? applicationData : []
-                );
+                setApplications(Array.isArray(applicationData) ? applicationData : []);
                 setEmployees(
                     (Array.isArray(employeeData) ? employeeData : []).filter(
                         (employee) => employee.isActive && employee.role === "APPROVER"
@@ -97,7 +107,6 @@ export default function Offers() {
             cancelled = true;
         };
     }, []);
-
     const eligibleApplications = useMemo(
         () =>
             applications.filter(
@@ -108,12 +117,14 @@ export default function Offers() {
         [applications]
     );
 
-    const existingApplicationIds = new Set(
-        offers
-            .filter((offer) =>
-                ["DRAFT", "PENDING_APPROVAL", "APPROVED", "SENT"].includes(offer.status)
-            )
-            .map((offer) => offer.applicationId)
+    const existingApplicationIds = useMemo(
+        () =>
+            new Set(
+                offers
+                    .filter((offer) => ACTIVE_STATUSES.includes(offer.status))
+                    .map((offer) => offer.applicationId)
+            ),
+        [offers]
     );
 
     const createableApplications = eligibleApplications.filter(
@@ -170,15 +181,38 @@ export default function Offers() {
         setError("");
         setNotice("");
         setActiveApproval({ ...approval, decision });
-        setApproverId(approval.approverId);
         setComments("");
     };
 
     const handleDecision = async (event) => {
         event.preventDefault();
 
-        if (!activeApproval || !approverId) {
-            setError("Select the assigned approver.");
+        if (!activeApproval) return;
+
+        setSubmitting(true);
+        setError("");
+        setNotice("");
+
+        try {
+            await decideApproval(activeApproval.approvalId, {
+                approverId: activeApproval.approverId,
+                decision: activeApproval.decision,
+                comments: comments.trim() || undefined,
+            });
+
+            setActiveApproval(null);
+            setComments("");
+            setNotice("Approval decision recorded.");
+            await loadData();
+        } catch (err) {
+            setError(err.message || "Unable to record the decision.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleSend = async (offer) => {
+        if (!window.confirm(`Send offer ${offer.offerId} to the candidate?`)) {
             return;
         }
 
@@ -187,19 +221,53 @@ export default function Offers() {
         setNotice("");
 
         try {
-            await decideApproval(activeApproval.approvalId, {
-                approverId,
-                decision: activeApproval.decision,
-                comments: comments.trim() || undefined,
-            });
-
-            setActiveApproval(null);
-            setApproverId("");
-            setComments("");
-            setNotice("Approval decision recorded.");
+            await sendOffer(offer.offerId);
+            setNotice("Offer marked as sent.");
             await loadData();
         } catch (err) {
-            setError(err.message || "Unable to record the decision.");
+            setError(err.message || "Unable to send offer.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleResponse = async (offer, decision) => {
+        const label = decision === "ACCEPTED" ? "accept" : "reject";
+
+        if (!window.confirm(`Record the candidate's decision to ${label} this offer?`)) {
+            return;
+        }
+
+        setSubmitting(true);
+        setError("");
+        setNotice("");
+
+        try {
+            await respondToOffer(offer.offerId, { decision });
+            setNotice(`Offer marked as ${decision.toLowerCase()}.`);
+            await loadData();
+        } catch (err) {
+            setError(err.message || "Unable to record offer response.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleWithdraw = async (offer) => {
+        const reason = window.prompt("Enter the reason for withdrawing this offer:");
+
+        if (!reason?.trim()) return;
+
+        setSubmitting(true);
+        setError("");
+        setNotice("");
+
+        try {
+            await withdrawOffer(offer.offerId, reason.trim());
+            setNotice("Offer withdrawn.");
+            await loadData();
+        } catch (err) {
+            setError(err.message || "Unable to withdraw offer.");
         } finally {
             setSubmitting(false);
         }
@@ -215,10 +283,11 @@ export default function Offers() {
                         Create compensation offers and manage approval decisions.
                     </p>
                 </div>
+
                 <button
                     className="offers-refresh"
                     onClick={loadData}
-                    disabled={loading}
+                    disabled={loading || submitting}
                 >
                     Refresh
                 </button>
@@ -246,6 +315,7 @@ export default function Offers() {
                             required
                         >
                             <option value="">Select application</option>
+
                             {createableApplications.map((application) => (
                                 <option
                                     key={application.applicationId}
@@ -255,10 +325,7 @@ export default function Offers() {
                                     {application.candidate?.fullName ||
                                         application.candidate?.name ||
                                         application.candidateId}{" "}
-                                    /{" "}
-                                    {application.requisition?.title ||
-                                        application.requisition?.jobTitle ||
-                                        application.requisitionId}
+                                    / {application.requisition?.title || application.requisitionId}
                                 </option>
                             ))}
                         </select>
@@ -314,7 +381,7 @@ export default function Offers() {
                 </div>
 
                 {loading ? (
-                    <p className="offers-empty">Loading offers…</p>
+                    <p className="offers-empty">Loading offers...</p>
                 ) : offers.length === 0 ? (
                     <p className="offers-empty">No offers have been created yet.</p>
                 ) : (
@@ -332,14 +399,22 @@ export default function Offers() {
                                 offer.application?.requisitionId ||
                                 "Requisition";
 
+                            const approvals = offer.approvals || [];
+                            const approvedCount = approvals.filter(
+                                (approval) => approval.status === "APPROVED"
+                            ).length;
+
                             return (
                                 <article className="offer-card" key={offer.offerId}>
                                     <div className="offer-card-top">
                                         <div>
-                                            <p className="offer-id">{offer.offerId}</p>
+                                            <p className="offer-id">
+                                                {offer.offerId} · Version {offer.version}
+                                            </p>
                                             <h3>{candidate}</h3>
                                             <p className="offer-role">{requisition}</p>
                                         </div>
+
                                         <span className={statusClass(offer.status)}>
                                             {offer.status?.replaceAll("_", " ")}
                                         </span>
@@ -363,27 +438,30 @@ export default function Offers() {
                                     <div className="offer-approvals">
                                         <h4>Approval workflow</h4>
 
-                                        {offer.approvals?.length ? (
-                                            offer.approvals.map((approval) => (
+                                        <p>
+                                            {approvedCount} of {approvals.length} approvals completed
+                                        </p>
+
+                                        {approvals.length ? (
+                                            approvals.map((approval) => (
                                                 <div
                                                     className="offer-approval-row"
                                                     key={approval.approvalId}
                                                 >
                                                     <div>
                                                         <strong>
-                                                            {employees.find(
-                                                                (employee) =>
-                                                                    employee.employeeId === approval.approverId
-                                                            )?.fullName ||
+                                                            {approval.approver?.fullName ||
                                                                 employees.find(
                                                                     (employee) =>
                                                                         employee.employeeId === approval.approverId
-                                                                )?.name ||
+                                                                )?.fullName ||
                                                                 approval.approverId}
                                                         </strong>
+
                                                         <span className={statusClass(approval.status)}>
                                                             {approval.status}
                                                         </span>
+
                                                         {approval.comments && (
                                                             <p className="offer-approval-comment">
                                                                 {approval.comments}
@@ -396,15 +474,18 @@ export default function Offers() {
                                                             <button
                                                                 type="button"
                                                                 className="offer-approve"
+                                                                disabled={submitting}
                                                                 onClick={() =>
                                                                     openDecision(approval, "APPROVED")
                                                                 }
                                                             >
                                                                 Approve
                                                             </button>
+
                                                             <button
                                                                 type="button"
                                                                 className="offer-reject"
+                                                                disabled={submitting}
                                                                 onClick={() =>
                                                                     openDecision(approval, "REJECTED")
                                                                 }
@@ -419,6 +500,52 @@ export default function Offers() {
                                             <p className="offers-empty">No approval records.</p>
                                         )}
                                     </div>
+
+                                    <div className="offer-approval-actions">
+                                        {offer.status === "APPROVED" && (
+                                            <button
+                                                type="button"
+                                                className="offer-approve"
+                                                disabled={submitting}
+                                                onClick={() => handleSend(offer)}
+                                            >
+                                                Mark as sent
+                                            </button>
+                                        )}
+
+                                        {offer.status === "SENT" && (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="offer-approve"
+                                                    disabled={submitting}
+                                                    onClick={() => handleResponse(offer, "ACCEPTED")}
+                                                >
+                                                    Record acceptance
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="offer-reject"
+                                                    disabled={submitting}
+                                                    onClick={() => handleResponse(offer, "REJECTED")}
+                                                >
+                                                    Record rejection
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {["APPROVED", "SENT"].includes(offer.status) && (
+                                            <button
+                                                type="button"
+                                                className="offer-reject"
+                                                disabled={submitting}
+                                                onClick={() => handleWithdraw(offer)}
+                                            >
+                                                Withdraw offer
+                                            </button>
+                                        )}
+                                    </div>
                                 </article>
                             );
                         })}
@@ -430,7 +557,7 @@ export default function Offers() {
                 <div
                     className="offers-modal-backdrop"
                     role="presentation"
-                    onClick={() => setActiveApproval(null)}
+                    onClick={() => !submitting && setActiveApproval(null)}
                 >
                     <section
                         className="offers-modal"
@@ -444,37 +571,22 @@ export default function Offers() {
                                 ? "Approve offer"
                                 : "Reject offer"}
                         </h2>
+
                         <p>
                             Approval ID: <strong>{activeApproval.approvalId}</strong>
                         </p>
 
-                        <form onSubmit={handleDecision}>
-                            <label>
-                                Assigned approver
-                                <select
-                                    value={approverId}
-                                    onChange={(event) => setApproverId(event.target.value)}
-                                    required
-                                >
-                                    <option value="">Select approver</option>
-                                    {employees
-                                        .filter(
-                                            (employee) =>
-                                                employee.employeeId === activeApproval.approverId
-                                        )
-                                        .map((employee) => (
-                                            <option
-                                                key={employee.employeeId}
-                                                value={employee.employeeId}
-                                            >
-                                                {employee.fullName ||
-                                                    employee.name ||
-                                                    employee.employeeId}
-                                            </option>
-                                        ))}
-                                </select>
-                            </label>
+                        <p>
+                            Assigned approver:{" "}
+                            <strong>
+                                {employees.find(
+                                    (employee) =>
+                                        employee.employeeId === activeApproval.approverId
+                                )?.fullName || activeApproval.approverId}
+                            </strong>
+                        </p>
 
+                        <form onSubmit={handleDecision}>
                             <label>
                                 Comments
                                 <textarea
@@ -489,10 +601,12 @@ export default function Offers() {
                                 <button
                                     type="button"
                                     className="offers-cancel"
+                                    disabled={submitting}
                                     onClick={() => setActiveApproval(null)}
                                 >
                                     Cancel
                                 </button>
+
                                 <button type="submit" disabled={submitting}>
                                     {submitting ? "Saving..." : "Confirm decision"}
                                 </button>
