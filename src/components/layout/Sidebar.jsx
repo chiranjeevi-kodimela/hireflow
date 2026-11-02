@@ -9,6 +9,7 @@ const navigation = [
             { label: 'Candidates', icon: '◉', path: '/candidates' },
             { label: 'Jobs', icon: '▤', path: '/jobs' },
             { label: 'Interviews', icon: '▦', path: '/interviews' },
+            { label: 'Availability', icon: '◷', path: '/availability' },
             { label: 'Applications', path: '/applications', icon: '📋' },
         ],
     },
