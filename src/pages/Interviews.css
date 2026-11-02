@@ -25,6 +25,15 @@
   gap: 18px;
 }
 
+.interview-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--text-secondary, #64748b);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .interview-form input,
 .interview-form select,
 .interview-filters select {
@@ -55,7 +64,7 @@
 
 .interview-error,
 .interview-success {
-  margin: 0;
+  margin: 14px 0 0;
   font-size: 13px;
 }
 
@@ -71,6 +80,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+}
+
+.interview-list-header h2 {
+  margin-bottom: 6px;
 }
 
 .interview-list-header span {
@@ -78,10 +92,32 @@
   font-size: 13px;
 }
 
+.interview-view-toggle {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--border, #e5e9e5);
+  border-radius: 8px;
+}
+
+.interview-view-toggle button {
+  padding: 7px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+}
+
+.interview-view-toggle button.active {
+  background: var(--brand, #16866b);
+  color: white;
+}
+
 .interview-filters {
   display: flex;
   gap: 12px;
-  margin-bottom: 18px;
+  margin: 20px 0;
 }
 
 .interview-filters select {
@@ -125,10 +161,80 @@
   font-weight: 600;
 }
 
+.interview-status.status-cancelled {
+  background: #fee2e2;
+  color: #b42318;
+}
+
+.interview-status.status-completed {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.interview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.interview-actions button {
+  padding: 6px 9px;
+  border: 1px solid var(--border, #e5e9e5);
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  color: var(--text-primary, #172033);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.interview-actions button:hover {
+  border-color: var(--brand, #16866b);
+}
+
+.interview-actions .cancel-action {
+  color: #c24141;
+}
+
 .empty-interviews {
   text-align: center;
   padding: 30px !important;
   color: var(--text-secondary, #64748b) !important;
+}
+
+.interview-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.calendar-day {
+  padding: 16px;
+  border: 1px solid var(--border, #e5e9e5);
+  border-radius: 10px;
+}
+
+.calendar-day h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-primary, #172033);
+}
+
+.calendar-interview {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border, #e5e9e5);
+  font-size: 13px;
+}
+
+.calendar-interview strong {
+  color: var(--text-primary, #172033);
+}
+
+.calendar-interview span {
+  color: var(--text-secondary, #64748b);
 }
 
 @media (max-width: 850px) {
@@ -146,5 +252,10 @@
 
   .interview-filters select {
     max-width: none;
+  }
+
+  .interview-list-header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

@@ -1,12 +1,51 @@
-import { useEffect, useState } from "react";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     getInterviews,
     createInterview,
     getEmployees,
     getInterviewPanels,
+    completeInterview,
+    cancelInterview,
+    rescheduleInterview,
 } from "../services/interviewService";
 import { getApplications } from "../services/applicationService";
 import "./Interviews.css";
+
+const interviewTypes = ["SCREENING", "TECHNICAL", "MANAGERIAL", "HR"];
+
+function toLocalInput(value) {
+    const date = new Date(value);
+    const offset = date.getTimezoneOffset();
+
+    return new Date(date.getTime() - offset * 60000)
+        .toISOString()
+        .slice(0, 16);
+}
+
+function formatDate(value) {
+    return value ? new Date(value).toLocaleString() : "—";
+}
+
+function getActorId(interview) {
+    const lead = interview.participants?.find(
+        (participant) => participant.role === "LEAD"
+    );
+
+    return lead?.employeeId || lead?.employee?.id;
+}
+
+function getEmployeeName(employee) {
+    return employee?.fullName || employee?.name || "Unknown";
+}
+
+function getCandidateName(interview) {
+    const candidate = interview.application?.candidate;
+
+    return candidate
+        ? `${candidate.firstName || ""} ${candidate.lastName || ""}`.trim()
+        : "Unknown candidate";
+}
 
 function Interviews() {
     const [interviews, setInterviews] = useState([]);
@@ -14,336 +53,566 @@ function Interviews() {
     const [employees, setEmployees] = useState([]);
     const [panels, setPanels] = useState([]);
 
-    const [statusFilter, setStatusFilter] = useState("");
-    const [typeFilter, setTypeFilter] = useState("");
+    const [filters, setFilters] = useState({
+        status: "",
+        interviewType: "",
+    });
 
-    const [applicationId, setApplicationId] = useState("");
-    const [panelId, setPanelId] = useState("");
-    const [interviewType, setInterviewType] = useState("SCREENING");
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
-    const [leadInterviewer, setLeadInterviewer] = useState("");
-    const [panelist, setPanelist] = useState("");
-
+    const [view, setView] = useState("list");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    async function loadInterviews() {
-        const data = await getInterviews({
-            status: statusFilter,
-            interviewType: typeFilter,
-        });
+    const [form, setForm] = useState({
+        applicationId: "",
+        panelId: "",
+        interviewType: "SCREENING",
+        startTime: "",
+        endTime: "",
+        leadInterviewer: "",
+        panelist: "",
+    });
 
-        setInterviews(Array.isArray(data) ? data : []);
-    }
+    const selectedApplication = applications.find(
+        (application) => application.applicationId === form.applicationId
+    );
 
+    const loadInterviews = useCallback(async (currentFilters = {}) => {
+        try {
+            const data = await getInterviews(currentFilters);
+            setInterviews(Array.isArray(data) ? data : []);
+        } catch (err) {
+            setError(err.message || "Failed to load interviews");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Initial page loading
     useEffect(() => {
-        async function loadData() {
-            try {
-                setError("");
+        let cancelled = false;
 
-                const [interviewData, applicationData, employeeData, panelData] =
+        async function loadInitialData() {
+            try {
+                const [interviewData, applicationData, employeeData] =
                     await Promise.all([
                         getInterviews(),
                         getApplications(),
                         getEmployees(),
-                        getInterviewPanels(),
                     ]);
 
-                setInterviews(interviewData || []);
+                if (cancelled) return;
+
+                setInterviews(Array.isArray(interviewData) ? interviewData : []);
+
                 setApplications(
-                    (applicationData || []).filter(
-                        (item) =>
-                            item.status === "ACTIVE" &&
+                    (Array.isArray(applicationData) ? applicationData : []).filter(
+                        (application) =>
+                            application.status === "ACTIVE" &&
                             ["SCREENING", "TECHNICAL", "MANAGERIAL", "HR"].includes(
-                                item.currentStage
+                                application.currentStage
                             )
                     )
                 );
-                setEmployees(employeeData || []);
-                setPanels(panelData || []);
+
+                setEmployees(Array.isArray(employeeData) ? employeeData : []);
             } catch (err) {
-                setError(err.message);
+                if (!cancelled) {
+                    setError(err.message || "Failed to load scheduling data");
+                }
             } finally {
-                setLoading(false);
+                if (!cancelled) {
+                    setLoading(false);
+                }
             }
         }
 
-        loadData();
+        loadInitialData();
+
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
-
+    // Load panels for selected requisition
     useEffect(() => {
-        let ignore = false;
+        let cancelled = false;
 
-        async function fetchFilteredInterviews() {
+        async function loadPanels() {
+            if (!selectedApplication?.requisitionId) return;
+
             try {
-                const data = await getInterviews({
-                    status: statusFilter,
-                    interviewType: typeFilter,
-                });
+                const data = await getInterviewPanels(
+                    selectedApplication.requisitionId
+                );
 
-                if (!ignore) {
-                    setInterviews(Array.isArray(data) ? data : []);
+                if (!cancelled) {
+                    setPanels(Array.isArray(data) ? data : []);
                 }
             } catch (err) {
-                if (!ignore) {
-                    setError(err.message);
+                if (!cancelled) {
+                    setPanels([]);
+                    setError(err.message || "Failed to load interview panels");
                 }
             }
         }
 
-        fetchFilteredInterviews();
+        loadPanels();
 
         return () => {
-            ignore = true;
+            cancelled = true;
         };
-    }, [statusFilter, typeFilter]);
+    }, [selectedApplication?.requisitionId]);
 
-    useEffect(() => {
-        let ignore = false;
+    const handleFilterChange = (event) => {
+        const { name, value } = event.target;
 
-        async function fetchPanels() {
-            if (!applicationId) {
-                setPanels([]);
-                return;
-            }
+        const updatedFilters = {
+            ...filters,
+            [name]: value,
+        };
 
-            const application = applications.find(
-                (item) => item.applicationId === applicationId
-            );
+        setFilters(updatedFilters);
+        setLoading(true);
+        setError("");
 
-            if (!application?.requisitionId) return;
+        loadInterviews(updatedFilters);
+    };
 
-            try {
-                const data = await getInterviewPanels(application.requisitionId);
+    const handleChange = (event) => {
+        const { name, value } = event.target;
 
-                if (!ignore) {
-                    setPanels(data || []);
-                }
-            } catch (err) {
-                if (!ignore) {
-                    setError(err.message);
-                }
-            }
+        setForm((previous) => ({
+            ...previous,
+            [name]: value,
+            ...(name === "applicationId" ? { panelId: "" } : {}),
+        }));
+
+        if (name === "applicationId") {
+            setPanels([]);
         }
+    };
 
-        fetchPanels();
-
-        return () => {
-            ignore = true;
-        };
-    }, [applicationId, applications]);
-
-    async function handleSchedule(event) {
+    const handleSchedule = async (event) => {
         event.preventDefault();
 
+        setError("");
+        setSuccess("");
+
         if (
-            !applicationId ||
-            !panelId ||
-            !startTime ||
-            !endTime ||
-            !leadInterviewer
+            !form.applicationId ||
+            !form.panelId ||
+            !form.startTime ||
+            !form.endTime ||
+            !form.leadInterviewer
         ) {
-            setError("Please complete all required scheduling fields.");
+            setError("Please complete all required fields.");
+            return;
+        }
+
+        const start = new Date(form.startTime);
+        const end = new Date(form.endTime);
+
+        if (start <= new Date()) {
+            setError("Interview must be scheduled for a future time.");
+            return;
+        }
+
+        if (start >= end) {
+            setError("End time must be later than start time.");
             return;
         }
 
         const participants = [
             {
-                employeeId: leadInterviewer,
+                employeeId: form.leadInterviewer,
                 role: "LEAD",
             },
         ];
 
-        if (panelist && panelist !== leadInterviewer) {
+        if (form.panelist && form.panelist !== form.leadInterviewer) {
             participants.push({
-                employeeId: panelist,
+                employeeId: form.panelist,
                 role: "PANELIST",
             });
         }
 
         try {
             setSaving(true);
-            setError("");
-            setSuccess("");
 
             await createInterview({
-                applicationId,
-                panelId,
-                interviewType,
-                startTime: new Date(startTime).toISOString(),
-                endTime: new Date(endTime).toISOString(),
+                applicationId: form.applicationId,
+                panelId: form.panelId,
+                interviewType: form.interviewType,
+                startTime: start.toISOString(),
+                endTime: end.toISOString(),
                 participants,
             });
 
-            setApplicationId("");
-            setPanelId("");
-            setStartTime("");
-            setEndTime("");
-            setLeadInterviewer("");
-            setPanelist("");
-
             setSuccess("Interview scheduled successfully.");
 
-            await loadInterviews();
+            setForm({
+                applicationId: "",
+                panelId: "",
+                interviewType: "SCREENING",
+                startTime: "",
+                endTime: "",
+                leadInterviewer: "",
+                panelist: "",
+            });
+
+            setPanels([]);
+            await loadInterviews(filters);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || "Unable to schedule interview.");
         } finally {
             setSaving(false);
         }
-    }
+    };
 
-    if (loading) {
-        return <div className="interviews-page">Loading interviews...</div>;
-    }
+    const handleComplete = async (interview) => {
+        const actorId = getActorId(interview);
+
+        if (!actorId) {
+            setError("No lead interviewer is assigned to this interview.");
+            return;
+        }
+
+        if (!window.confirm("Mark this interview as completed?")) return;
+
+        try {
+            setError("");
+            setSuccess("");
+
+            await completeInterview(interview.interviewId, {
+                completedById: actorId,
+            });
+
+            setSuccess("Interview marked as completed.");
+            await loadInterviews(filters);
+        } catch (err) {
+            setError(err.message || "Unable to complete interview.");
+        }
+    };
+
+    const handleCancel = async (interview) => {
+        const actorId = getActorId(interview);
+
+        if (!actorId) {
+            setError("No lead interviewer is assigned to this interview.");
+            return;
+        }
+
+        const reason = window.prompt("Enter the cancellation reason:");
+
+        if (!reason?.trim()) return;
+
+        try {
+            setError("");
+            setSuccess("");
+
+            await cancelInterview(interview.interviewId, {
+                cancelledById: actorId,
+                reason: reason.trim(),
+            });
+
+            setSuccess("Interview cancelled.");
+            await loadInterviews(filters);
+        } catch (err) {
+            setError(err.message || "Unable to cancel interview.");
+        }
+    };
+
+    const handleReschedule = async (interview) => {
+        const actorId = getActorId(interview);
+
+        if (!actorId) {
+            setError("No lead interviewer is assigned to this interview.");
+            return;
+        }
+
+        const newStart = window.prompt(
+            "New start time (YYYY-MM-DDTHH:mm):",
+            toLocalInput(interview.startTime)
+        );
+
+        if (!newStart) return;
+
+        const newEnd = window.prompt(
+            "New end time (YYYY-MM-DDTHH:mm):",
+            toLocalInput(interview.endTime)
+        );
+
+        if (!newEnd) return;
+
+        const reason = window.prompt("Enter the rescheduling reason:");
+
+        if (!reason?.trim()) return;
+
+        const start = new Date(newStart);
+        const end = new Date(newEnd);
+
+        if (
+            Number.isNaN(start.getTime()) ||
+            Number.isNaN(end.getTime()) ||
+            start <= new Date() ||
+            start >= end
+        ) {
+            setError("Enter valid future start and end times.");
+            return;
+        }
+
+        try {
+            setError("");
+            setSuccess("");
+
+            await rescheduleInterview(interview.interviewId, {
+                rescheduledById: actorId,
+                startTime: start.toISOString(),
+                endTime: end.toISOString(),
+                reason: reason.trim(),
+            });
+
+            setSuccess("Interview rescheduled successfully.");
+            await loadInterviews(filters);
+        } catch (err) {
+            setError(err.message || "Unable to reschedule interview.");
+        }
+    };
+
+    const groupedInterviews = useMemo(() => {
+        return interviews.reduce((groups, interview) => {
+            const date = new Date(interview.startTime).toLocaleDateString();
+
+            if (!groups[date]) groups[date] = [];
+
+            groups[date].push(interview);
+            return groups;
+        }, {});
+    }, [interviews]);
+
+    const renderInterview = (interview) => {
+        const isScheduled = interview.status === "SCHEDULED";
+
+        return (
+            <tr key={interview.interviewId}>
+                <td>{getCandidateName(interview)}</td>
+                <td>{interview.application?.requisition?.title || "—"}</td>
+                <td>{interview.interviewType}</td>
+                <td>{interview.panel?.name || "—"}</td>
+                <td>{formatDate(interview.startTime)}</td>
+                <td>
+                    <span
+                        className={`interview-status status-${(
+                            interview.status || ""
+                        ).toLowerCase()}`}
+                    >
+                        {interview.status}
+                    </span>
+                </td>
+                <td>
+                    {isScheduled && (
+                        <div className="interview-actions">
+                            <button
+                                type="button"
+                                onClick={() => handleComplete(interview)}
+                            >
+                                Complete
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => handleReschedule(interview)}
+                            >
+                                Reschedule
+                            </button>
+
+                            <button
+                                type="button"
+                                className="cancel-action"
+                                onClick={() => handleCancel(interview)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+                </td>
+            </tr>
+        );
+    };
 
     return (
         <div className="interviews-page">
-            <div className="page-header">
-                <div>
-                    <h1>Interviews</h1>
-                    <p>Schedule interviews and manage interviewer assignments.</p>
-                </div>
-            </div>
-
-            <div className="interview-form-card">
+            <section className="interview-form-card">
                 <h2>Schedule Interview</h2>
 
-                <form onSubmit={handleSchedule} className="interview-form">
-                    <div className="form-group">
-                        <label>Application</label>
+                <form className="interview-form" onSubmit={handleSchedule}>
+                    <label>
+                        Application
                         <select
-                            value={applicationId}
-                            onChange={(e) => setApplicationId(e.target.value)}
+                            name="applicationId"
+                            value={form.applicationId}
+                            onChange={handleChange}
                             required
                         >
                             <option value="">Select application</option>
+
                             {applications.map((application) => (
                                 <option
                                     key={application.applicationId}
                                     value={application.applicationId}
                                 >
-                                    {application.candidate?.fullName} —{" "}
-                                    {application.requisition?.title} (
-                                    {application.currentStage})
+                                    {application.applicationId} —{" "}
+                                    {application.candidate?.firstName}{" "}
+                                    {application.candidate?.lastName}
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </label>
 
-                    <div className="form-group">
-                        <label>Interview Type</label>
+                    <label>
+                        Interview Panel
                         <select
-                            value={interviewType}
-                            onChange={(e) => setInterviewType(e.target.value)}
-                        >
-                            <option value="SCREENING">Screening</option>
-                            <option value="TECHNICAL">Technical</option>
-                            <option value="MANAGERIAL">Managerial</option>
-                            <option value="HR">HR</option>
-                        </select>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Interview Panel</label>
-                        <select
-                            value={panelId}
-                            onChange={(e) => setPanelId(e.target.value)}
+                            name="panelId"
+                            value={form.panelId}
+                            onChange={handleChange}
                             required
+                            disabled={!form.applicationId}
                         >
                             <option value="">Select panel</option>
+
                             {panels.map((panel) => (
                                 <option key={panel.panelId} value={panel.panelId}>
-                                    {panel.panelName}
+                                    {panel.name || panel.panelId}
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </label>
 
-                    <div className="form-group">
-                        <label>Lead Interviewer</label>
+                    <label>
+                        Interview Type
                         <select
-                            value={leadInterviewer}
-                            onChange={(e) => setLeadInterviewer(e.target.value)}
+                            name="interviewType"
+                            value={form.interviewType}
+                            onChange={handleChange}
+                        >
+                            {interviewTypes.map((type) => (
+                                <option key={type} value={type}>
+                                    {type}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label>
+                        Lead Interviewer
+                        <select
+                            name="leadInterviewer"
+                            value={form.leadInterviewer}
+                            onChange={handleChange}
                             required
                         >
                             <option value="">Select lead interviewer</option>
+
                             {employees.map((employee) => (
                                 <option
                                     key={employee.employeeId}
                                     value={employee.employeeId}
                                 >
-                                    {employee.fullName} ({employee.role})
+                                    {getEmployeeName(employee)}
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </label>
 
-                    <div className="form-group">
-                        <label>Additional Panelist (Optional)</label>
+                    <label>
+                        Additional Panelist (Optional)
                         <select
-                            value={panelist}
-                            onChange={(e) => setPanelist(e.target.value)}
+                            name="panelist"
+                            value={form.panelist}
+                            onChange={handleChange}
                         >
                             <option value="">No additional panelist</option>
+
                             {employees
                                 .filter(
                                     (employee) =>
-                                        employee.employeeId !== leadInterviewer
+                                        employee.employeeId !== form.leadInterviewer
                                 )
                                 .map((employee) => (
                                     <option
                                         key={employee.employeeId}
                                         value={employee.employeeId}
                                     >
-                                        {employee.fullName}
+                                        {getEmployeeName(employee)}
                                     </option>
                                 ))}
                         </select>
-                    </div>
+                    </label>
 
-                    <div className="form-group">
-                        <label>Start Time</label>
+                    <label>
+                        Start Time
                         <input
                             type="datetime-local"
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
+                            name="startTime"
+                            value={form.startTime}
+                            onChange={handleChange}
                             required
                         />
-                    </div>
+                    </label>
 
-                    <div className="form-group">
-                        <label>End Time</label>
+                    <label>
+                        End Time
                         <input
                             type="datetime-local"
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
+                            name="endTime"
+                            value={form.endTime}
+                            onChange={handleChange}
                             required
                         />
-                    </div>
+                    </label>
 
                     <button type="submit" disabled={saving}>
                         {saving ? "Scheduling..." : "Schedule Interview"}
                     </button>
                 </form>
-            </div>
 
-            {error && <p className="interview-error">{error}</p>}
-            {success && <p className="interview-success">{success}</p>}
+                {error && <p className="interview-error">{error}</p>}
+                {success && <p className="interview-success">{success}</p>}
+            </section>
 
-            <div className="interview-list-card">
+            <section className="interview-list-card">
                 <div className="interview-list-header">
-                    <h2>All Interviews</h2>
-                    <span>{interviews.length} interviews</span>
+                    <div>
+                        <h2>Interviews</h2>
+                        <span>{interviews.length} interviews found</span>
+                    </div>
+
+                    <div className="interview-view-toggle">
+                        <button
+                            className={view === "list" ? "active" : ""}
+                            onClick={() => setView("list")}
+                            type="button"
+                        >
+                            List
+                        </button>
+
+                        <button
+                            className={view === "calendar" ? "active" : ""}
+                            onClick={() => setView("calendar")}
+                            type="button"
+                        >
+                            Calendar
+                        </button>
+                    </div>
                 </div>
 
                 <div className="interview-filters">
                     <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
+                        name="status"
+                        value={filters.status}
+                        onChange={handleFilterChange}
                     >
                         <option value="">All statuses</option>
                         <option value="SCHEDULED">Scheduled</option>
@@ -352,67 +621,90 @@ function Interviews() {
                     </select>
 
                     <select
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
+                        name="interviewType"
+                        value={filters.interviewType}
+                        onChange={handleFilterChange}
                     >
                         <option value="">All interview types</option>
-                        <option value="SCREENING">Screening</option>
-                        <option value="TECHNICAL">Technical</option>
-                        <option value="MANAGERIAL">Managerial</option>
-                        <option value="HR">HR</option>
+
+                        {interviewTypes.map((type) => (
+                            <option key={type} value={type}>
+                                {type}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
-                <div className="interview-table-wrapper">
-                    <table className="interview-table">
-                        <thead>
-                            <tr>
-                                <th>Candidate</th>
-                                <th>Position</th>
-                                <th>Interview Type</th>
-                                <th>Panel</th>
-                                <th>Scheduled Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {interviews.map((interview) => (
-                                <tr key={interview.interviewId}>
-                                    <td>
-                                        <strong>
-                                            {interview.application?.candidate?.fullName || "Unknown"}
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        {interview.application?.requisition?.title || "-"}
-                                    </td>
-                                    <td>{interview.interviewType}</td>
-                                    <td>{interview.panel?.panelName || "-"}</td>
-                                    <td>
-                                        {new Date(interview.startTime).toLocaleString()}
-                                        {" — "}
-                                        {new Date(interview.endTime).toLocaleTimeString()}
-                                    </td>
-                                    <td>
-                                        <span className="interview-status">
-                                            {interview.status}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-
-                            {interviews.length === 0 && (
+                {loading ? (
+                    <p>Loading interviews...</p>
+                ) : interviews.length === 0 ? (
+                    <p className="empty-interviews">No interviews found.</p>
+                ) : view === "list" ? (
+                    <div className="interview-table-wrapper">
+                        <table className="interview-table">
+                            <thead>
                                 <tr>
-                                    <td colSpan="6" className="empty-interviews">
-                                        No interviews found.
-                                    </td>
+                                    <th>Candidate</th>
+                                    <th>Position</th>
+                                    <th>Type</th>
+                                    <th>Panel</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                            </thead>
+
+                            <tbody>{interviews.map(renderInterview)}</tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="interview-calendar">
+                        {Object.entries(groupedInterviews).map(([date, items]) => (
+                            <div className="calendar-day" key={date}>
+                                <h3>{date}</h3>
+
+                                {items.map((interview) => (
+                                    <div
+                                        className="calendar-interview"
+                                        key={interview.interviewId}
+                                    >
+                                        <strong>{getCandidateName(interview)}</strong>
+                                        <span>{interview.interviewType}</span>
+                                        <span>{formatDate(interview.startTime)}</span>
+                                        <span>{interview.status}</span>
+
+                                        {interview.status === "SCHEDULED" && (
+                                            <div className="interview-actions">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleComplete(interview)}
+                                                >
+                                                    Complete
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleReschedule(interview)}
+                                                >
+                                                    Reschedule
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="cancel-action"
+                                                    onClick={() => handleCancel(interview)}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </section>
         </div>
     );
 }
