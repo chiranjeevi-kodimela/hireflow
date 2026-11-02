@@ -506,4 +506,41 @@ const rescheduleInterview = async (interviewId, data) => {
     { isolationLevel: "Serializable" },
   );
 };
-module.exports = { createInterview, completeInterview, cancelInterview, rescheduleInterview };
+const getAllInterviews = async (filters = {}) => {
+  const where = {};
+
+  if (filters.status) {
+    where.status = filters.status;
+  }
+
+  if (filters.interviewType) {
+    where.interviewType = filters.interviewType;
+  }
+
+  if (filters.applicationId) {
+    where.applicationId = filters.applicationId;
+  }
+
+  return prisma.interview.findMany({
+    where,
+    include: {
+      application: {
+        include: {
+          candidate: true,
+          requisition: true,
+        },
+      },
+      panel: true,
+      participants: {
+        include: {
+          employee: true,
+        },
+      },
+      scorecards: true,
+    },
+    orderBy: {
+      startTime: "asc",
+    },
+  });
+};
+module.exports = { createInterview, completeInterview, cancelInterview, rescheduleInterview, getAllInterviews };
