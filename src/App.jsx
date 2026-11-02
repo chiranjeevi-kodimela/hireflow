@@ -4,6 +4,8 @@ import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Requisitions from './pages/Requisitions';
 import Candidates from './pages/Candidates';
+import Applications from './pages/Applications';
+
 function App() {
   return (
     <BrowserRouter>
@@ -12,6 +14,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/jobs" element={<Requisitions />} />
           <Route path="/candidates" element={<Candidates />} />
+          <Route path="/applications" element={<Applications />} />
         </Routes>
       </MainLayout>
     </BrowserRouter>

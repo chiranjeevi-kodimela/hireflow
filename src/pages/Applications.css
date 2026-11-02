@@ -1,0 +1,148 @@
+.applications-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.application-form-card,
+.application-list-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e9e5);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.application-form-card h2,
+.application-list-card h2 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  color: var(--text-primary, #172033);
+}
+
+.application-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+}
+
+.form-group select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--border, #e5e9e5);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text-primary, #172033);
+  font-size: 14px;
+}
+
+.application-form button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: var(--brand, #16866b);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.application-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.application-error,
+.application-success {
+  margin: 14px 0 0;
+  font-size: 13px;
+}
+
+.application-error {
+  color: #d65c5c;
+}
+
+.application-success {
+  color: #16866b;
+}
+
+.application-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.application-list-header span {
+  font-size: 13px;
+  color: var(--text-secondary, #64748b);
+}
+
+.application-table-wrapper {
+  overflow-x: auto;
+}
+
+.application-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.application-table th,
+.application-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid var(--border, #e5e9e5);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.application-table th {
+  color: var(--text-secondary, #64748b);
+  font-weight: 600;
+}
+
+.application-table td {
+  color: var(--text-primary, #172033);
+}
+
+.application-table td small {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-secondary, #64748b);
+}
+
+.stage-badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #ddf3e9;
+  color: #106b56;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.empty-applications {
+  text-align: center;
+  padding: 30px !important;
+  color: var(--text-secondary, #64748b) !important;
+}
+
+@media (max-width: 850px) {
+  .application-form {
+    grid-template-columns: 1fr;
+  }
+
+  .application-form button {
+    width: 100%;
+  }
+}
