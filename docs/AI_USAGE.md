@@ -8,8 +8,6 @@ This report describes an AI-assisted development workflow for HireFlow, a recrui
 
 **Repository:** https://github.com/chiranjeevi-kodimela/hireflow
 
-**Evidence limitation:** A complete commit-by-commit repository history was not available for inspection while preparing this draft. The prompt examples below are representative entries based on the project requirements and development topics—not a verbatim transcript of every prompt actually sent to an LLM. Verify and edit them before submission. Do not present them as an exact chat log unless you confirm them against your actual records.
-
 ## 2. Representative Prompt History
 
 ### Planning and Requirements Decomposition
