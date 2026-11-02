@@ -1,0 +1,1602 @@
+[
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900002",
+    "requisitionId": "REQ-2026-900002",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.059Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900003",
+    "requisitionId": "REQ-2026-900003",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.111Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900004",
+    "requisitionId": "REQ-2026-900004",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.127Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900005",
+    "requisitionId": "REQ-2026-900005",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.143Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900006",
+    "requisitionId": "REQ-2026-900006",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.158Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900007",
+    "requisitionId": "REQ-2026-900007",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.173Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900008",
+    "requisitionId": "REQ-2026-900008",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.189Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900009",
+    "requisitionId": "REQ-2026-900009",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.204Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900010",
+    "requisitionId": "REQ-2026-900010",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.218Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900011",
+    "requisitionId": "REQ-2026-900011",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.233Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900012",
+    "requisitionId": "REQ-2026-900012",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.248Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900013",
+    "requisitionId": "REQ-2026-900013",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.262Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900014",
+    "requisitionId": "REQ-2026-900014",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.278Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900015",
+    "requisitionId": "REQ-2026-900015",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.292Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900016",
+    "requisitionId": "REQ-2026-900016",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.307Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900018",
+    "requisitionId": "REQ-2026-900018",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.322Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900019",
+    "requisitionId": "REQ-2026-900019",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.337Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900020",
+    "requisitionId": "REQ-2026-900020",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.352Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900021",
+    "requisitionId": "REQ-2026-900021",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.366Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900022",
+    "requisitionId": "REQ-2026-900022",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.381Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900023",
+    "requisitionId": "REQ-2026-900023",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.395Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900024",
+    "requisitionId": "REQ-2026-900024",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.412Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900025",
+    "requisitionId": "REQ-2026-900025",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.427Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900026",
+    "requisitionId": "REQ-2026-900026",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.443Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900027",
+    "requisitionId": "REQ-2026-900027",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.458Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900028",
+    "requisitionId": "REQ-2026-900028",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.472Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900029",
+    "requisitionId": "REQ-2026-900029",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.486Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900030",
+    "requisitionId": "REQ-2026-900030",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.502Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900031",
+    "requisitionId": "REQ-2026-900031",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.523Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900032",
+    "requisitionId": "REQ-2026-900032",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.542Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900033",
+    "requisitionId": "REQ-2026-900033",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.562Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900034",
+    "requisitionId": "REQ-2026-900034",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.580Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900035",
+    "requisitionId": "REQ-2026-900035",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.597Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900037",
+    "requisitionId": "REQ-2026-900037",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.613Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900038",
+    "requisitionId": "REQ-2026-900038",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.637Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900039",
+    "requisitionId": "REQ-2026-900039",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.656Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900040",
+    "requisitionId": "REQ-2026-900040",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.671Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900041",
+    "requisitionId": "REQ-2026-900041",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.687Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900042",
+    "requisitionId": "REQ-2026-900042",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.705Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900043",
+    "requisitionId": "REQ-2026-900043",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.721Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900044",
+    "requisitionId": "REQ-2026-900044",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.737Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900045",
+    "requisitionId": "REQ-2026-900045",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.752Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900046",
+    "requisitionId": "REQ-2026-900046",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.768Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900047",
+    "requisitionId": "REQ-2026-900047",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.784Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900048",
+    "requisitionId": "REQ-2026-900048",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.800Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900049",
+    "requisitionId": "REQ-2026-900049",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.816Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900050",
+    "requisitionId": "REQ-2026-900050",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.833Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900051",
+    "requisitionId": "REQ-2026-900051",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.848Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900052",
+    "requisitionId": "REQ-2026-900052",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.863Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900053",
+    "requisitionId": "REQ-2026-900053",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.879Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900055",
+    "requisitionId": "REQ-2026-900055",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.895Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900056",
+    "requisitionId": "REQ-2026-900056",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.918Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900104",
+    "requisitionId": "REQ-2026-900104",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.935Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900105",
+    "requisitionId": "REQ-2026-900105",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.950Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900106",
+    "requisitionId": "REQ-2026-900106",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.965Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900107",
+    "requisitionId": "REQ-2026-900107",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.979Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900108",
+    "requisitionId": "REQ-2026-900108",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:12.994Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900109",
+    "requisitionId": "REQ-2026-900109",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.009Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900110",
+    "requisitionId": "REQ-2026-900110",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.024Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900111",
+    "requisitionId": "REQ-2026-900111",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.040Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900112",
+    "requisitionId": "REQ-2026-900112",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.055Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900113",
+    "requisitionId": "REQ-2026-900113",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.073Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900058",
+    "requisitionId": "REQ-2026-900058",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.088Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900059",
+    "requisitionId": "REQ-2026-900059",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.102Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900060",
+    "requisitionId": "REQ-2026-900060",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.116Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900061",
+    "requisitionId": "REQ-2026-900061",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.132Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900062",
+    "requisitionId": "REQ-2026-900062",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.148Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900063",
+    "requisitionId": "REQ-2026-900063",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.163Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900064",
+    "requisitionId": "REQ-2026-900064",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.178Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900065",
+    "requisitionId": "REQ-2026-900065",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.194Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900066",
+    "requisitionId": "REQ-2026-900066",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.210Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900067",
+    "requisitionId": "REQ-2026-900067",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.227Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900068",
+    "requisitionId": "REQ-2026-900068",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.243Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900069",
+    "requisitionId": "REQ-2026-900069",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.262Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900071",
+    "requisitionId": "REQ-2026-900071",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.280Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900072",
+    "requisitionId": "REQ-2026-900072",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.300Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900073",
+    "requisitionId": "REQ-2026-900073",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.317Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900074",
+    "requisitionId": "REQ-2026-900074",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.334Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900075",
+    "requisitionId": "REQ-2026-900075",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.350Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900076",
+    "requisitionId": "REQ-2026-900076",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.370Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900077",
+    "requisitionId": "REQ-2026-900077",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.388Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900078",
+    "requisitionId": "REQ-2026-900078",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.406Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900079",
+    "requisitionId": "REQ-2026-900079",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.422Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900080",
+    "requisitionId": "REQ-2026-900080",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.439Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900081",
+    "requisitionId": "REQ-2026-900081",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.458Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900082",
+    "requisitionId": "REQ-2026-900082",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.483Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900083",
+    "requisitionId": "REQ-2026-900083",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.503Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900084",
+    "requisitionId": "REQ-2026-900084",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.519Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900085",
+    "requisitionId": "REQ-2026-900085",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.533Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900086",
+    "requisitionId": "REQ-2026-900086",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.549Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900087",
+    "requisitionId": "REQ-2026-900087",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.566Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900088",
+    "requisitionId": "REQ-2026-900088",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.580Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900089",
+    "requisitionId": "REQ-2026-900089",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.596Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900090",
+    "requisitionId": "REQ-2026-900090",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.612Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900092",
+    "requisitionId": "REQ-2026-900092",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.627Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900093",
+    "requisitionId": "REQ-2026-900093",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.642Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900094",
+    "requisitionId": "REQ-2026-900094",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.657Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900095",
+    "requisitionId": "REQ-2026-900095",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.672Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900096",
+    "requisitionId": "REQ-2026-900096",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.687Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900097",
+    "requisitionId": "REQ-2026-900097",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.701Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900098",
+    "requisitionId": "REQ-2026-900098",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.716Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900099",
+    "requisitionId": "REQ-2026-900099",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.732Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900100",
+    "requisitionId": "REQ-2026-900100",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.747Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900101",
+    "requisitionId": "REQ-2026-900101",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.762Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900102",
+    "requisitionId": "REQ-2026-900102",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.779Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900115",
+    "requisitionId": "REQ-2026-900115",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.798Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900116",
+    "requisitionId": "REQ-2026-900116",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.816Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900117",
+    "requisitionId": "REQ-2026-900117",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.832Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900118",
+    "requisitionId": "REQ-2026-900118",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.850Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900119",
+    "requisitionId": "REQ-2026-900119",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.868Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900120",
+    "requisitionId": "REQ-2026-900120",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.884Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900121",
+    "requisitionId": "REQ-2026-900121",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.902Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900122",
+    "requisitionId": "REQ-2026-900122",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.918Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900123",
+    "requisitionId": "REQ-2026-900123",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.933Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900124",
+    "requisitionId": "REQ-2026-900124",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.951Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900125",
+    "requisitionId": "REQ-2026-900125",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.971Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900126",
+    "requisitionId": "REQ-2026-900126",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:13.987Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900127",
+    "requisitionId": "REQ-2026-900127",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.003Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900129",
+    "requisitionId": "REQ-2026-900129",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.021Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900130",
+    "requisitionId": "REQ-2026-900130",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.037Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900131",
+    "requisitionId": "REQ-2026-900131",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.053Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900132",
+    "requisitionId": "REQ-2026-900132",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.068Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900133",
+    "requisitionId": "REQ-2026-900133",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.084Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900134",
+    "requisitionId": "REQ-2026-900134",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.100Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900135",
+    "requisitionId": "REQ-2026-900135",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.116Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900136",
+    "requisitionId": "REQ-2026-900136",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.133Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900137",
+    "requisitionId": "REQ-2026-900137",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.150Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900138",
+    "requisitionId": "REQ-2026-900138",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.166Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900139",
+    "requisitionId": "REQ-2026-900139",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.182Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900140",
+    "requisitionId": "REQ-2026-900140",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.198Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900141",
+    "requisitionId": "REQ-2026-900141",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.216Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900142",
+    "requisitionId": "REQ-2026-900142",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.235Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900143",
+    "requisitionId": "REQ-2026-900143",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.253Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900144",
+    "requisitionId": "REQ-2026-900144",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.271Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900145",
+    "requisitionId": "REQ-2026-900145",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.288Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900146",
+    "requisitionId": "REQ-2026-900146",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.306Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900148",
+    "requisitionId": "REQ-2026-900148",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.324Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900149",
+    "requisitionId": "REQ-2026-900149",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.339Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900150",
+    "requisitionId": "REQ-2026-900150",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.356Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900151",
+    "requisitionId": "REQ-2026-900151",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.372Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900152",
+    "requisitionId": "REQ-2026-900152",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.390Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900153",
+    "requisitionId": "REQ-2026-900153",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.406Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900154",
+    "requisitionId": "REQ-2026-900154",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.422Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900155",
+    "requisitionId": "REQ-2026-900155",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.438Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900156",
+    "requisitionId": "REQ-2026-900156",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.454Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900157",
+    "requisitionId": "REQ-2026-900157",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.469Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900158",
+    "requisitionId": "REQ-2026-900158",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.486Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900159",
+    "requisitionId": "REQ-2026-900159",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.503Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900160",
+    "requisitionId": "REQ-2026-900160",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.519Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900161",
+    "requisitionId": "REQ-2026-900161",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.535Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900162",
+    "requisitionId": "REQ-2026-900162",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.552Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900164",
+    "requisitionId": "REQ-2026-900164",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.567Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900165",
+    "requisitionId": "REQ-2026-900165",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.583Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900166",
+    "requisitionId": "REQ-2026-900166",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.598Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900167",
+    "requisitionId": "REQ-2026-900167",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.615Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900168",
+    "requisitionId": "REQ-2026-900168",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.631Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900169",
+    "requisitionId": "REQ-2026-900169",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.652Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900170",
+    "requisitionId": "REQ-2026-900170",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.667Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900103",
+    "requisitionId": "REQ-2026-900103",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.681Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900001",
+    "requisitionId": "REQ-2026-900001",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.697Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900017",
+    "requisitionId": "REQ-2026-900017",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.713Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900114",
+    "requisitionId": "REQ-2026-900114",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.729Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900036",
+    "requisitionId": "REQ-2026-900036",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.744Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900128",
+    "requisitionId": "REQ-2026-900128",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.758Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900054",
+    "requisitionId": "REQ-2026-900054",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.773Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900057",
+    "requisitionId": "REQ-2026-900057",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.788Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900070",
+    "requisitionId": "REQ-2026-900070",
+    "panelName": "Senior Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Senior Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.804Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900147",
+    "requisitionId": "REQ-2026-900147",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.820Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900091",
+    "requisitionId": "REQ-2026-900091",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.835Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900163",
+    "requisitionId": "REQ-2026-900163",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.849Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900171",
+    "requisitionId": "REQ-2026-900171",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.863Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900172",
+    "requisitionId": "REQ-2026-900172",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.878Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900173",
+    "requisitionId": "REQ-2026-900173",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.896Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900174",
+    "requisitionId": "REQ-2026-900174",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.913Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900175",
+    "requisitionId": "REQ-2026-900175",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.928Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900176",
+    "requisitionId": "REQ-2026-900176",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.944Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900177",
+    "requisitionId": "REQ-2026-900177",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.959Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900178",
+    "requisitionId": "REQ-2026-900178",
+    "panelName": "Data Engineer Interview Panel",
+    "description": "Synthetic interview panel for Data Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.975Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900179",
+    "requisitionId": "REQ-2026-900179",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:14.989Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900180",
+    "requisitionId": "REQ-2026-900180",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.008Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900181",
+    "requisitionId": "REQ-2026-900181",
+    "panelName": "QA Engineer Interview Panel",
+    "description": "Synthetic interview panel for QA Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.027Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900182",
+    "requisitionId": "REQ-2026-900182",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.042Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900183",
+    "requisitionId": "REQ-2026-900183",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.057Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900184",
+    "requisitionId": "REQ-2026-900184",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.072Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900185",
+    "requisitionId": "REQ-2026-900185",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.089Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900186",
+    "requisitionId": "REQ-2026-900186",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.105Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900187",
+    "requisitionId": "REQ-2026-900187",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.120Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900188",
+    "requisitionId": "REQ-2026-900188",
+    "panelName": "Software Engineer Interview Panel",
+    "description": "Synthetic interview panel for Software Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.135Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900189",
+    "requisitionId": "REQ-2026-900189",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.149Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900190",
+    "requisitionId": "REQ-2026-900190",
+    "panelName": "Data Analyst Interview Panel",
+    "description": "Synthetic interview panel for Data Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.163Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900191",
+    "requisitionId": "REQ-2026-900191",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.180Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900192",
+    "requisitionId": "REQ-2026-900192",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.195Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900193",
+    "requisitionId": "REQ-2026-900193",
+    "panelName": "Backend Developer Interview Panel",
+    "description": "Synthetic interview panel for Backend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.214Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900194",
+    "requisitionId": "REQ-2026-900194",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.231Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900195",
+    "requisitionId": "REQ-2026-900195",
+    "panelName": "Frontend Developer Interview Panel",
+    "description": "Synthetic interview panel for Frontend Developer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.248Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900196",
+    "requisitionId": "REQ-2026-900196",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.264Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900197",
+    "requisitionId": "REQ-2026-900197",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.279Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900198",
+    "requisitionId": "REQ-2026-900198",
+    "panelName": "DevOps Engineer Interview Panel",
+    "description": "Synthetic interview panel for DevOps Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.295Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900199",
+    "requisitionId": "REQ-2026-900199",
+    "panelName": "Machine Learning Engineer Interview Panel",
+    "description": "Synthetic interview panel for Machine Learning Engineer",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.311Z"
+  },
+  {
+    "panelId": "SYN-PANEL-REQ-2026-900200",
+    "requisitionId": "REQ-2026-900200",
+    "panelName": "Product Analyst Interview Panel",
+    "description": "Synthetic interview panel for Product Analyst",
+    "isActive": true,
+    "createdAt": "2026-11-02T09:03:15.327Z"
+  }
+]

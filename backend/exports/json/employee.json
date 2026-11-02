@@ -1,0 +1,281 @@
+[
+  {
+    "employeeId": "EMP-000001",
+    "fullName": "Arjun Kumar",
+    "email": "arjun@hireflow.demo",
+    "department": "Engineering",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-01T21:28:17.692Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000001",
+    "fullName": "Ananya Patel",
+    "email": "employee1@hireflow.test",
+    "department": "Data",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.164Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000002",
+    "fullName": "Rohan Reddy",
+    "email": "employee2@hireflow.test",
+    "department": "Product",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.201Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000003",
+    "fullName": "Arjun Nair",
+    "email": "employee3@hireflow.test",
+    "department": "Product",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.212Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000004",
+    "fullName": "Rohan Nair",
+    "email": "employee4@hireflow.test",
+    "department": "Data",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.223Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000005",
+    "fullName": "Ananya Kumar",
+    "email": "employee5@hireflow.test",
+    "department": "Product",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.234Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000006",
+    "fullName": "Vihaan Gupta",
+    "email": "employee6@hireflow.test",
+    "department": "Engineering",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.245Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000007",
+    "fullName": "Arjun Mehta",
+    "email": "employee7@hireflow.test",
+    "department": "Finance",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.255Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000008",
+    "fullName": "Priya Kumar",
+    "email": "employee8@hireflow.test",
+    "department": "Finance",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.265Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000009",
+    "fullName": "Aadhya Nair",
+    "email": "employee9@hireflow.test",
+    "department": "Finance",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.275Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000010",
+    "fullName": "Aditya Kumar",
+    "email": "employee10@hireflow.test",
+    "department": "Data",
+    "role": "HIRING_MANAGER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.285Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000011",
+    "fullName": "Aadhya Patel",
+    "email": "employee11@hireflow.test",
+    "department": "Data",
+    "role": "APPROVER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.294Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000012",
+    "fullName": "Sneha Kumar",
+    "email": "employee12@hireflow.test",
+    "department": "Engineering",
+    "role": "APPROVER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.299Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000013",
+    "fullName": "Aadhya Kumar",
+    "email": "employee13@hireflow.test",
+    "department": "Product",
+    "role": "APPROVER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.304Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000014",
+    "fullName": "Ananya Sharma",
+    "email": "employee14@hireflow.test",
+    "department": "Data",
+    "role": "APPROVER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.308Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000015",
+    "fullName": "Diya Nair",
+    "email": "employee15@hireflow.test",
+    "department": "Engineering",
+    "role": "APPROVER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.313Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000016",
+    "fullName": "Vihaan Mehta",
+    "email": "employee16@hireflow.test",
+    "department": "Finance",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.317Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000017",
+    "fullName": "Kavya Nair",
+    "email": "employee17@hireflow.test",
+    "department": "Data",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.321Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000018",
+    "fullName": "Sneha Reddy",
+    "email": "employee18@hireflow.test",
+    "department": "Engineering",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.326Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000019",
+    "fullName": "Arjun Kumar",
+    "email": "employee19@hireflow.test",
+    "department": "Product",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.331Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000020",
+    "fullName": "Rahul Rao",
+    "email": "employee20@hireflow.test",
+    "department": "Data",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.336Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000021",
+    "fullName": "Aarav Gupta",
+    "email": "employee21@hireflow.test",
+    "department": "Data",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.340Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000022",
+    "fullName": "Diya Mehta",
+    "email": "employee22@hireflow.test",
+    "department": "Human Resources",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.345Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000023",
+    "fullName": "Kiran Sharma",
+    "email": "employee23@hireflow.test",
+    "department": "Engineering",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.349Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000024",
+    "fullName": "Priya Rao",
+    "email": "employee24@hireflow.test",
+    "department": "Product",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.356Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000025",
+    "fullName": "Rahul Das",
+    "email": "employee25@hireflow.test",
+    "department": "Finance",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.362Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000026",
+    "fullName": "Ananya Das",
+    "email": "employee26@hireflow.test",
+    "department": "Engineering",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.369Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000027",
+    "fullName": "Priya Das",
+    "email": "employee27@hireflow.test",
+    "department": "Engineering",
+    "role": "INTERVIEWER",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.375Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000028",
+    "fullName": "Aditya Reddy",
+    "email": "employee28@hireflow.test",
+    "department": "Data",
+    "role": "HR",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.380Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000029",
+    "fullName": "Vihaan Das",
+    "email": "employee29@hireflow.test",
+    "department": "Finance",
+    "role": "HR",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.387Z"
+  },
+  {
+    "employeeId": "SYN-EMP-000030",
+    "fullName": "Meera Das",
+    "email": "employee30@hireflow.test",
+    "department": "Human Resources",
+    "role": "HR",
+    "isActive": true,
+    "createdAt": "2026-11-02T08:47:04.392Z"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "test_candidate",
+    "value": 1,
+    "updatedAt": "2026-11-02T05:12:14.827Z"
+  },
+  {
+    "name": "test_requisition",
+    "value": 1,
+    "updatedAt": "2026-11-02T05:12:14.827Z"
+  },
+  {
+    "name": "interview",
+    "value": 6660,
+    "updatedAt": "2026-11-02T09:14:53.016Z"
+  },
+  {
+    "name": "offer",
+    "value": 100,
+    "updatedAt": "2026-11-02T09:22:19.449Z"
+  }
+]

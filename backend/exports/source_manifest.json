@@ -1,0 +1,124 @@
+{
+  "generatedAt": "2026-11-02T09:32:06.986Z",
+  "format": [
+    "CSV",
+    "JSON"
+  ],
+  "entities": [
+    {
+      "entity": "employee",
+      "recordCount": 31,
+      "jsonFile": "json/employee.json",
+      "csvFile": "csv/employee.csv"
+    },
+    {
+      "entity": "hiringManager",
+      "recordCount": 11,
+      "jsonFile": "json/hiringManager.json",
+      "csvFile": "csv/hiringManager.csv"
+    },
+    {
+      "entity": "requisition",
+      "recordCount": 201,
+      "jsonFile": "json/requisition.json",
+      "csvFile": "csv/requisition.csv"
+    },
+    {
+      "entity": "candidate",
+      "recordCount": 5001,
+      "jsonFile": "json/candidate.json",
+      "csvFile": "csv/candidate.csv"
+    },
+    {
+      "entity": "application",
+      "recordCount": 8000,
+      "jsonFile": "json/application.json",
+      "csvFile": "csv/application.csv"
+    },
+    {
+      "entity": "skillRequirement",
+      "recordCount": 831,
+      "jsonFile": "json/skillRequirement.json",
+      "csvFile": "csv/skillRequirement.csv"
+    },
+    {
+      "entity": "interviewPanel",
+      "recordCount": 200,
+      "jsonFile": "json/interviewPanel.json",
+      "csvFile": "csv/interviewPanel.csv"
+    },
+    {
+      "entity": "panelMember",
+      "recordCount": 600,
+      "jsonFile": "json/panelMember.json",
+      "csvFile": "csv/panelMember.csv"
+    },
+    {
+      "entity": "availability",
+      "recordCount": 6240,
+      "jsonFile": "json/availability.json",
+      "csvFile": "csv/availability.csv"
+    },
+    {
+      "entity": "interview",
+      "recordCount": 2000,
+      "jsonFile": "json/interview.json",
+      "csvFile": "csv/interview.csv"
+    },
+    {
+      "entity": "interviewParticipant",
+      "recordCount": 4000,
+      "jsonFile": "json/interviewParticipant.json",
+      "csvFile": "csv/interviewParticipant.csv"
+    },
+    {
+      "entity": "scorecard",
+      "recordCount": 2000,
+      "jsonFile": "json/scorecard.json",
+      "csvFile": "csv/scorecard.csv"
+    },
+    {
+      "entity": "evaluationCriterion",
+      "recordCount": 805,
+      "jsonFile": "json/evaluationCriterion.json",
+      "csvFile": "csv/evaluationCriterion.csv"
+    },
+    {
+      "entity": "scorecardItem",
+      "recordCount": 8001,
+      "jsonFile": "json/scorecardItem.json",
+      "csvFile": "csv/scorecardItem.csv"
+    },
+    {
+      "entity": "offer",
+      "recordCount": 101,
+      "jsonFile": "json/offer.json",
+      "csvFile": "csv/offer.csv"
+    },
+    {
+      "entity": "approval",
+      "recordCount": 1500,
+      "jsonFile": "json/approval.json",
+      "csvFile": "csv/approval.csv"
+    },
+    {
+      "entity": "applicationStageEvent",
+      "recordCount": 10402,
+      "jsonFile": "json/applicationStageEvent.json",
+      "csvFile": "csv/applicationStageEvent.csv"
+    },
+    {
+      "entity": "auditLog",
+      "recordCount": 18205,
+      "jsonFile": "json/auditLog.json",
+      "csvFile": "csv/auditLog.csv"
+    },
+    {
+      "entity": "idCounter",
+      "recordCount": 4,
+      "jsonFile": "json/idCounter.json",
+      "csvFile": "csv/idCounter.csv"
+    }
+  ],
+  "totalRecords": 68133
+}
