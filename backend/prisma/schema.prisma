@@ -348,9 +348,9 @@ model Scorecard {
   scorecardId         String              @id
   interviewId         String
   reviewerId          String
-  technicalScore      Decimal             @db.Decimal(3, 2)
-  communicationScore  Decimal             @db.Decimal(3, 2)
-  problemSolvingScore Decimal             @db.Decimal(3, 2)
+  technicalScore      Decimal             @db.Decimal(4, 2)
+  communicationScore  Decimal             @db.Decimal(4, 2)
+  problemSolvingScore Decimal             @db.Decimal(4, 2)
   recommendation      ScoreRecommendation
   comments            String?
   submittedAt         DateTime            @default(now())
