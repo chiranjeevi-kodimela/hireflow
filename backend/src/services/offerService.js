@@ -102,4 +102,18 @@ const createOffer = async (data) => {
   });
 };
 
-module.exports = { createOffer };
+const getAllOffers = async () => {
+  return prisma.offer.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      approvals: true,
+      application: {
+        include: {
+          candidate: true,
+          requisition: true,
+        },
+      },
+    },
+  });
+};
+module.exports = { createOffer, getAllOffers };
