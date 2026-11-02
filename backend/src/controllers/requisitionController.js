@@ -1,5 +1,8 @@
 const requisitionService = require("../services/requisitionService");
-
+const {
+  // keep your existing imports
+  changeRequisitionStatus,
+} = require("../services/requisitionService");
 const createRequisition = async (req, res, next) => {
   try {
     const requisition = await requisitionService.createRequisition(req.body);
@@ -62,10 +65,27 @@ const updateRequisition = async (req, res, next) => {
     next(error);
   }
 };
+const changeStatus = async (req, res, next) => {
+  try {
+    const requisition = await changeRequisitionStatus(
+      req.params.id,
+      req.body
+    );
 
+    res.status(200).json({
+      success: true,
+      message: "Requisition status updated successfully",
+      data: requisition,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   createRequisition,
   getAllRequisitions,
   getRequisitionById,
   updateRequisition,
+  changeStatus,
 };
+

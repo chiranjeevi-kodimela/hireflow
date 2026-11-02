@@ -192,7 +192,6 @@ const updateRequisition = async (requisitionId, data) => {
     "minSalary",
     "maxSalary",
     "openings",
-    "status",
   ];
 
   const updateData = {};
@@ -293,10 +292,67 @@ const updateRequisition = async (requisitionId, data) => {
     },
   });
 };
+const changeRequisitionStatus = async (requisitionId, data) => {
+  const { status, reason } = data;
 
+  const allowedTransitions = {
+    OPEN: ["ON_HOLD", "CLOSED", "CANCELLED"],
+    ON_HOLD: ["OPEN", "CLOSED", "CANCELLED"],
+    CLOSED: [],
+    CANCELLED: [],
+  };
+
+  if (!status || !reason?.trim()) {
+    const error = new Error("Status and reason are required");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const requisition = await prisma.requisition.findUnique({
+    where: { requisitionId },
+  });
+
+  if (!requisition) {
+    const error = new Error("Requisition not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (!allowedTransitions[requisition.status]?.includes(status)) {
+    const error = new Error(
+      `Cannot change requisition from ${requisition.status} to ${status}`,
+    );
+    error.statusCode = 409;
+    throw error;
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const updated = await tx.requisition.update({
+      where: { requisitionId },
+      data: { status },
+    });
+
+    await tx.auditLog.create({
+      data: {
+        action: "REQUISITION_STATUS_CHANGED",
+        entityType: "Requisition",
+        entityId: requisitionId,
+        details: {
+          previousStatus: requisition.status,
+          newStatus: status,
+          reason: reason.trim(),
+        },
+      },
+    });
+
+    return updated;
+  });
+};
 module.exports = {
   createRequisition,
   getAllRequisitions,
   getRequisitionById,
   updateRequisition,
+  changeRequisitionStatus,
 };
+
