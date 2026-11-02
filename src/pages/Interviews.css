@@ -1,0 +1,150 @@
+.interviews-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.interview-form-card,
+.interview-list-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e9e5);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.interview-form-card h2,
+.interview-list-card h2 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  color: var(--text-primary, #172033);
+}
+
+.interview-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.interview-form input,
+.interview-form select,
+.interview-filters select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--border, #e5e9e5);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  color: var(--text-primary, #172033);
+  font-size: 14px;
+}
+
+.interview-form button {
+  align-self: end;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: var(--brand, #16866b);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.interview-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.interview-error,
+.interview-success {
+  margin: 0;
+  font-size: 13px;
+}
+
+.interview-error {
+  color: #d65c5c;
+}
+
+.interview-success {
+  color: #16866b;
+}
+
+.interview-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.interview-list-header span {
+  color: var(--text-secondary, #64748b);
+  font-size: 13px;
+}
+
+.interview-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.interview-filters select {
+  max-width: 220px;
+}
+
+.interview-table-wrapper {
+  overflow-x: auto;
+}
+
+.interview-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.interview-table th,
+.interview-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid var(--border, #e5e9e5);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.interview-table th {
+  color: var(--text-secondary, #64748b);
+  font-weight: 600;
+}
+
+.interview-table td {
+  color: var(--text-primary, #172033);
+}
+
+.interview-status {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #ddf3e9;
+  color: #106b56;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.empty-interviews {
+  text-align: center;
+  padding: 30px !important;
+  color: var(--text-secondary, #64748b) !important;
+}
+
+@media (max-width: 850px) {
+  .interview-form {
+    grid-template-columns: 1fr;
+  }
+
+  .interview-form button {
+    width: 100%;
+  }
+
+  .interview-filters {
+    flex-direction: column;
+  }
+
+  .interview-filters select {
+    max-width: none;
+  }
+}
