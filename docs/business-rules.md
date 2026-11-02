@@ -1,174 +1,160 @@
+
 # HireFlow — Business Rules
 
-## 1. Requisition Management
+## 1. Purpose
 
-- A requisition must be created by an authorized hiring manager or HR employee.
-- Every requisition must have a title, department, location, salary range and number of openings.
-- Minimum salary cannot exceed maximum salary.
-- A requisition must be approved before it becomes OPEN.
-- Only OPEN requisitions can receive new applications.
-- CLOSED and CANCELLED requisitions cannot accept applications.
-- Every requisition must have at least one defined skill requirement before approval.
+This document describes the business rules governing HireFlow’s recruitment workflow. These rules define how requisitions, candidates, applications, interviews, evaluations, and offers should behave.
 
-## 2. Candidate and Application Management
+The goal is to maintain consistent recruitment data, prevent invalid workflow changes, and clarify the responsibilities of HR, hiring managers, and interviewers.
 
-- A candidate must have a valid email address.
-- A candidate can apply to the same requisition only once.
-- An application must reference an existing candidate and requisition.
-- An application can only be created for an OPEN requisition.
-- Every application begins at the APPLIED stage.
-- Application status and current stage must remain consistent.
-- A rejected or withdrawn application cannot proceed to another stage.
-- A candidate can apply to different requisitions independently.
+## 2. User Roles and Responsibilities
 
-## 3. Application Stage Transitions
+HireFlow supports role-based responsibilities.
 
-Allowed normal workflow:
+| Role | Main responsibility |
+|---|---|
+| HR | Coordinate recruitment activities, manage candidate applications, schedule interviews, and manage offer workflows |
+| Hiring Manager | Define hiring requirements, review candidates, and make hiring decisions |
+| Interviewer | Participate in interviews and submit structured evaluations |
 
-APPLIED → SCREENING → TECHNICAL → MANAGERIAL → HR → OFFER → HIRED
+Users should only perform actions permitted by their assigned role. Access to sensitive recruitment information should be limited to authorized users.
 
-Additional outcomes:
+## 3. Requisition Rules
 
-- Any active stage may transition to REJECTED.
-- A candidate may withdraw from any active stage.
-- A withdrawn application cannot be reactivated automatically.
-- A rejected application cannot be reopened without an authorized administrative action.
+1. A requisition represents a hiring requirement for a position.
+2. A requisition should contain the information needed to identify and understand the role.
+3. Each requisition should be associated with a responsible hiring manager.
+4. A requisition should have a defined status.
+5. Applications should be associated with an existing requisition.
+6. A requisition that is closed should not accept new applications unless it is reopened through an authorized action.
+7. Changes to requisition status should be reflected consistently wherever the requisition is displayed.
 
-Stage gate requirements:
+## 4. Candidate and Application Rules
 
-| Transition             | Required condition                         |
-| ---------------------- | ------------------------------------------ |
-| APPLIED → SCREENING    | Application is valid                       |
-| SCREENING → TECHNICAL  | Screening review completed                 |
-| TECHNICAL → MANAGERIAL | Required technical scorecards submitted    |
-| MANAGERIAL → HR        | Managerial evaluation completed            |
-| HR → OFFER             | HR review completed and candidate selected |
-| OFFER → HIRED          | Offer accepted and joining confirmed       |
+1. Candidate information should be stored separately from application information.
+2. A candidate may apply to more than one requisition.
+3. Each application must reference an existing candidate and requisition.
+4. An application should represent a candidate’s progress for one specific requisition.
+5. Application status should follow the configured recruitment stages.
+6. An application should not reference a nonexistent candidate or requisition.
+7. Duplicate applications for the same candidate and requisition should be prevented or handled according to the application’s defined duplicate policy.
+8. A candidate’s application status should not be changed without an authorized action.
 
-- Every transition must create an ApplicationStageEvent.
-- Invalid transitions must be rejected by the backend.
-- The application’s current_stage must reflect its latest valid event.
+## 5. Recruitment Stage Rules
 
-## 4. Interview Scheduling
+1. Each application has a current recruitment stage or status.
+2. Stage changes should follow the configured workflow.
+3. Invalid stage transitions should be rejected.
+4. A stage change should update the application’s current status.
+5. Important stage changes should be traceable where audit history is implemented.
+6. Rejected or withdrawn applications should not continue through active hiring stages unless explicitly reopened.
+7. A selected candidate may proceed to the offer process, subject to the applicable approval rules.
 
-- An interview can only be scheduled for an active application.
-- Every interview must have a valid start and end time.
-- Every interview must belong to an interview panel.
-- Every scheduled interview must have at least one participant.
-- Participants must be active employees.
-- Every participant must have availability covering the complete interview slot.
-- An interviewer cannot attend two overlapping interviews.
-- An interview cannot be scheduled outside the interviewer's available time.
-- Cancelled interviews do not block future scheduling.
-- Rescheduling must retain the original interview history.
-- Time comparisons must use a consistent timezone strategy.
+The exact stage names and permitted transitions should match the workflow configured in the application.
 
-## 5. Interview Evaluation
+## 6. Interview Scheduling Rules
 
-- Each interviewer can submit one scorecard per interview.
-- A scorecard must reference an existing interview and reviewer.
-- Reviewers must be assigned participants in that interview.
-- Technical, communication and problem-solving scores must be between 0 and 10.
-- Every completed interview must have the required scorecards.
-- Evaluation criteria must be relevant to the requisition and interview type.
-- A candidate cannot advance beyond an interview stage until the required evaluations are submitted.
-- Submitted scorecards must retain their original submission history.
+1. An interview must be associated with a valid application.
+2. An interview must have a defined date, time, and duration.
+3. An interview should include the required interviewer or panel members.
+4. Interview scheduling should consider interviewer availability.
+5. An interviewer should not be assigned to overlapping interviews when conflict prevention is enabled.
+6. Invalid or conflicting interview times should be rejected.
+7. Changes to interview schedules should be reflected in the application’s interview information.
+8. Cancelled interviews should not be treated as active scheduled interviews.
+9. Interview details should be accessible only to authorized users.
 
-## 6. Offer Management
+## 7. Interview Evaluation Rules
 
-- An offer can only be created for an eligible application.
-- An application must complete the required interview and HR stages before an offer is created.
-- Offered salary must be greater than zero.
-- Offered salary must be within the requisition's approved salary range.
-- An offer outside the approved range must be flagged for exception handling.
-- An offer must receive all required approvals before it can be sent.
-- Only approved offers can transition to SENT.
-- An accepted offer can lead to the application becoming HIRED.
-- Declined, expired or withdrawn offers must retain their history.
-- Only one active offer may exist for an application.
+1. An evaluation must be associated with the relevant interview and application.
+2. Evaluations should use structured fields rather than relying only on unstructured feedback.
+3. Required evaluation fields should be validated before submission.
+4. Interviewers should submit feedback for interviews they are authorized to evaluate.
+5. Evaluation records should remain associated with the correct candidate and requisition.
+6. Hiring decisions should consider the available evaluation information.
+7. Evaluation data should not be silently overwritten when the system requires a history of submitted feedback.
 
-## 7. Approval Management
+## 8. Offer Rules
 
-- Every approval must reference exactly one requisition or offer.
-- Only authorized employees can approve or reject requests.
-- An approver cannot approve their own request where separation of duties is required.
-- Approval decisions must include the approver and decision timestamp.
-- Rejected approvals must include a reason.
-- Offers cannot be sent while required approvals are pending.
-- Approval history must not be overwritten.
+1. An offer must be associated with a valid application.
+2. An offer should only be initiated for a candidate who has reached the appropriate hiring decision stage.
+3. Offer details should be validated before submission.
+4. Offers requiring approval should not be finalized before the required approval is recorded.
+5. An offer should have a defined status.
+6. Offer status changes should follow the configured offer workflow.
+7. Rejected, withdrawn, or expired offers should not be treated as active offers.
+8. Offer information should only be accessible to authorized users.
 
-## 8. Audit and Traceability
+## 9. Data Integrity Rules
 
-The system must record important actions, including:
+1. Required fields must be provided before a record is created.
+2. Related records must reference valid entities.
+3. Invalid identifiers should return an appropriate error.
+4. Data should not be duplicated unnecessarily across related records.
+5. Updates should preserve valid relationships between entities.
+6. Database constraints and backend validation should work together to protect data integrity.
+7. Failed operations should not leave partially updated records.
 
-- Requisition creation and status changes.
-- Application creation and stage transitions.
-- Interview scheduling, cancellation and rescheduling.
-- Scorecard submission.
-- Offer creation and status changes.
-- Approval decisions.
+## 10. Error Handling Rules
 
-Each audit record should capture:
+The system should handle invalid operations consistently.
 
-- Actor responsible for the action.
-- Entity type and entity ID.
-- Action performed.
-- Previous value, where applicable.
-- New value, where applicable.
-- Timestamp.
+Examples include:
 
-Audit history must be append-only for normal application operations.
+- Missing required information.
+- Invalid or nonexistent record identifiers.
+- Unauthorized actions.
+- Invalid application-stage transitions.
+- Interview scheduling conflicts.
+- Invalid offer approval actions.
 
-## 9. Exception Handling
+Errors should provide enough information for the user or client application to understand why an operation failed, without exposing sensitive internal details.
 
-The system must identify and report the following deliberate anomaly cases:
+## 11. Audit and Traceability
 
-| Issue Type                    | Description                                         | Expected System Response                              |
-| ----------------------------- | --------------------------------------------------- | ----------------------------------------------------- |
-| STAGE_WITHOUT_REVIEW          | Candidate advances without required evaluation      | Block transition and flag issue                       |
-| INTERVIEWER_DOUBLE_BOOKED     | Interviewer assigned to overlapping interviews      | Reject scheduling and flag conflict                   |
-| OFFER_ABOVE_BAND              | Offer exceeds approved salary range                 | Block normal approval or require documented exception |
-| WITHDRAWN_CANDIDATE_SCHEDULED | Withdrawn candidate still has a scheduled interview | Flag and cancel invalid future interview              |
-| IRRELEVANT_EVALUATION         | Scorecard contains criteria unrelated to the role   | Flag scorecard for review                             |
+Where audit history is implemented:
 
-Anomaly records must have:
+1. Important recruitment decisions should be traceable.
+2. Relevant events may include requisition updates, application-stage changes, interview scheduling changes, evaluation submissions, and offer decisions.
+3. Event records should identify the affected entity and the action performed.
+4. Audit history should not be treated as a substitute for the current state of a record.
+5. Audit information should be protected from unauthorized modification.
 
-- A unique issue ID.
-- An issue type.
-- A reference to the affected record.
-- A description.
-- Expected outcome.
-- Ground-truth label.
+## 12. Rule Enforcement
 
-Synthetic anomaly records must be separated from normal baseline records.
+Business rules should be enforced primarily by the backend, because frontend validation alone can be bypassed.
 
-## 10. Recruitment Metrics
+The frontend may provide immediate validation and helpful messages, while the backend remains responsible for validating requests, permissions, workflow transitions, and data integrity.
 
-The system should calculate:
+Database constraints should be used where appropriate to enforce relationships and required data.
 
-| Metric                    | Calculation                                                   |
-| ------------------------- | ------------------------------------------------------------- |
-| Total Requisitions        | Count of requisitions                                         |
-| Open Requisitions         | Count where status = OPEN                                     |
-| Total Applications        | Count of applications                                         |
-| Interview Conversion Rate | Applications reaching interview / eligible applications × 100 |
-| Offer Rate                | Offers created / applications × 100                           |
-| Offer Acceptance Rate     | Accepted offers / offers sent × 100                           |
-| Hiring Rate               | Hired applications / total applications × 100                 |
-| Average Time to Hire      | Average days between application and hire                     |
-| Interview Conflict Count  | Number of detected scheduling conflicts                       |
-| Pending Approvals         | Count of approvals with PENDING decision                      |
+## 13. Rule Verification
 
-Metrics must be calculated from actual records, not independently generated random values.
+Business rules should be verified through API tests, database checks, and workflow testing.
 
-## 11. Data Generation Rules
+Important scenarios include:
 
-- Use a fixed random seed: 20261022.
-- Generate master records before dependent records.
-- Generate baseline records using valid business rules.
-- Generate deliberate anomalies separately.
-- Use deterministic IDs.
-- Derive statuses and calculated values from source records.
-- Generate ground_truth.csv and ground_truth.json separately.
-- Validate primary keys, foreign keys, enums, date ranges and workflow transitions.
-- Running the generator twice with the same seed and configuration must produce identical outputs.
+- Creating a requisition with valid and invalid data.
+- Creating an application for an existing requisition and candidate.
+- Rejecting invalid application-stage transitions.
+- Preventing unauthorized actions.
+- Detecting conflicting interview schedules.
+- Validating interview evaluation submissions.
+- Enforcing required offer approvals.
+- Confirming that failed operations do not corrupt related records.
+
+Only rules that have been implemented and tested should be reported as verified.
+
+## 14. Scope and Limitations
+
+Some rules depend on the current implementation and may require further refinement, including:
+
+- Exact requisition and application status values.
+- Permitted transitions between recruitment stages.
+- Duplicate-application handling.
+- Interview conflict detection and availability rules.
+- Offer approval requirements.
+- Audit-history coverage.
+- Reopening or cancelling recruitment records.
+
+These rules should be updated as the application evolves and as additional business requirements are clarified.
