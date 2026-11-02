@@ -1,15 +1,21 @@
-
 import './HiringPipeline.css';
 
 const stages = [
-    { name: 'Applied', count: 120, color: '#8bbca8' },
-    { name: 'Screening', count: 65, color: '#77a9e8' },
-    { name: 'Interview', count: 36, color: '#d9b875' },
-    { name: 'Offer', count: 18, color: '#bd9bc9' },
-    { name: 'Hired', count: 12, color: '#16866b' },
+    { key: 'applied', name: 'Applied', color: '#8bbca8' },
+    { key: 'screening', name: 'Screening', color: '#77a9e8' },
+    { key: 'interview', name: 'Interview', color: '#d9b875' },
+    { key: 'offer', name: 'Offer', color: '#bd9bc9' },
+    { key: 'hired', name: 'Hired', color: '#16866b' },
 ];
 
-function HiringPipeline() {
+function HiringPipeline({ pipeline }) {
+    const counts = pipeline?.stages || {};
+
+    const maxCount = Math.max(
+        ...stages.map((stage) => counts[stage.key] || 0),
+        1
+    );
+
     return (
         <section className="pipeline-card">
             <div className="section-heading">
@@ -18,36 +24,44 @@ function HiringPipeline() {
                     <p>Candidate progression across stages</p>
                 </div>
 
-                <span className="pipeline-period">This month</span>
+                <span className="pipeline-period">All time</span>
             </div>
 
             <div className="pipeline-total">
-                <strong>251</strong>
-                <span>candidates currently tracked</span>
+                <strong>
+                    {(pipeline?.totalApplications || 0).toLocaleString()}
+                </strong>
+                <span>applications across active stages</span>
             </div>
 
             <div className="pipeline-stages">
-                {stages.map((stage) => (
-                    <div className="pipeline-stage" key={stage.name}>
-                        <div className="stage-info">
-                            <span className="stage-dot"
-                                style={{ background: stage.color }}
-                            />
-                            <span>{stage.name}</span>
-                            <strong>{stage.count}</strong>
-                        </div>
+                {stages.map((stage) => {
+                    const count = counts[stage.key] || 0;
 
-                        <div className="stage-track">
-                            <div
-                                className="stage-progress"
-                                style={{
-                                    width: `${(stage.count / 120) * 100}%`,
-                                    background: stage.color,
-                                }}
-                            />
+                    return (
+                        <div className="pipeline-stage" key={stage.key}>
+                            <div className="stage-info">
+                                <span
+                                    className="stage-dot"
+                                    style={{ background: stage.color }}
+                                />
+
+                                <span>{stage.name}</span>
+                                <strong>{count.toLocaleString()}</strong>
+                            </div>
+
+                            <div className="stage-track">
+                                <div
+                                    className="stage-progress"
+                                    style={{
+                                        width: `${(count / maxCount) * 100}%`,
+                                        background: stage.color,
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </section>
     );

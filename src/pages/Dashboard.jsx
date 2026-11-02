@@ -93,7 +93,7 @@ function Dashboard() {
                     </div>
 
                     <div className="dashboard-main-grid">
-                        <HiringPipeline />
+                        <HiringPipeline pipeline={dashboardData.pipeline}  />
                         <ActivityFeed
                             activities={dashboardData.recentActivity}
                         />
