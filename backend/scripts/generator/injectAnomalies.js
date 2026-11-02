@@ -30,8 +30,8 @@ const run = async () => {
           is: {
             currentStage: "SCREENING",
             status: "ACTIVE",
-            candidateId: { startsWith: "SYN-CAND-" },
-            requisitionId: { startsWith: "REQ-2026-9" },
+            candidateId: { startsWith: "CAND-" },
+            requisitionId: { startsWith: "REQ-2026-" },
           },
         },
       },
@@ -51,8 +51,8 @@ const run = async () => {
       where: {
         status: "ACTIVE",
         currentStage: "APPLIED",
-        candidateId: { startsWith: "SYN-CAND-" },
-        requisitionId: { startsWith: "REQ-2026-9" },
+        candidateId: { startsWith: "CAND-" },
+        requisitionId: { startsWith: "REQ-2026-" },
         interviews: { none: {} },
       },
     });

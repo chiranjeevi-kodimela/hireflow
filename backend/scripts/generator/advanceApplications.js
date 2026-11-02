@@ -6,8 +6,8 @@ const advanceApplications = async () => {
     where: {
       currentStage: "APPLIED",
       status: "ACTIVE",
-      candidateId: { startsWith: "SYN-CAND-" },
-      requisitionId: { startsWith: "REQ-2026-9" },
+      candidateId: { startsWith: "CAND-" },
+      requisitionId: { startsWith: "REQ-2026-" },
     },
     take: 2000,
     orderBy: { applicationId: "asc" },

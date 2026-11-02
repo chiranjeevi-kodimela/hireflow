@@ -14,8 +14,8 @@ const generateScorecards = async () => {
       status: { in: ["SCHEDULED", "COMPLETED"] },
       application: {
         is: {
-          candidateId: { startsWith: "SYN-CAND-" },
-          requisitionId: { startsWith: "REQ-2026-9" },
+          candidateId: { startsWith: "CAND-" },
+          requisitionId: { startsWith: "REQ-2026-" },
         },
       },
     },

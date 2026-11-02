@@ -7,14 +7,14 @@ const random = createRandom(20261022);
 const generateApplications = async () => {
   const candidates = await prisma.candidate.findMany({
     where: {
-      candidateId: { startsWith: "SYN-CAND-" },
+      candidateId: { startsWith: "CAND-" },
     },
     select: { candidateId: true },
   });
 
   const requisitions = await prisma.requisition.findMany({
     where: {
-      requisitionId: { startsWith: "REQ-2026-9" },
+      requisitionId: { startsWith: "REQ-2026-" },
       status: "OPEN",
     },
     select: { requisitionId: true },

@@ -41,8 +41,8 @@ const generateInterviews = async () => {
     where: {
       currentStage: "SCREENING",
       status: "ACTIVE",
-      candidateId: { startsWith: "SYN-CAND-" },
-      requisitionId: { startsWith: "REQ-2026-9" },
+      candidateId: { startsWith: "CAND-" },
+      requisitionId: { startsWith: "REQ-2026-" },
     },
     select: {
       applicationId: true,

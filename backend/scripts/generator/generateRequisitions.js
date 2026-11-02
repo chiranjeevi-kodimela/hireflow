@@ -52,7 +52,7 @@ const generateRequisitions = async () => {
     const minSalary = random.integer(300000, 1200000);
     const maxSalary = minSalary + random.integer(200000, 800000);
 
-    const requisitionId = `REQ-2026-${String(900000 + i).padStart(6, "0")}`;
+    const requisitionId = `REQ-2026-${String(i).padStart(6, "0")}`;
 
     await prisma.requisition.upsert({
       where: { requisitionId },

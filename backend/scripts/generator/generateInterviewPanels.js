@@ -6,7 +6,7 @@ const random = createRandom(20261022);
 const generatePanels = async () => {
   const requisitions = await prisma.requisition.findMany({
     where: {
-      requisitionId: { startsWith: "REQ-2026-9" },
+      requisitionId: { startsWith: "REQ-2026-" },
       status: "OPEN",
     },
   });

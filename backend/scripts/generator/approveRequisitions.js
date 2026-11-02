@@ -10,7 +10,7 @@ const approveRequisitions = async () => {
   const requisitions = await prisma.requisition.findMany({
     where: {
       requisitionId: {
-        startsWith: "REQ-2026-9",
+        startsWith: "REQ-2026-",
       },
     },
     include: {

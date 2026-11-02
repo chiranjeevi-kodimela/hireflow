@@ -74,7 +74,7 @@ const generateCandidates = async () => {
   let generated = 0;
 
   for (let i = 1; i <= 5000; i++) {
-    const candidateId = `SYN-CAND-${String(i).padStart(6, "0")}`;
+    const candidateId = `CAND-${String(i).padStart(6, "0")}`;
     const email = `candidate${i}@hireflow.test`;
 
     await prisma.candidate.upsert({
