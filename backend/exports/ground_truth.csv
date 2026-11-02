@@ -1,0 +1,6 @@
+anomalyId,type,entityId,relatedEntityId,description,expectedDetection
+"ANOMALY-001","ADVANCEMENT_WITHOUT_REVIEW","APP-SYN-CAND-002796-REQ-2026-900047","","Application advanced from APPLIED to TECHNICAL without screening review.","Stage progression lacks the required completed review."
+"ANOMALY-002","INTERVIEWER_DOUBLE_BOOKED","INT-2026-000590","INT-2026-002674","Two scheduled interviews overlap for the same interviewer.","An interviewer has conflicting scheduled interview times."
+"ANOMALY-003","OFFER_EXCEEDS_SALARY_BAND","cmvz23fdg0007f8v073r6w50y","","Offer salary 932183 exceeds approved maximum 832183.","Offer base salary exceeds the requisition compensation limit."
+"ANOMALY-004","WITHDRAWN_CANDIDATE_STILL_SCHEDULED","APP-SYN-CAND-000626-REQ-2026-900073","INT-2026-001707","Candidate is withdrawn but still has a scheduled interview.","Scheduled interview belongs to a withdrawn application."
+"ANOMALY-005","IRRELEVANT_EVALUATION_CRITERION","SCORE-INT-2026-000001-SYN-EMP-000019","cmvz23ff2000ff8v00f58xh7i","Scorecard includes a criterion unrelated to job performance.","Evaluation contains an irrelevant criterion."

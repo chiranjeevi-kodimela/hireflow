@@ -1,0 +1,40 @@
+[
+  {
+    "anomalyId": "ANOMALY-001",
+    "type": "ADVANCEMENT_WITHOUT_REVIEW",
+    "entityId": "APP-SYN-CAND-002796-REQ-2026-900047",
+    "description": "Application advanced from APPLIED to TECHNICAL without screening review.",
+    "expectedDetection": "Stage progression lacks the required completed review."
+  },
+  {
+    "anomalyId": "ANOMALY-002",
+    "type": "INTERVIEWER_DOUBLE_BOOKED",
+    "entityId": "INT-2026-000590",
+    "relatedEntityId": "INT-2026-002674",
+    "description": "Two scheduled interviews overlap for the same interviewer.",
+    "expectedDetection": "An interviewer has conflicting scheduled interview times."
+  },
+  {
+    "anomalyId": "ANOMALY-003",
+    "type": "OFFER_EXCEEDS_SALARY_BAND",
+    "entityId": "cmvz23fdg0007f8v073r6w50y",
+    "description": "Offer salary 932183 exceeds approved maximum 832183.",
+    "expectedDetection": "Offer base salary exceeds the requisition compensation limit."
+  },
+  {
+    "anomalyId": "ANOMALY-004",
+    "type": "WITHDRAWN_CANDIDATE_STILL_SCHEDULED",
+    "entityId": "APP-SYN-CAND-000626-REQ-2026-900073",
+    "relatedEntityId": "INT-2026-001707",
+    "description": "Candidate is withdrawn but still has a scheduled interview.",
+    "expectedDetection": "Scheduled interview belongs to a withdrawn application."
+  },
+  {
+    "anomalyId": "ANOMALY-005",
+    "type": "IRRELEVANT_EVALUATION_CRITERION",
+    "entityId": "SCORE-INT-2026-000001-SYN-EMP-000019",
+    "relatedEntityId": "cmvz23ff2000ff8v00f58xh7i",
+    "description": "Scorecard includes a criterion unrelated to job performance.",
+    "expectedDetection": "Evaluation contains an irrelevant criterion."
+  }
+]
