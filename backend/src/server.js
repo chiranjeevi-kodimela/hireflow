@@ -4,10 +4,10 @@ const candidateRoutes = require("./routes/candidateRoutes");
 const express = require("express");
 const cors = require("cors");
 const prisma = require("./config/database");
-
+const applicationRoutes = require("./routes/applicationRoutes");
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
-
+const applicationStageRoutes = require("./routes/applicationStageRoutes");
 const app = express();
 
 // Middleware
@@ -28,9 +28,11 @@ app.get("/api/health", async (req, res, next) => {
     next(error);
   }
 });
+
 app.use("/api/requisitions", requisitionRoutes);
 app.use("/api/candidates", candidateRoutes);
-
+app.use("/api/applications", applicationRoutes);
+app.use("/api/applications", applicationStageRoutes);
 // Handle unknown routes
 app.use(notFound);
 
