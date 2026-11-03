@@ -62,6 +62,7 @@ const createApplication = async (data) => {
 
       await tx.applicationStageEvent.create({
         data: {
+          eventId: `${applicationId}-EVT-001`,
           applicationId,
           fromStage: null,
           toStage: "APPLIED",

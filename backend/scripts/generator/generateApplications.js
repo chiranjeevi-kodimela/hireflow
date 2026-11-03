@@ -1,14 +1,16 @@
 const prisma = require("../../src/config/database");
 const { createRandom } = require("./random");
+const config = require("./config");
 const { createApplication } = require("../../src/services/applicationService");
 
-const random = createRandom(20261022);
+const random = createRandom(config.seed);
 
 const generateApplications = async () => {
   const candidates = await prisma.candidate.findMany({
     where: {
       candidateId: { startsWith: "CAND-" },
     },
+    orderBy: { candidateId: "asc" },
     select: { candidateId: true },
   });
 
@@ -17,18 +19,23 @@ const generateApplications = async () => {
       requisitionId: { startsWith: "REQ-2026-" },
       status: "OPEN",
     },
+    orderBy: { requisitionId: "asc" },
     select: { requisitionId: true },
   });
 
-  if (candidates.length < 5000 || requisitions.length === 0) {
+  if (
+    candidates.length < config.candidates ||
+    requisitions.length === 0 ||
+    config.applications > candidates.length * requisitions.length
+  ) {
     throw new Error(
-      "Generate 5,000 candidates and approve synthetic requisitions first.",
+      `Generate at least ${config.candidates} candidates and approve enough synthetic requisitions first.`,
     );
   }
 
   const pairs = new Set();
 
-  while (pairs.size < 8000) {
+  while (pairs.size < config.applications) {
     const candidate = random.pick(candidates);
     const requisition = random.pick(requisitions);
 
@@ -58,8 +65,10 @@ const generateApplications = async () => {
       throw error;
     }
 
-    if ((i + 1) % 500 === 0) {
-      console.log(`Processed ${i + 1}/8000 applications`);
+    if ((i + 1) % 500 === 0 || i + 1 === applications.length) {
+      console.log(
+        `Processed ${i + 1}/${config.applications} applications`,
+      );
     }
   }
 

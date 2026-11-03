@@ -202,7 +202,7 @@ const createInterview = async (data) => {
 
         await tx.interviewParticipant.createMany({
           data: participants.map((participant) => ({
-            participantId: require("crypto").randomUUID(),
+            participantId: `${interviewId}-${participant.employeeId}`,
             interviewId,
             employeeId: participant.employeeId,
             role: participant.role,

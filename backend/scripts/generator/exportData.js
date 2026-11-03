@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 const prisma = require("../../src/config/database");
+const config = require("./config");
+const { getExportDir } = require("./paths");
+
+const quoteIdentifier = (identifier) =>
+  `"${identifier.replace(/"/g, '""')}"`;
 
 const models = [
   "employee",
@@ -48,21 +53,75 @@ const toCSV = (records) => {
   return [headers.map(escapeCSV).join(","), ...rows].join("\n");
 };
 
+const toSQLValue = (value, fieldType) => {
+  if (value === null || value === undefined) return "NULL";
+  if (fieldType === "Json") {
+    return `${quoteLiteral(JSON.stringify(value))}::jsonb`;
+  }
+  if (value instanceof Date) {
+    return `${quoteLiteral(value.toISOString())}::timestamptz`;
+  }
+  if (typeof value === "boolean") return value ? "TRUE" : "FALSE";
+  if (typeof value === "number" || typeof value === "bigint") {
+    return String(value);
+  }
+  if (typeof value === "object" && typeof value.toString === "function") {
+    return quoteLiteral(value.toString());
+  }
+  return quoteLiteral(String(value));
+};
+
+const quoteLiteral = (value) => `'${value.replace(/'/g, "''")}'`;
+
+const toSQL = (records, modelName, model) => {
+  if (records.length === 0) return "";
+  const fields = model.fields.filter(
+    (field) => field.kind === "scalar" || field.kind === "enum",
+  );
+  const columns = fields.filter((field) =>
+    records.some((record) => Object.hasOwn(record, field.name)),
+  );
+  const statements = [];
+
+  for (let offset = 0; offset < records.length; offset += 500) {
+    const batch = records.slice(offset, offset + 500);
+    const values = batch.map(
+      (record) =>
+        `(${columns
+          .map((field) => toSQLValue(record[field.name], field.type))
+          .join(", ")})`,
+    );
+    statements.push(
+      `INSERT INTO ${quoteIdentifier(modelName)} (${columns
+        .map((field) => quoteIdentifier(field.name))
+        .join(", ")}) VALUES\n${values.join(",\n")};`,
+    );
+  }
+
+  return statements.join("\n\n");
+};
+
 const run = async () => {
-  const exportDir = path.join(__dirname, "../../exports");
+  const exportDir = getExportDir();
   const csvDir = path.join(exportDir, "csv");
   const jsonDir = path.join(exportDir, "json");
+  const runtimeModels = prisma._runtimeDataModel.models;
 
   try {
     fs.mkdirSync(csvDir, { recursive: true });
     fs.mkdirSync(jsonDir, { recursive: true });
 
     const manifest = [];
+    const sqlStatements = ["SET TIME ZONE 'UTC';", "BEGIN;"];
 
     for (const modelName of models) {
       const model = prisma[modelName];
+      const schemaEntry = Object.entries(runtimeModels).find(
+        ([name]) => name.toLowerCase() === modelName.toLowerCase(),
+      );
+      const [schemaModelName, schemaModel] = schemaEntry || [];
 
-      if (!model || typeof model.findMany !== "function") {
+      if (!model || !schemaModel || typeof model.findMany !== "function") {
         throw new Error(`Prisma model not found: ${modelName}`);
       }
 
@@ -76,6 +135,7 @@ const run = async () => {
       fs.writeFileSync(jsonPath, JSON.stringify(records, null, 2));
 
       fs.writeFileSync(csvPath, toCSV(records));
+      sqlStatements.push(toSQL(records, schemaModelName, schemaModel));
 
       manifest.push({
         entity: modelName,
@@ -87,12 +147,27 @@ const run = async () => {
       console.log(`${modelName}: ${records.length} records exported`);
     }
 
+    sqlStatements.push("COMMIT;");
+    fs.writeFileSync(
+      path.join(exportDir, "hireflow.sql"),
+      `${sqlStatements.filter(Boolean).join("\n\n")}\n`,
+    );
+
     fs.writeFileSync(
       path.join(exportDir, "source_manifest.json"),
       JSON.stringify(
         {
           generatedAt: new Date().toISOString(),
-          format: ["CSV", "JSON"],
+          seed: config.seed,
+          calendarStart: config.calendarStart,
+          requestedCounts: {
+            requisitions: config.requisitions,
+            candidates: config.candidates,
+            applications: config.applications,
+            interviews: config.interviews,
+          },
+          format: ["CSV", "JSON", "SQL"],
+          sqlFile: "hireflow.sql",
           entities: manifest,
           totalRecords: manifest.reduce(
             (sum, item) => sum + item.recordCount,

@@ -1,13 +1,15 @@
 const prisma = require("../../src/config/database");
+const config = require("./config");
 
 const generateAvailability = async () => {
   const employees = await prisma.employee.findMany({
     where: {
       isActive: true,
       role: {
-        in: ["INTERVIEWER", "HIRING_MANAGER", "HR"],
+        in: ["INTERVIEWER", "HIRING_MANAGER", "HR", "OPERATIONS"],
       },
     },
+    orderBy: { employeeId: "asc" },
   });
 
   if (employees.length === 0) {
@@ -17,7 +19,7 @@ const generateAvailability = async () => {
   const slots = [];
   const workingHours = [9, 10, 11, 13, 14, 15];
 
-  let currentDate = new Date("2026-11-03T00:00:00.000Z");
+  let currentDate = new Date(`${config.calendarStart}T00:00:00.000Z`);
   let workingDays = 0;
 
   while (workingDays < 40) {

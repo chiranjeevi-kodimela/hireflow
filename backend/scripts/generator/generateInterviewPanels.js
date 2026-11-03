@@ -1,7 +1,8 @@
 const prisma = require("../../src/config/database");
 const { createRandom } = require("./random");
+const config = require("./config");
 
-const random = createRandom(20261022);
+const random = createRandom(config.seed);
 
 const generatePanels = async () => {
   const requisitions = await prisma.requisition.findMany({
@@ -9,15 +10,17 @@ const generatePanels = async () => {
       requisitionId: { startsWith: "REQ-2026-" },
       status: "OPEN",
     },
+    orderBy: { requisitionId: "asc" },
   });
 
   const employees = await prisma.employee.findMany({
     where: {
       isActive: true,
       role: {
-        in: ["INTERVIEWER", "HIRING_MANAGER", "HR"],
+        in: ["INTERVIEWER", "HIRING_MANAGER", "HR", "OPERATIONS"],
       },
     },
+    orderBy: { employeeId: "asc" },
   });
 
   if (employees.length < 3) {

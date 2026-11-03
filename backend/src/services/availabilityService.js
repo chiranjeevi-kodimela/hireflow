@@ -42,7 +42,13 @@ const createAvailability = async (data) => {
   }
 
   if (
-    !["INTERVIEWER", "HIRING_MANAGER", "HR", "ADMIN"].includes(interviewer.role)
+    ![
+      "INTERVIEWER",
+      "HIRING_MANAGER",
+      "HR",
+      "OPERATIONS",
+      "ADMIN",
+    ].includes(interviewer.role)
   ) {
     const error = new Error("Employee is not eligible to conduct interviews");
     error.statusCode = 400;

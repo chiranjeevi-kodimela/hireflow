@@ -1,7 +1,8 @@
 const prisma = require("../../src/config/database");
 const { createRandom } = require("./random");
+const config = require("./config");
 
-const random = createRandom(20261022);
+const random = createRandom(config.seed);
 
 const firstNames = [
   "Aarav",
@@ -73,7 +74,7 @@ const companies = [
 const generateCandidates = async () => {
   let generated = 0;
 
-  for (let i = 1; i <= 5000; i++) {
+  for (let i = 1; i <= config.candidates; i++) {
     const candidateId = `CAND-${String(i).padStart(6, "0")}`;
     const email = `candidate${i}@hireflow.test`;
 
@@ -94,8 +95,8 @@ const generateCandidates = async () => {
 
     generated++;
 
-    if (i % 500 === 0) {
-      console.log(`Processed ${i}/5000 candidates`);
+    if (i % 500 === 0 || i === config.candidates) {
+      console.log(`Processed ${i}/${config.candidates} candidates`);
     }
   }
 

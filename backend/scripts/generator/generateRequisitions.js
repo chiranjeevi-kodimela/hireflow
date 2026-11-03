@@ -1,7 +1,8 @@
 const prisma = require("../../src/config/database");
 const { createRandom } = require("./random");
+const config = require("./config");
 
-const random = createRandom(20261022);
+const random = createRandom(config.seed);
 
 const titles = [
   "Software Engineer",
@@ -38,6 +39,7 @@ const employmentTypes = ["FULL_TIME", "PART_TIME", "CONTRACT", "INTERN"];
 const generateRequisitions = async () => {
   const managers = await prisma.hiringManager.findMany({
     where: { isActive: true },
+    orderBy: { hiringManagerId: "asc" },
   });
 
   if (managers.length === 0) {
@@ -48,7 +50,7 @@ const generateRequisitions = async () => {
 
   let generated = 0;
 
-  for (let i = 1; i <= 200; i++) {
+  for (let i = 1; i <= config.requisitions; i++) {
     const minSalary = random.integer(300000, 1200000);
     const maxSalary = minSalary + random.integer(200000, 800000);
 

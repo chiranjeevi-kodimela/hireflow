@@ -75,13 +75,38 @@ The backend tests use Node's built-in test runner and do not require a database.
 
 ## Synthetic data and exports
 
-The generator scripts are in `backend/scripts/generator/`; generated CSV, JSON, SQL, validation results, source manifest, and anomaly labels are in `backend/exports/`. They require a configured PostgreSQL database and generated Prisma client. The seed used by the current generator scripts is `20261022`. The scripts are separate database-backed steps, not a single clean-reset command; run only against a disposable database. Interview generation currently creates screening interviews only. `generateOffers.js` now processes applications already at the OFFER stage; it does not fabricate later-stage interviews or bypass the review gates.
+The ordered generator is `backend/scripts/generator/generateDataset.js`. It requires an empty disposable PostgreSQL database, an up-to-date Prisma client, and a configured `DATABASE_URL`. Apply migrations and generate the client, then run from `backend/`:
 
-The checked-in export set reports 5,001 candidates, 201 requisitions, 8,000 applications, and 2,000 interviews. The candidate and requisition totals include deliberate anomaly fixtures, so they are not exactly the requested 5,000/200 baseline counts. The current generator scripts also do not expose a shared scale parameter or provide a verified two-run checksum comparison. These are known data-generation gaps; do not treat the checked-in exports as evidence that those acceptance criteria have passed.
+```sh
+npx prisma migrate deploy
+npx prisma generate
+npm run generate:data
+```
 
-The checked-in validation report currently has no detected integrity issues and identifies all five labelled anomaly types. Its validator does not yet verify every schema foreign key, enum, lifecycle transition, or date-order rule. The checked-in generated schema dictionary also predates the fix for its missing model headings; rerun `node scripts/generator/generateDataDictionary.js` from `backend/` after installing backend dependencies and configuring the database to refresh it.
+Default seeded baseline: 200 requisitions, 5,000 candidates, 8,000 applications, and 2,000 total interviews. Interview count includes screening and three later-stage interview rounds for 100 fully reviewed applications. It also generates a rescheduled interview and one labeled incomplete scorecard. Baseline records are generated first; labeled anomalies are injected after normal workflows. The synthetic employee set includes HR, hiring managers, interviewers, approvers, and an operations partner.
 
-The five deliberate anomaly labels are recorded separately in `backend/exports/ground_truth.csv` and `backend/exports/ground_truth.json`. See [the business rules](./docs/business-rules.md), [the data dictionary](./docs/data-dictionary.md), [the ER diagram](./docs/er-diagram.md), and [the backend-generated schema dictionary](./backend/docs/DATA_DICTIONARY.md) for workflow, relationships, and data details.
+The shared generator settings are `HIRE_FLOW_SEED`, `HIRE_FLOW_REQUISITIONS`, `HIRE_FLOW_CANDIDATES`, `HIRE_FLOW_APPLICATIONS`, `HIRE_FLOW_INTERVIEWS`, `HIRE_FLOW_FOLLOWUP_APPLICATIONS`, and `HIRE_FLOW_CALENDAR_START` (UTC date; defaults to tomorrow). For example, on PowerShell:
+
+```powershell
+$env:HIRE_FLOW_SEED = "20261022"
+$env:HIRE_FLOW_REQUISITIONS = "20"
+$env:HIRE_FLOW_CANDIDATES = "500"
+$env:HIRE_FLOW_APPLICATIONS = "800"
+$env:HIRE_FLOW_INTERVIEWS = "200"
+$env:HIRE_FLOW_FOLLOWUP_APPLICATIONS = "10"
+$env:HIRE_FLOW_CALENDAR_START = "2026-11-04"
+npm run generate:data
+```
+
+Total interviews equal screening interviews plus three follow-up rounds per follow-up application. Use `HIRE_FLOW_EXPORT_DIR` to select an export directory; by default it is `backend/exports/seed-<seed>`. The generator does not reset or delete database records. It aborts if the database is not empty or if the selected output directory already contains ground truth. CSV, JSON, SQL inserts, a source manifest, ground truth, and a validation report are written to that directory. Validation checks all schema-declared primary/unique keys, foreign keys and enums, plus workflow, dates, joins, score derivation, and exact ground-truth entity matches.
+
+To demonstrate repeatability, run the same seed, scale, and calendar start against two separate empty databases, with distinct `HIRE_FLOW_EXPORT_DIR` values. Then compare logical row counts and checksums (timestamps and generated audit surrogate IDs are normalized):
+
+```sh
+npm run compare:exports -- ..\exports\repro-a ..\exports\repro-b
+```
+
+The checked-in `backend/exports/` files predate this expanded generator and are not evidence of a current reproducibility run; regenerate them using the steps above. See [the business rules](./docs/business-rules.md), [the data dictionary](./docs/data-dictionary.md), [the ER diagram](./docs/er-diagram.md), and [the backend schema dictionary](./backend/docs/DATA_DICTIONARY.md).
 
 ## Submission context
 

@@ -175,6 +175,7 @@ const createScorecard = async (data) => {
           comments: comments || null,
           items: {
             create: items.map((item) => ({
+              itemId: `SCOREITEM-${scorecardId}-${item.criterionId}`,
               criterionId: item.criterionId,
               score: item.score,
               comments: item.comments || null,

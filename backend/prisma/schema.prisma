@@ -17,6 +17,7 @@ enum EmployeeRole {
   INTERVIEWER
   APPROVER
   ADMIN
+  OPERATIONS
 }
 
 enum EmploymentType {

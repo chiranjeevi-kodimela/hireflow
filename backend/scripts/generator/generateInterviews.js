@@ -1,14 +1,15 @@
 const prisma = require("../../src/config/database");
 const { createRandom } = require("./random");
+const config = require("./config");
 const { createInterview } = require("../../src/services/interviewService");
 
-const random = createRandom(20261022);
+const random = createRandom(config.seed);
 
 const generateTimeSlots = () => {
   const slots = [];
   const hours = [9, 10, 11, 13, 14, 15];
 
-  let date = new Date("2026-11-03T00:00:00.000Z");
+  let date = new Date(`${config.calendarStart}T00:00:00.000Z`);
   let workingDays = 0;
 
   while (workingDays < 40) {
@@ -51,7 +52,7 @@ const generateInterviews = async () => {
     orderBy: {
       applicationId: "asc",
     },
-    take: 2000,
+    take: config.screeningInterviews,
   });
 
   const requisitionIds = [
@@ -68,6 +69,7 @@ const generateInterviews = async () => {
         select: {
           employeeId: true,
         },
+        orderBy: { employeeId: "asc" },
       },
     },
   });
@@ -156,7 +158,9 @@ const generateInterviews = async () => {
     }
 
     if (generated % 100 === 0) {
-      console.log(`Generated ${generated}/2000 interviews`);
+      console.log(
+        `Generated ${generated}/${config.screeningInterviews} screening interviews`,
+      );
     }
   }
 

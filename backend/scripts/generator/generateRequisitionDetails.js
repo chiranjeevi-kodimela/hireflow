@@ -1,7 +1,8 @@
 const prisma = require("../../src/config/database");
 const { createRandom } = require("./random");
+const config = require("./config");
 
-const random = createRandom(20261022);
+const random = createRandom(config.seed);
 
 const skills = [
   "JavaScript",
@@ -96,6 +97,9 @@ const generateDetails = async () => {
       if (!existing) {
         await prisma.evaluationCriterion.create({
           data: {
+            criterionId: `CRIT-${requisition.requisitionId}-${criterion.name
+              .toUpperCase()
+              .replace(/[^A-Z0-9]+/g, "-")}`,
             requisitionId: requisition.requisitionId,
             ...criterion,
             isRequired: true,

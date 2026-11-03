@@ -1,8 +1,7 @@
 const prisma = require("../../src/config/database");
+const config = require("./config");
 const { createOffer } = require("../../src/services/offerService");
 const { decideApproval } = require("../../src/services/approvalService");
-
-const MAX_OFFERS = 100;
 
 const run = async () => {
   try {
@@ -13,6 +12,7 @@ const run = async () => {
         },
         interview: {
           is: {
+            interviewType: "HR",
             status: "COMPLETED",
             application: {
               is: {
@@ -37,12 +37,20 @@ const run = async () => {
         },
       },
       orderBy: { scorecardId: "asc" },
-      take: MAX_OFFERS,
     });
 
-    console.log(`Qualified candidates found: ${scorecards.length}`);
+    const qualifiedApplications = [
+      ...new Map(
+        scorecards.map((scorecard) => [
+          scorecard.interview.application.applicationId,
+          scorecard,
+        ]),
+      ).values(),
+    ].slice(0, config.followupApplications);
 
-    if (scorecards.length === 0) {
+    console.log(`Qualified candidates found: ${qualifiedApplications.length}`);
+
+    if (qualifiedApplications.length === 0) {
       throw new Error(
         "No qualified applications are at OFFER stage. Complete the required interview reviews first.",
       );
@@ -52,7 +60,7 @@ const run = async () => {
     let offersApproved = 0;
     let skipped = 0;
 
-    for (const scorecard of scorecards) {
+    for (const scorecard of qualifiedApplications) {
       const application = scorecard.interview.application;
       const requisition = application.requisition;
 
@@ -88,7 +96,9 @@ const run = async () => {
         }
 
         if (offersCreated % 10 === 0) {
-          console.log(`Offers created: ${offersCreated}/${scorecards.length}`);
+          console.log(
+            `Offers created: ${offersCreated}/${qualifiedApplications.length}`,
+          );
         }
       } catch (error) {
         skipped++;

@@ -1,303 +1,313 @@
-# HireFlow — Data Dictionary
-
-## 1. Requisition
-
-Represents an approved job opening within an organization.
-
-| Field             | Type     | Required | Constraints / Description                                 |
-| ----------------- | -------- | -------- | --------------------------------------------------------- |
-| requisition_id    | String   | Yes      | Primary key. Format: REQ-2026-000001                      |
-| title             | String   | Yes      | Job title                                                 |
-| department        | String   | Yes      | Hiring department                                         |
-| location          | String   | Yes      | Job location                                              |
-| employment_type   | Enum     | Yes      | FULL_TIME, PART_TIME, CONTRACT, INTERN                    |
-| min_salary        | Decimal  | Yes      | Minimum approved salary                                   |
-| max_salary        | Decimal  | Yes      | Maximum approved salary; must be >= min_salary            |
-| openings          | Integer  | Yes      | Must be greater than 0                                    |
-| hiring_manager_id | String   | Yes      | Foreign key to HiringManager                              |
-| status            | Enum     | Yes      | DRAFT, PENDING_APPROVAL, OPEN, ON_HOLD, CLOSED, CANCELLED |
-| created_at        | DateTime | Yes      | Record creation timestamp                                 |
-| updated_at        | DateTime | Yes      | Last update timestamp                                     |
-
-## 2. HiringManager
-
-Represents an employee responsible for a requisition.
-
-| Field             | Type     | Required | Constraints / Description      |
-| ----------------- | -------- | -------- | ------------------------------ |
-| hiring_manager_id | String   | Yes      | Primary key                    |
-| employee_id       | String   | Yes      | Unique foreign key to Employee |
-| full_name         | String   | Yes      | Manager's name                 |
-| email             | String   | Yes      | Unique, valid email            |
-| department        | String   | Yes      | Manager's department           |
-| designation       | String   | Yes      | Job designation                |
-| is_active         | Boolean  | Yes      | Defaults to true               |
-| created_at        | DateTime | Yes      | Record creation timestamp      |
-
-**Relationship:** One Employee can have zero or one HiringManager profile.
-
-## 3. Candidate
-
-Represents a person applying for job opportunities.
-
-| Field            | Type     | Required | Constraints / Description        |
-| ---------------- | -------- | -------- | -------------------------------- |
-| candidate_id     | String   | Yes      | Primary key. Format: CAND-000001 |
-| full_name        | String   | Yes      | Candidate's name                 |
-| email            | String   | Yes      | Unique, valid email              |
-| phone            | String   | No       | Contact number                   |
-| location         | String   | No       | Candidate's location             |
-| experience_years | Decimal  | Yes      | Must be >= 0                     |
-| current_company  | String   | No       | Current or previous company      |
-| resume_url       | String   | No       | Resume reference                 |
-| created_at       | DateTime | Yes      | Record creation timestamp        |
-
-## 4. Application
-
-Connects a candidate to a requisition.
-
-| Field          | Type     | Required | Constraints / Description                                                        |
-| -------------- | -------- | -------- | -------------------------------------------------------------------------------- |
-| application_id | String   | Yes      | Primary key. Format: APP-<candidate-id>-<req-id>                                 |
-| candidate_id   | String   | Yes      | Foreign key to Candidate                                                         |
-| requisition_id | String   | Yes      | Foreign key to Requisition                                                       |
-| current_stage  | Enum     | Yes      | APPLIED, SCREENING, TECHNICAL, MANAGERIAL, HR, OFFER, HIRED, REJECTED, WITHDRAWN |
-| status         | Enum     | Yes      | ACTIVE, REJECTED, WITHDRAWN, HIRED                                               |
-| applied_at     | DateTime | Yes      | Application submission timestamp                                                 |
-| updated_at     | DateTime | Yes      | Last update timestamp                                                            |
-
-**Constraints:**
-
-- A candidate can apply to a particular requisition only once.
-- Candidate and requisition must exist before an application is created.
-- Stage transitions must follow the defined workflow rules.
-
-## 5. SkillRequirement
-
-Defines the skills and expected proficiency for a requisition.
-
-| Field                | Type     | Required | Constraints / Description                |
-| -------------------- | -------- | -------- | ---------------------------------------- |
-| skill_requirement_id | String   | Yes      | Primary key                              |
-| requisition_id       | String   | Yes      | Foreign key to Requisition               |
-| skill_name           | String   | Yes      | Example: JavaScript, SQL, React          |
-| minimum_level        | Enum     | Yes      | BEGINNER, INTERMEDIATE, ADVANCED, EXPERT |
-| is_mandatory         | Boolean  | Yes      | Whether the skill is required            |
-| weight               | Decimal  | Yes      | Evaluation weight, greater than 0        |
-| created_at           | DateTime | Yes      | Record creation timestamp                |
-
-**Constraint:** Skill weights for a requisition must be validated and normalized before calculating an overall skill score.
-
----
-
-# Workflow Entities
-
-## 6. InterviewPanel
-
-Represents a group of interviewers assigned to a requisition.
-
-| Field          | Type     | Required | Constraints / Description   |
-| -------------- | -------- | -------- | --------------------------- |
-| panel_id       | String   | Yes      | Primary key                 |
-| requisition_id | String   | Yes      | Foreign key to Requisition  |
-| panel_name     | String   | Yes      | Name of the interview panel |
-| description    | String   | No       | Panel purpose               |
-| is_active      | Boolean  | Yes      | Defaults to true            |
-| created_at     | DateTime | Yes      | Creation timestamp          |
-
-## 7. Availability
-
-Stores the available time slots of an interviewer.
-
-| Field           | Type     | Required | Constraints / Description             |
-| --------------- | -------- | -------- | ------------------------------------- |
-| availability_id | String   | Yes      | Primary key                           |
-| interviewer_id  | String   | Yes      | Foreign key to Employee               |
-| start_time      | DateTime | Yes      | Availability start                    |
-| end_time        | DateTime | Yes      | Availability end; must be after start |
-| status          | Enum     | Yes      | AVAILABLE, UNAVAILABLE, BOOKED        |
-| created_at      | DateTime | Yes      | Creation timestamp                    |
-
-**Rules:**
-
-- Availability periods must have valid start and end times.
-- Interview scheduling must check interviewer availability.
-- Overlapping availability records should be handled consistently.
-
-## 8. Interview
-
-Represents a scheduled interview for an application.
-
-| Field          | Type     | Required | Constraints / Description                             |
-| -------------- | -------- | -------- | ----------------------------------------------------- |
-| interview_id   | String   | Yes      | Primary key. Format: INT-2026-000001                  |
-| application_id | String   | Yes      | Foreign key to Application                            |
-| panel_id       | String   | Yes      | Foreign key to InterviewPanel                         |
-| start_time     | DateTime | Yes      | Scheduled start                                       |
-| end_time       | DateTime | Yes      | Must be after start                                   |
-| interview_type | Enum     | Yes      | TECHNICAL, MANAGERIAL, HR, SCREENING                  |
-| status         | Enum     | Yes      | SCHEDULED, COMPLETED, CANCELLED, RESCHEDULED, NO_SHOW |
-| meeting_link   | String   | No       | Online meeting URL                                    |
-| created_at     | DateTime | Yes      | Creation timestamp                                    |
-
-**Rules:**
-
-- Interviewers must be available during the scheduled slot.
-- An interviewer cannot be booked for overlapping interviews.
-- Withdrawn or rejected applications cannot receive new interviews.
-- Rescheduling must preserve previous scheduling history.
-
-## 9. Scorecard
-
-Stores structured feedback from an interviewer.
-
-| Field                 | Type     | Required | Constraints / Description                               |
-| --------------------- | -------- | -------- | ------------------------------------------------------- |
-| scorecard_id          | String   | Yes      | Primary key. Format: SCORE-<interview-id>-<reviewer-id> |
-| interview_id          | String   | Yes      | Foreign key to Interview                                |
-| reviewer_id           | String   | Yes      | Foreign key to Employee                                 |
-| technical_score       | Decimal  | Yes      | Score from 0 to 10                                       |
-| communication_score   | Decimal  | Yes      | Score from 0 to 10                                       |
-| problem_solving_score | Decimal  | Yes      | Score from 0 to 10                                       |
-| recommendation        | Enum     | Yes      | STRONG_YES, YES, MAYBE, NO, STRONG_NO                   |
-| comments              | String   | No       | Interviewer feedback                                    |
-| submitted_at          | DateTime | Yes      | Submission timestamp                                    |
-
-**Rules:**
-
-- One reviewer can submit only one scorecard per interview.
-- Scorecards must be submitted before the application advances beyond the relevant interview stage.
-- Scores must remain within the 1–5 range.
-- Evaluation criteria must be relevant to the requisition and interview type.
-
-## 10. Offer
-
-Represents a job offer made to a candidate.
-
-| Field          | Type     | Required | Constraints / Description                                                       |
-| -------------- | -------- | -------- | ------------------------------------------------------------------------------- |
-| offer_id       | String   | Yes      | Primary key. Format: OFF-2026-000001                                            |
-| application_id | String   | Yes      | Foreign key to Application                                                      |
-| offered_salary | Decimal  | Yes      | Must be greater than 0                                                          |
-| currency       | String   | Yes      | Example: INR                                                                    |
-| joining_date   | Date     | Yes      | Proposed joining date                                                           |
-| status         | Enum     | Yes      | DRAFT, PENDING_APPROVAL, APPROVED, SENT, ACCEPTED, REJECTED, EXPIRED, WITHDRAWN |
-| created_at     | DateTime | Yes      | Creation timestamp                                                              |
-| updated_at     | DateTime | Yes      | Last update timestamp                                                           |
-
-**Rules:**
-
-- Offered salary must be checked against the requisition's approved salary band.
-- An offer must receive required approvals before being sent.
-- Offer status changes must be recorded in audit history.
-- Multiple historical offers may exist, but only one active offer is allowed per application.
-
-## 11. Approval
-
-Tracks approval decisions for requisitions and offers.
-
-| Field          | Type     | Required | Constraints / Description   |
-| -------------- | -------- | -------- | --------------------------- |
-| approval_id    | String   | Yes      | Primary key                 |
-| offer_id       | String   | No       | Foreign key to Offer        |
-| requisition_id | String   | No       | Foreign key to Requisition  |
-| approver_id    | String   | Yes      | Foreign key to Employee     |
-| approval_type  | Enum     | Yes      | REQUISITION, OFFER          |
-| decision       | Enum     | Yes      | PENDING, APPROVED, REJECTED |
-| comments       | String   | No       | Approval notes              |
-| decided_at     | DateTime | No       | Set when a decision is made |
-| created_at     | DateTime | Yes      | Creation timestamp          |
-
-**Constraint:** Exactly one of offer_id or requisition_id must be populated, matching approval_type.
-
----
-
-# Supporting Entities
-
-## 12. Employee
-
-Represents an internal employee, including interviewers, approvers and administrators.
-
-| Field       | Type     | Required | Constraints / Description                        |
-| ----------- | -------- | -------- | ------------------------------------------------ |
-| employee_id | String   | Yes      | Primary key                                      |
-| full_name   | String   | Yes      | Employee's name                                  |
-| email       | String   | Yes      | Unique, valid email                              |
-| department  | String   | Yes      | Department                                       |
-| role        | Enum     | Yes      | HR, HIRING_MANAGER, INTERVIEWER, APPROVER, ADMIN |
-| is_active   | Boolean  | Yes      | Defaults to true                                 |
-| created_at  | DateTime | Yes      | Record creation timestamp                        |
-
-## 13. PanelMember
-
-Connects employees to interview panels.
-
-| Field           | Type     | Required | Constraints / Description     |
-| --------------- | -------- | -------- | ----------------------------- |
-| panel_member_id | String   | Yes      | Primary key                   |
-| panel_id        | String   | Yes      | Foreign key to InterviewPanel |
-| employee_id     | String   | Yes      | Foreign key to Employee       |
-| assigned_at     | DateTime | Yes      | Assignment timestamp          |
-
-**Constraint:** An employee can be assigned to a panel only once.
-
-## 14. InterviewParticipant
-
-Connects individual interviewers to scheduled interviews.
-
-| Field          | Type   | Required | Constraints / Description |
-| -------------- | ------ | -------- | ------------------------- |
-| participant_id | String | Yes      | Primary key               |
-| interview_id   | String | Yes      | Foreign key to Interview  |
-| employee_id    | String | Yes      | Foreign key to Employee   |
-| role           | Enum   | Yes      | LEAD, PANELIST, OBSERVER  |
-
-**Constraint:** An employee can participate in an interview only once.
-
-## 15. ApplicationStageEvent
-
-Maintains the complete history of application stage transitions.
-
-| Field          | Type     | Required | Constraints / Description              |
-| -------------- | -------- | -------- | -------------------------------------- |
-| event_id       | String   | Yes      | Primary key                            |
-| application_id | String   | Yes      | Foreign key to Application             |
-| from_stage     | String   | No       | Previous stage; null for initial stage |
-| to_stage       | String   | Yes      | New stage                              |
-| changed_by     | String   | Yes      | Foreign key to Employee                |
-| reason         | String   | No       | Reason for transition                  |
-| changed_at     | DateTime | Yes      | Transition timestamp                   |
-
-**Rule:** Stage history is append-only. Existing events must not be overwritten.
-
-## 16. AuditLog
-
-Records important system actions for traceability.
-
-| Field       | Type     | Required | Constraints / Description                           |
-| ----------- | -------- | -------- | --------------------------------------------------- |
-| audit_id    | String   | Yes      | Primary key                                         |
-| employee_id | String   | No       | Foreign key to Employee                             |
-| entity_type | String   | Yes      | Entity being changed                                |
-| entity_id   | String   | Yes      | ID of the affected record                           |
-| action      | Enum     | Yes      | CREATE, UPDATE, DELETE, APPROVE, REJECT, RESCHEDULE |
-| old_value   | JSON     | No       | Previous values                                     |
-| new_value   | JSON     | No       | Updated values                                      |
-| created_at  | DateTime | Yes      | Event timestamp                                     |
-
----
-
-# Global Database Constraints
-
-1. Every entity must have a unique primary key.
-2. Every foreign key must reference an existing record.
-3. Candidate email and employee email must be unique.
-4. Candidate-requisition combinations must be unique.
-5. All dates must follow valid chronological order.
-6. Salary values must be non-negative and consistent with approved bands.
-7. Interview start time must be earlier than end time.
-8. Interviewers cannot have overlapping scheduled interviews.
-9. Application stage transitions must follow defined business rules.
-10. Historical events must not be silently overwritten or deleted.
-11. Approval records must reference exactly one target entity.
-12. Synthetic anomaly records must carry explicit ground-truth labels and must not be confused with valid baseline records.
+# HireFlow Data Dictionary
+
+Generated from the Prisma schema. Field types, requiredness, defaults, enum choices, uniqueness, foreign keys, and relationship cardinality are schema-derived; the validation column documents additional application rules.
+
+## Effective dates and lifecycle history
+
+Availability and interview rows use `startTime`/`endTime` intervals. There are no separate `effectiveFrom`/`effectiveTo` version columns. Every successful application stage change creates an `ApplicationStageEvent`; interview and offer changes are recorded in `AuditLog` with old/new values where applicable. PostgreSQL uses timestamp-without-time-zone columns; application and export values are interpreted as UTC, so configure the database session timezone as UTC.
+
+## Employee
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| employeeId | String | Yes | - | Primary key | - |
+| fullName | String | Yes | - |  | - |
+| email | String | Yes | - | Unique | - |
+| department | String | Yes | - |  | - |
+| role | EmployeeRole | Yes | HR, HIRING_MANAGER, INTERVIEWER, APPROVER, ADMIN, OPERATIONS |  | - |
+| isActive | Boolean | Yes | Default: true |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| availabilities | Availability | No (zero or more) | - | 1:N Availability | - |
+| panelMemberships | PanelMember | No (zero or more) | - | 1:N PanelMember | - |
+| interviewParticipations | InterviewParticipant | No (zero or more) | - | 1:N InterviewParticipant | - |
+| scorecards | Scorecard | No (zero or more) | - | 1:N Scorecard | - |
+| approvals | Approval | No (zero or more) | - | 1:N Approval | - |
+| stageChanges | ApplicationStageEvent | No (zero or more) | - | 1:N ApplicationStageEvent | - |
+| auditLogs | AuditLog | No (zero or more) | - | 1:N AuditLog | - |
+| hiringManagerProfile | HiringManager | No | - | 1:1 HiringManager (optional) | - |
+
+## HiringManager
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| hiringManagerId | String | Yes | - | Primary key | - |
+| employeeId | String | Yes | - | Unique | - |
+| designation | String | Yes | - |  | - |
+| isActive | Boolean | Yes | Default: true |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| employee | Employee | Yes | - | 1:1 Employee; FK: employeeId | - |
+| requisitions | Requisition | No (zero or more) | - | 1:N Requisition | - |
+
+## Requisition
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| requisitionId | String | Yes | - | Primary key | Immutable ID; format REQ-2026-000001 with a six-digit counter. |
+| title | String | Yes | - |  | - |
+| department | String | Yes | - |  | - |
+| location | String | Yes | - |  | - |
+| employmentType | EmploymentType | Yes | FULL_TIME, PART_TIME, CONTRACT, INTERN |  | - |
+| minSalary | Decimal(12, 2) | Yes | - |  | INR per year; must be non-negative and no greater than maxSalary. |
+| maxSalary | Decimal(12, 2) | Yes | - |  | INR per year; must be greater than or equal to minSalary. |
+| openings | Int | Yes | - |  | Whole number; must be greater than zero. |
+| hiringManagerId | String | Yes | - |  | - |
+| status | RequisitionStatus | Yes | DRAFT, PENDING_APPROVAL, OPEN, ON_HOLD, CLOSED, CANCELLED |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| updatedAt | DateTime | Yes | - |  | UTC timestamp. |
+| skillRequirements | SkillRequirement | No (zero or more) | - | 1:N SkillRequirement | - |
+| interviewPanels | InterviewPanel | No (zero or more) | - | 1:N InterviewPanel | - |
+| evaluationCriteria | EvaluationCriterion | No (zero or more) | - | 1:N EvaluationCriterion | - |
+| approvals | Approval | No (zero or more) | - | 1:N Approval | - |
+| hiringManager | HiringManager | Yes | - | N:1 HiringManager; FK: hiringManagerId | - |
+| applications | Application | No (zero or more) | - | 1:N Application | - |
+
+## Candidate
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| candidateId | String | Yes | - | Primary key | Immutable ID; format CAND-000001 with a six-digit counter. |
+| fullName | String | Yes | - |  | - |
+| email | String | Yes | - | Unique | - |
+| phone | String | No | - |  | - |
+| location | String | No | - |  | - |
+| experienceYears | Decimal(4, 1) | Yes | - |  | Years; decimal precision 1; must be non-negative. |
+| currentCompany | String | No | - |  | - |
+| resumeUrl | String | No | - |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| applications | Application | No (zero or more) | - | 1:N Application | - |
+
+## Application
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| applicationId | String | Yes | - | Primary key | Immutable composite ID; format APP-<candidate-id>-<requisition-id>. |
+| candidateId | String | Yes | - |  | - |
+| requisitionId | String | Yes | - |  | - |
+| currentStage | ApplicationStage | Yes | APPLIED, SCREENING, TECHNICAL, MANAGERIAL, HR, OFFER, HIRED, REJECTED, WITHDRAWN |  | Must follow the documented linear workflow; REJECTED and WITHDRAWN are terminal. |
+| status | ApplicationStatus | Yes | ACTIVE, REJECTED, WITHDRAWN, HIRED |  | Must agree with HIRED, REJECTED, or WITHDRAWN terminal stage. |
+| appliedAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| updatedAt | DateTime | Yes | - |  | UTC timestamp. |
+| interviews | Interview | No (zero or more) | - | 1:N Interview | - |
+| offers | Offer | No (zero or more) | - | 1:N Offer | - |
+| stageEvents | ApplicationStageEvent | No (zero or more) | - | 1:N ApplicationStageEvent | - |
+| candidate | Candidate | Yes | - | N:1 Candidate; FK: candidateId | - |
+| requisition | Requisition | Yes | - | N:1 Requisition; FK: requisitionId | - |
+
+Composite unique constraints: `candidateId + requisitionId`.
+
+## SkillRequirement
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| skillRequirementId | String | Yes | - | Primary key | - |
+| requisitionId | String | Yes | - |  | - |
+| skillName | String | Yes | - |  | - |
+| minimumLevel | SkillLevel | Yes | BEGINNER, INTERMEDIATE, ADVANCED, EXPERT |  | - |
+| isMandatory | Boolean | Yes | Default: true |  | - |
+| weight | Decimal(5, 2) | Yes | - |  | Relative weight points; must be positive. |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| requisition | Requisition | Yes | - | N:1 Requisition; FK: requisitionId | - |
+
+## InterviewPanel
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| panelId | String | Yes | - | Primary key | - |
+| requisitionId | String | Yes | - |  | - |
+| panelName | String | Yes | - |  | - |
+| description | String | No | - |  | - |
+| isActive | Boolean | Yes | Default: true |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| requisition | Requisition | Yes | - | N:1 Requisition; FK: requisitionId | - |
+| members | PanelMember | No (zero or more) | - | 1:N PanelMember | - |
+| interviews | Interview | No (zero or more) | - | 1:N Interview | - |
+
+## PanelMember
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| panelMemberId | String | Yes | - | Primary key | - |
+| panelId | String | Yes | - |  | - |
+| employeeId | String | Yes | - |  | - |
+| assignedAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| panel | InterviewPanel | Yes | - | N:1 InterviewPanel; FK: panelId | - |
+| employee | Employee | Yes | - | N:1 Employee; FK: employeeId | - |
+
+Composite unique constraints: `panelId + employeeId`.
+
+## Availability
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| availabilityId | String | Yes | - | Primary key | - |
+| interviewerId | String | Yes | - |  | - |
+| startTime | DateTime | Yes | - |  | UTC timestamp; must be in the future when created. |
+| endTime | DateTime | Yes | - |  | UTC timestamp; must be after startTime. |
+| status | AvailabilityStatus | Yes | AVAILABLE, UNAVAILABLE, BOOKED |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| interviewer | Employee | Yes | - | N:1 Employee; FK: interviewerId | - |
+
+## Interview
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| interviewId | String | Yes | - | Primary key | Immutable ID; format INT-2026-000001 with a six-digit counter. |
+| applicationId | String | Yes | - |  | - |
+| panelId | String | Yes | - |  | - |
+| startTime | DateTime | Yes | - |  | UTC timestamp; must be in the future. |
+| endTime | DateTime | Yes | - |  | UTC timestamp; must be after startTime. |
+| interviewType | InterviewType | Yes | TECHNICAL, MANAGERIAL, HR, SCREENING |  | - |
+| status | InterviewStatus | Yes | SCHEDULED, COMPLETED, CANCELLED, RESCHEDULED, NO_SHOW |  | Only SCHEDULED interviews participate in conflict checks; changes are audit-recorded. |
+| meetingLink | String | No | - |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| application | Application | Yes | - | N:1 Application; FK: applicationId | - |
+| panel | InterviewPanel | Yes | - | N:1 InterviewPanel; FK: panelId | - |
+| participants | InterviewParticipant | No (zero or more) | - | 1:N InterviewParticipant | - |
+| scorecards | Scorecard | No (zero or more) | - | 1:N Scorecard | - |
+
+## InterviewParticipant
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| participantId | String | Yes | - | Primary key | - |
+| interviewId | String | Yes | - |  | - |
+| employeeId | String | Yes | - |  | - |
+| role | ParticipantRole | Yes | LEAD, PANELIST, OBSERVER |  | - |
+| interview | Interview | Yes | - | N:1 Interview; FK: interviewId | - |
+| employee | Employee | Yes | - | N:1 Employee; FK: employeeId | - |
+
+Composite unique constraints: `interviewId + employeeId`.
+
+## Scorecard
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| scorecardId | String | Yes | - | Primary key | Immutable composite ID; format SCORE-<interview-id>-<reviewer-id>. |
+| interviewId | String | Yes | - |  | - |
+| reviewerId | String | Yes | - |  | - |
+| technicalScore | Decimal(4, 2) | Yes | - |  | Score on a 0-10 scale. |
+| communicationScore | Decimal(4, 2) | Yes | - |  | Score on a 0-10 scale. |
+| problemSolvingScore | Decimal(4, 2) | Yes | - |  | Score on a 0-10 scale. |
+| recommendation | ScoreRecommendation | Yes | STRONG_YES, YES, MAYBE, NO, STRONG_NO |  | Derived from weighted rubric scores: >=8 STRONG_YES, >=7 YES, >=5 MAYBE, >=3 NO, otherwise STRONG_NO. |
+| comments | String | No | - |  | - |
+| submittedAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| items | ScorecardItem | No (zero or more) | - | 1:N ScorecardItem | - |
+| interview | Interview | Yes | - | N:1 Interview; FK: interviewId | - |
+| reviewer | Employee | Yes | - | N:1 Employee; FK: reviewerId | - |
+
+Composite unique constraints: `interviewId + reviewerId`.
+
+## EvaluationCriterion
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| criterionId | String | Yes | Default: cuid(1) | Primary key | - |
+| requisitionId | String | Yes | - |  | - |
+| name | String | Yes | - |  | - |
+| description | String | No | - |  | - |
+| category | String | Yes | - |  | - |
+| weight | Decimal(5, 2) | Yes | - |  | Relative rubric weight points; must be positive. |
+| isRequired | Boolean | Yes | Default: true |  | - |
+| isActive | Boolean | Yes | Default: true |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| requisition | Requisition | Yes | - | N:1 Requisition; FK: requisitionId | - |
+| scorecardItems | ScorecardItem | No (zero or more) | - | 1:N ScorecardItem | - |
+
+## ScorecardItem
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| itemId | String | Yes | Default: cuid(1) | Primary key | - |
+| scorecardId | String | Yes | - |  | - |
+| criterionId | String | Yes | - |  | - |
+| score | Decimal(4, 2) | Yes | - |  | Rubric score on a 0-10 scale. |
+| comments | String | No | - |  | - |
+| scorecard | Scorecard | Yes | - | N:1 Scorecard; FK: scorecardId | - |
+| criterion | EvaluationCriterion | Yes | - | N:1 EvaluationCriterion; FK: criterionId | - |
+
+Composite unique constraints: `scorecardId + criterionId`.
+
+## Offer
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| offerId | String | Yes | Default: cuid(1) | Primary key | Immutable ID; format OFF-2026-000001 with a six-digit counter. |
+| applicationId | String | Yes | - |  | - |
+| version | Int | Yes | Default: 1 |  | - |
+| baseSalary | Decimal(12, 2) | Yes | - |  | INR per year; must be positive and within the requisition compensation band. |
+| bonus | Decimal(12, 2) | No | - |  | INR per year; optional and must be non-negative. |
+| currency | String | Yes | Default: "INR" |  | - |
+| status | OfferStatus | Yes | DRAFT, PENDING_APPROVAL, APPROVED, SENT, ACCEPTED, REJECTED, WITHDRAWN, EXPIRED |  | Must follow the approval, send, response, withdrawal, and expiry lifecycle. |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| sentAt | DateTime | No | - |  | UTC timestamp. |
+| respondedAt | DateTime | No | - |  | UTC timestamp. |
+| application | Application | Yes | - | N:1 Application; FK: applicationId | - |
+| approvals | Approval | No (zero or more) | - | 1:N Approval | - |
+
+Composite unique constraints: `applicationId + version`.
+
+## Approval
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| approvalId | String | Yes | Default: cuid(1) | Primary key | - |
+| offerId | String | No | - |  | - |
+| requisitionId | String | No | - |  | - |
+| approverId | String | Yes | - |  | - |
+| approvalType | ApprovalType | Yes | REQUISITION, OFFER |  | Must match the single populated offerId or requisitionId target. |
+| status | ApprovalStatus | Yes | PENDING, APPROVED, REJECTED |  | - |
+| comments | String | No | - |  | - |
+| requestedAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| decidedAt | DateTime | No | - |  | UTC timestamp; absent while PENDING and required after a decision. |
+| offer | Offer | No | - | N:1 Offer (optional); FK: offerId | - |
+| requisition | Requisition | No | - | N:1 Requisition (optional); FK: requisitionId | - |
+| approver | Employee | Yes | - | N:1 Employee; FK: approverId | - |
+
+## ApplicationStageEvent
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| eventId | String | Yes | Default: cuid(1) | Primary key | - |
+| applicationId | String | Yes | - |  | - |
+| fromStage | String | No | - |  | - |
+| toStage | String | Yes | - |  | - |
+| changedById | String | No | - |  | - |
+| reason | String | No | - |  | - |
+| changedAt | DateTime | Yes | Default: now() |  | UTC event timestamp; records a stage transition without replacing prior events. |
+| application | Application | Yes | - | N:1 Application; FK: applicationId | - |
+| changedBy | Employee | No | - | N:1 Employee (optional); FK: changedById | - |
+
+## AuditLog
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| auditLogId | String | Yes | Default: cuid(1) | Primary key | - |
+| actorId | String | No | - |  | - |
+| action | String | Yes | - |  | - |
+| entityType | String | Yes | - |  | - |
+| entityId | String | Yes | - |  | - |
+| details | Json | No | - |  | - |
+| createdAt | DateTime | Yes | Default: now() |  | UTC timestamp. |
+| actor | Employee | No | - | N:1 Employee (optional); FK: actorId | - |
+
+## IdCounter
+
+| Field | Type | Required | Allowed values / default | Unique / relationship | Unit and validation |
+|---|---|---|---|---|---|
+| name | String | Yes | - | Primary key | - |
+| value | Int | Yes | Default: 0 |  | - |
+| updatedAt | DateTime | Yes | - |  | UTC timestamp. |
+
+## Application lifecycle
+
+Allowed forward transitions are APPLIED → SCREENING → TECHNICAL → MANAGERIAL → HR → OFFER → HIRED. REJECTED and WITHDRAWN are terminal decision stages. Progression requires the prior interview to be completed and every assigned non-observer interviewer to have a scorecard; HIRED requires an accepted offer.
+
+## Cross-record validation
+
+- Applications are unique per candidate/requisition pair.
+- Each foreign key and enum value is checked against the Prisma schema by `validateData.js`.
+- Requisition compensation bands must be ordered; offer base salary must fall within the related band.
+- Interview and availability end times must be later than start times.
+- Approval must reference exactly one target, matching `approvalType`.
+- Scorecard recommendations are derived from weighted active rubric criteria, not independently assigned.
+- Known exception records are labeled separately in `ground_truth.csv` and `ground_truth.json`; labels are not included in operational feature exports.

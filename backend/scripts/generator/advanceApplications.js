@@ -1,4 +1,5 @@
 const prisma = require("../../src/config/database");
+const config = require("./config");
 const { updateApplicationStage } = require("../../src/services/applicationStageService");
 
 const advanceApplications = async () => {
@@ -9,7 +10,7 @@ const advanceApplications = async () => {
       candidateId: { startsWith: "CAND-" },
       requisitionId: { startsWith: "REQ-2026-" },
     },
-    take: 2000,
+    take: config.screeningInterviews,
     orderBy: { applicationId: "asc" },
   });
 
@@ -36,8 +37,10 @@ const advanceApplications = async () => {
 
     updated++;
 
-    if (updated % 500 === 0) {
-      console.log(`Advanced ${updated}/2000 applications`);
+    if (updated % 500 === 0 || updated === applications.length) {
+      console.log(
+        `Advanced ${updated}/${config.screeningInterviews} applications`,
+      );
     }
   }
 

@@ -29,6 +29,7 @@ const submitRequisition = async (requisitionId, submittedById) => {
 
     const approvers = await tx.employee.findMany({
       where: { role: "APPROVER", isActive: true },
+      orderBy: { employeeId: "asc" },
     });
 
     if (approvers.length === 0) {
@@ -44,6 +45,7 @@ const submitRequisition = async (requisitionId, submittedById) => {
 
     await tx.approval.createMany({
       data: approvers.map((approver) => ({
+        approvalId: `APR-REQ-${requisitionId}-${approver.employeeId}`,
         requisitionId,
         approverId: approver.employeeId,
         approvalType: "REQUISITION",

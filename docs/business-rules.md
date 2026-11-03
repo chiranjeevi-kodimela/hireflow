@@ -42,15 +42,13 @@ Users should only perform actions permitted by their assigned role. Access to se
 
 ## 5. Recruitment Stage Rules
 
-1. Each application has a current recruitment stage or status.
-2. Stage changes should follow the configured workflow.
-3. Invalid stage transitions should be rejected.
-4. A stage change should update the application’s current status.
-5. Important stage changes should be traceable where audit history is implemented.
-6. Rejected or withdrawn applications should not continue through active hiring stages unless explicitly reopened.
-7. A selected candidate may proceed to the offer process, subject to the applicable approval rules.
-
-The exact stage names and permitted transitions should match the workflow configured in the application.
+1. Each application has a current recruitment stage and lifecycle status.
+2. Normal transitions are APPLIED → SCREENING → TECHNICAL → MANAGERIAL → HR → OFFER → HIRED. REJECTED and WITHDRAWN are terminal decisions.
+3. Before moving beyond an interview stage, the required interview must be completed and every assigned non-observer interviewer must submit a rubric scorecard.
+4. An accepted offer is required before an application can become HIRED.
+5. Invalid stage transitions are rejected by the backend.
+6. Every successful stage change creates an ApplicationStageEvent and an audit record.
+7. Rejected or withdrawn applications cannot continue through active stages unless explicitly reopened.
 
 ## 6. Interview Scheduling Rules
 
@@ -58,11 +56,12 @@ The exact stage names and permitted transitions should match the workflow config
 2. An interview must have a defined date, time, and duration.
 3. An interview should include the required interviewer or panel members.
 4. Interview scheduling should consider interviewer availability.
-5. An interviewer should not be assigned to overlapping interviews when conflict prevention is enabled.
-6. Invalid or conflicting interview times should be rejected.
-7. Changes to interview schedules should be reflected in the application’s interview information.
-8. Cancelled interviews should not be treated as active scheduled interviews.
-9. Interview details should be accessible only to authorized users.
+5. Every non-observer interviewer must have availability for the complete interview interval.
+6. An interviewer must not be assigned to overlapping scheduled interviews.
+7. Invalid or conflicting interview times should be rejected.
+8. Changes to interview schedules should be captured with previous and new times in the audit history.
+9. Cancelled interviews should not be treated as active scheduled interviews.
+10. Interview details should be accessible only to authorized users.
 
 ## 7. Interview Evaluation Rules
 
@@ -149,12 +148,11 @@ Only rules that have been implemented and tested should be reported as verified.
 
 Some rules depend on the current implementation and may require further refinement, including:
 
-- Exact requisition and application status values.
-- Permitted transitions between recruitment stages.
-- Duplicate-application handling.
-- Interview conflict detection and availability rules.
-- Offer approval requirements.
-- Audit-history coverage.
 - Reopening or cancelling recruitment records.
+- Effective-dated versions of master data; current availability/interviews use explicit UTC intervals, while workflow changes use timestamped events.
 
 These rules should be updated as the application evolves and as additional business requirements are clarified.
+
+## 15. Synthetic dataset generation
+
+The ordered generator creates parent records before dependent records, uses a fixed shared seed and configurable counts, advances applications through the same stage gates, creates all required rubric reviews for progressed applications, and generates offers through the approval service. It then injects labeled exception fixtures in a separate ground-truth file. Dataset validation checks schema-derived keys, foreign keys, enums, lifecycle and date rules, joins, scorecard arithmetic, and exact labeled entity matches. It does not silently treat an injected exception as a valid baseline record.

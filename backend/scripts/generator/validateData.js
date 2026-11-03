@@ -1,346 +1,311 @@
 const fs = require("fs");
-const path = require("path");
 const prisma = require("../../src/config/database");
+const { Prisma } = require("../../src/generated/prisma");
+const { findSchemaIssues, groundTruthMatches } = require("./dataValidation");
+const { getExportDir } = require("./paths");
+
+const formatLabel = (label) => ({
+  ...label,
+  entityId: String(label.entityId),
+  relatedEntityId: label.relatedEntityId
+    ? String(label.relatedEntityId)
+    : null,
+});
+
+const detectAnomalies = (records) => {
+  const detected = [];
+  const applications = new Map(
+    records.Application.map((application) => [
+      application.applicationId,
+      application,
+    ]),
+  );
+  const participantsByInterview = new Map();
+  for (const participant of records.InterviewParticipant) {
+    const participants = participantsByInterview.get(participant.interviewId) || [];
+    participants.push(participant);
+    participantsByInterview.set(participant.interviewId, participants);
+  }
+  const scorecardsByInterview = new Map();
+  for (const scorecard of records.Scorecard) {
+    const scorecards = scorecardsByInterview.get(scorecard.interviewId) || [];
+    scorecards.push(scorecard);
+    scorecardsByInterview.set(scorecard.interviewId, scorecards);
+  }
+
+  const outOfBandOffers = records.Offer.filter((offer) => {
+    const application = applications.get(offer.applicationId);
+    const requisition = records.Requisition.find(
+      (item) => item.requisitionId === application?.requisitionId,
+    );
+    return (
+      requisition &&
+      (Number(offer.baseSalary) < Number(requisition.minSalary) ||
+        Number(offer.baseSalary) > Number(requisition.maxSalary))
+    );
+  });
+  for (const offer of outOfBandOffers) {
+    detected.push({
+      type: "OFFER_EXCEEDS_SALARY_BAND",
+      entityId: offer.offerId,
+      relatedEntityId: null,
+    });
+  }
+
+  const scheduledInterviews = records.Interview.filter(
+    (interview) => interview.status === "SCHEDULED",
+  );
+  for (let firstIndex = 0; firstIndex < scheduledInterviews.length; firstIndex++) {
+    const first = scheduledInterviews[firstIndex];
+    const firstIds = new Set(
+      (participantsByInterview.get(first.interviewId) || [])
+        .filter((participant) => participant.role !== "OBSERVER")
+        .map((participant) => participant.employeeId),
+    );
+    for (
+      let secondIndex = firstIndex + 1;
+      secondIndex < scheduledInterviews.length;
+      secondIndex++
+    ) {
+      const second = scheduledInterviews[secondIndex];
+      const sharesInterviewer = (
+        participantsByInterview.get(second.interviewId) || []
+      ).some(
+        (participant) =>
+          participant.role !== "OBSERVER" &&
+          firstIds.has(participant.employeeId),
+      );
+      if (
+        sharesInterviewer &&
+        first.startTime < second.endTime &&
+        second.startTime < first.endTime
+      ) {
+        detected.push({
+          type: "INTERVIEWER_DOUBLE_BOOKED",
+          entityId: second.interviewId,
+          relatedEntityId: first.interviewId,
+        });
+      }
+
+      const application = applications.get(second.applicationId);
+      if (
+        application?.status === "WITHDRAWN" &&
+        !detected.some(
+          (item) =>
+            item.type === "WITHDRAWN_CANDIDATE_STILL_SCHEDULED" &&
+            item.entityId === application.applicationId &&
+            item.relatedEntityId === second.interviewId,
+        )
+      ) {
+        detected.push({
+          type: "WITHDRAWN_CANDIDATE_STILL_SCHEDULED",
+          entityId: application.applicationId,
+          relatedEntityId: second.interviewId,
+        });
+      }
+    }
+
+    const application = applications.get(first.applicationId);
+    if (
+      application?.status === "WITHDRAWN" &&
+      !detected.some(
+        (item) =>
+          item.type === "WITHDRAWN_CANDIDATE_STILL_SCHEDULED" &&
+          item.entityId === application.applicationId &&
+          item.relatedEntityId === first.interviewId,
+      )
+    ) {
+      detected.push({
+        type: "WITHDRAWN_CANDIDATE_STILL_SCHEDULED",
+        entityId: application.applicationId,
+        relatedEntityId: first.interviewId,
+      });
+    }
+  }
+
+  const criteriaById = new Map(
+    records.EvaluationCriterion.map((criterion) => [
+      criterion.criterionId,
+      criterion,
+    ]),
+  );
+  for (const item of records.ScorecardItem) {
+    const criterion = criteriaById.get(item.criterionId);
+    if (
+      criterion &&
+      (!criterion.isActive ||
+        criterion.category === "IRRELEVANT" ||
+        criterion.name === "Favorite Sports Team")
+    ) {
+      detected.push({
+        type: "IRRELEVANT_EVALUATION_CRITERION",
+        entityId: item.scorecardId,
+        relatedEntityId: item.criterionId,
+      });
+    }
+  }
+
+  for (const interview of records.Interview) {
+    if (interview.status !== "COMPLETED") continue;
+    const scoredReviewerIds = new Set(
+      (scorecardsByInterview.get(interview.interviewId) || []).map(
+        (scorecard) => scorecard.reviewerId,
+      ),
+    );
+    for (const participant of participantsByInterview.get(interview.interviewId) || []) {
+      if (
+        participant.role !== "OBSERVER" &&
+        !scoredReviewerIds.has(participant.employeeId)
+      ) {
+        detected.push({
+          type: "INCOMPLETE_SCORECARD",
+          entityId: interview.interviewId,
+          relatedEntityId: participant.employeeId,
+        });
+      }
+    }
+  }
+
+  const requiredInterviewForStage = {
+    TECHNICAL: "SCREENING",
+    MANAGERIAL: "TECHNICAL",
+    HR: "MANAGERIAL",
+    OFFER: "HR",
+  };
+  for (const event of records.ApplicationStageEvent) {
+    if (
+      !requiredInterviewForStage[event.toStage] ||
+      !event.fromStage ||
+      event.toStage === "WITHDRAWN" ||
+      event.toStage === "REJECTED"
+    ) {
+      continue;
+    }
+    const requiredType = requiredInterviewForStage[event.toStage];
+    const validReview = records.Interview.some((interview) => {
+      if (
+        interview.applicationId !== event.applicationId ||
+        interview.interviewType !== requiredType ||
+        interview.status !== "COMPLETED"
+      ) {
+        return false;
+      }
+      const scorecardIds = new Set(
+        (scorecardsByInterview.get(interview.interviewId) || []).map(
+          (scorecard) => scorecard.reviewerId,
+        ),
+      );
+      const assigned = (participantsByInterview.get(interview.interviewId) || [])
+        .filter((participant) => participant.role !== "OBSERVER")
+        .map((participant) => participant.employeeId);
+      return (
+        assigned.length > 0 &&
+        assigned.every((reviewerId) => scorecardIds.has(reviewerId))
+      );
+    });
+    if (!validReview) {
+      detected.push({
+        type: "ADVANCEMENT_WITHOUT_REVIEW",
+        entityId: event.applicationId,
+        relatedEntityId: null,
+      });
+    }
+  }
+
+  return detected;
+};
 
 const run = async () => {
   try {
     console.log("Starting HireFlow data validation...\n");
 
-    const [
-      employees,
-      requisitions,
-      candidates,
-      applications,
-      panels,
-      interviews,
-      participants,
-      scorecards,
-      scorecardItems,
-      criteria,
-      offers,
-      approvals,
-      stageEvents,
-    ] = await Promise.all([
-      prisma.employee.findMany(),
-      prisma.requisition.findMany(),
-      prisma.candidate.findMany(),
-      prisma.application.findMany(),
-      prisma.interviewPanel.findMany(),
-      prisma.interview.findMany(),
-      prisma.interviewParticipant.findMany(),
-      prisma.scorecard.findMany(),
-      prisma.scorecardItem.findMany(),
-      prisma.evaluationCriterion.findMany(),
-      prisma.offer.findMany({
-        include: { application: { include: { requisition: true } } },
+    const models = Prisma.dmmf.datamodel.models;
+    const entries = await Promise.all(
+      models.map(async (model) => {
+        const delegateName =
+          model.name[0].toLowerCase() + model.name.slice(1);
+        const delegate = prisma[delegateName];
+        if (!delegate || typeof delegate.findMany !== "function") {
+          throw new Error(`Prisma delegate not found for ${model.name}`);
+        }
+        return [model.name, await delegate.findMany()];
       }),
-      prisma.approval.findMany(),
-      prisma.applicationStageEvent.findMany(),
-    ]);
-
-    const issues = [];
-    const expectedAnomalies = [];
-
-    const checkUnique = (records, key, label) => {
-      const values = records.map((record) => record[key]);
-      const duplicates = values.filter(
-        (value, index) => values.indexOf(value) !== index,
-      );
-
-      if (duplicates.length > 0) {
-        issues.push({
-          check: `${label} primary-key uniqueness`,
-          count: duplicates.length,
-          examples: [...new Set(duplicates)].slice(0, 5),
-        });
-      }
-    };
-
-    const checkForeignKey = (records, field, validIds, label) => {
-      const invalid = records.filter(
-        (record) => record[field] != null && !validIds.has(record[field]),
-      );
-
-      if (invalid.length > 0) {
-        issues.push({
-          check: `${label} foreign-key integrity`,
-          count: invalid.length,
-          examples: invalid.slice(0, 5).map((item) => item[field]),
-        });
-      }
-    };
-
-    const ids = (records, field) =>
-      new Set(records.map((record) => record[field]));
-
-    // 1. Primary-key uniqueness.
-    checkUnique(employees, "employeeId", "Employee");
-    checkUnique(requisitions, "requisitionId", "Requisition");
-    checkUnique(candidates, "candidateId", "Candidate");
-    checkUnique(applications, "applicationId", "Application");
-    checkUnique(panels, "panelId", "InterviewPanel");
-    checkUnique(interviews, "interviewId", "Interview");
-    checkUnique(participants, "participantId", "InterviewParticipant");
-    checkUnique(scorecards, "scorecardId", "Scorecard");
-    checkUnique(scorecardItems, "itemId", "ScorecardItem");
-    checkUnique(criteria, "criterionId", "EvaluationCriterion");
-    checkUnique(offers, "offerId", "Offer");
-    checkUnique(approvals, "approvalId", "Approval");
-    checkUnique(stageEvents, "eventId", "ApplicationStageEvent");
-
-    // 2. Foreign-key integrity.
-    checkForeignKey(
-      applications,
-      "candidateId",
-      ids(candidates, "candidateId"),
-      "Application candidate",
     );
-
-    checkForeignKey(
-      applications,
-      "requisitionId",
-      ids(requisitions, "requisitionId"),
-      "Application requisition",
+    const records = Object.fromEntries(entries);
+    const recordsByModel = new Map(entries);
+    const enumValues = new Map(
+      Prisma.dmmf.datamodel.enums.map((item) => [
+        item.name,
+        item.values.map((value) => value.name),
+      ]),
     );
-
-    checkForeignKey(
-      interviews,
-      "applicationId",
-      ids(applications, "applicationId"),
-      "Interview application",
-    );
-
-    checkForeignKey(
-      interviews,
-      "panelId",
-      ids(panels, "panelId"),
-      "Interview panel",
-    );
-
-    checkForeignKey(
-      participants,
-      "interviewId",
-      ids(interviews, "interviewId"),
-      "Participant interview",
-    );
-
-    checkForeignKey(
-      participants,
-      "employeeId",
-      ids(employees, "employeeId"),
-      "Participant employee",
-    );
-
-    checkForeignKey(
-      scorecards,
-      "interviewId",
-      ids(interviews, "interviewId"),
-      "Scorecard interview",
-    );
-
-    checkForeignKey(
-      scorecards,
-      "reviewerId",
-      ids(employees, "employeeId"),
-      "Scorecard reviewer",
-    );
-
-    checkForeignKey(
-      scorecardItems,
-      "scorecardId",
-      ids(scorecards, "scorecardId"),
-      "Scorecard item",
-    );
-
-    checkForeignKey(
-      scorecardItems,
-      "criterionId",
-      ids(criteria, "criterionId"),
-      "Scorecard criterion",
-    );
-
-    checkForeignKey(
-      offers,
-      "applicationId",
-      ids(applications, "applicationId"),
-      "Offer application",
-    );
-
-    checkForeignKey(
-      approvals,
-      "approverId",
-      ids(employees, "employeeId"),
-      "Approval employee",
-    );
-
-    checkForeignKey(
-      stageEvents,
-      "applicationId",
-      ids(applications, "applicationId"),
-      "Stage event application",
-    );
-
-    // 3. Duplicate candidate-requisition applications.
-    const applicationPairs = applications.map(
-      (item) => `${item.candidateId}|${item.requisitionId}`,
-    );
-
-    const duplicatePairs = applicationPairs.filter(
-      (pair, index) => applicationPairs.indexOf(pair) !== index,
-    );
-
-    if (duplicatePairs.length > 0) {
-      issues.push({
-        check: "Duplicate candidate-requisition applications",
-        count: duplicatePairs.length,
-      });
-    }
-
-    // 4. Detect salary-band anomalies.
-    for (const offer of offers) {
-      const requisition = offer.application.requisition;
-      const salary = Number(offer.baseSalary);
-
-      if (
-        salary < Number(requisition.minSalary) ||
-        salary > Number(requisition.maxSalary)
-      ) {
-        expectedAnomalies.push({
-          type: "OFFER_EXCEEDS_SALARY_BAND",
-          entityId: offer.offerId,
-        });
-      }
-    }
-
-    // 5. Detect interviewer scheduling conflicts.
-    const scheduledInterviews = interviews.filter(
-      (item) => item.status === "SCHEDULED",
-    );
-
-    const scheduledIds = new Set(
-      scheduledInterviews.map((item) => item.interviewId),
-    );
-
-    const activeParticipants = participants.filter(
-      (item) => item.role !== "OBSERVER" && scheduledIds.has(item.interviewId),
-    );
-
-    const interviewMap = new Map(
-      scheduledInterviews.map((item) => [item.interviewId, item]),
-    );
-
-    const conflicts = new Set();
-
-    for (let i = 0; i < activeParticipants.length; i++) {
-      for (let j = i + 1; j < activeParticipants.length; j++) {
-        const a = activeParticipants[i];
-        const b = activeParticipants[j];
-
-        if (a.employeeId !== b.employeeId || a.interviewId === b.interviewId) {
-          continue;
-        }
-
-        const first = interviewMap.get(a.interviewId);
-        const second = interviewMap.get(b.interviewId);
-
-        const overlaps =
-          first.startTime < second.endTime && second.startTime < first.endTime;
-
-        if (overlaps) {
-          conflicts.add(
-            [first.interviewId, second.interviewId].sort().join("|"),
-          );
-        }
-      }
-    }
-
-    if (conflicts.size > 0) {
-      expectedAnomalies.push({
-        type: "INTERVIEWER_DOUBLE_BOOKED",
-        count: conflicts.size,
-        examples: [...conflicts].slice(0, 5),
-      });
-    }
-
-    // 6. Detect withdrawn applications with scheduled interviews.
-    const applicationMap = new Map(
-      applications.map((item) => [item.applicationId, item]),
-    );
-
-    const withdrawnScheduled = scheduledInterviews.filter((interview) => {
-      const application = applicationMap.get(interview.applicationId);
-      return application?.status === "WITHDRAWN";
+    const issues = findSchemaIssues({
+      models,
+      recordsByModel,
+      enumValues,
     });
 
-    for (const interview of withdrawnScheduled) {
-      expectedAnomalies.push({
-        type: "WITHDRAWN_CANDIDATE_STILL_SCHEDULED",
-        entityId: interview.applicationId,
-        relatedEntityId: interview.interviewId,
+    const applications = records.Application;
+    const requisitions = records.Requisition;
+    const eventsByApplication = new Map();
+    for (const event of records.ApplicationStageEvent) {
+      const events = eventsByApplication.get(event.applicationId) || [];
+      events.push(event);
+      eventsByApplication.set(event.applicationId, events);
+    }
+    const legalTransitions = {
+      APPLIED: ["SCREENING", "REJECTED", "WITHDRAWN"],
+      SCREENING: ["TECHNICAL", "REJECTED", "WITHDRAWN"],
+      TECHNICAL: ["MANAGERIAL", "REJECTED", "WITHDRAWN"],
+      MANAGERIAL: ["HR", "REJECTED", "WITHDRAWN"],
+      HR: ["OFFER", "REJECTED", "WITHDRAWN"],
+      OFFER: ["HIRED", "REJECTED", "WITHDRAWN"],
+      HIRED: [],
+      REJECTED: [],
+      WITHDRAWN: [],
+    };
+    const groundTruthPath = require("path").join(
+      getExportDir(),
+      "ground_truth.json",
+    );
+    const groundTruth = fs.existsSync(groundTruthPath)
+      ? JSON.parse(fs.readFileSync(groundTruthPath, "utf8")).map(formatLabel)
+      : [];
+    if (!groundTruth.length) {
+      issues.push({
+        check: "Ground truth file",
+        message: "ground_truth.json is missing or empty",
+      });
+    }
+    const expectedAnomalyIds = new Set(
+      groundTruth.map((item) => item.entityId),
+    );
+
+    const invalidRequisitions = requisitions.filter(
+      (item) =>
+        Number(item.minSalary) > Number(item.maxSalary) || item.openings < 1,
+    );
+    if (invalidRequisitions.length) {
+      issues.push({
+        check: "Requisition salary band and openings",
+        count: invalidRequisitions.length,
+        examples: invalidRequisitions
+          .slice(0, 5)
+          .map((item) => item.requisitionId),
       });
     }
 
-    // 7. Detect irrelevant evaluation criteria.
-    const criterionMap = new Map(
-      criteria.map((item) => [item.criterionId, item]),
-    );
-
-    for (const item of scorecardItems) {
-      const criterion = criterionMap.get(item.criterionId);
-
-      if (
-        criterion &&
-        (criterion.category === "IRRELEVANT" ||
-          criterion.name === "Favorite Sports Team")
-      ) {
-        expectedAnomalies.push({
-          type: "IRRELEVANT_EVALUATION_CRITERION",
-          entityId: item.scorecardId,
-          relatedEntityId: item.criterionId,
-        });
-      }
+    const duplicateApplications = new Set();
+    const applicationPairs = new Set();
+    for (const application of applications) {
+      const key = `${application.candidateId}|${application.requisitionId}`;
+      if (applicationPairs.has(key)) duplicateApplications.add(key);
+      applicationPairs.add(key);
     }
-
-    // 8. Detect advancement without a completed review.
-    const interviewApplicationIds = new Set(
-      interviews
-        .filter((item) => item.status === "COMPLETED")
-        .map((item) => item.applicationId),
-    );
-
-    for (const event of stageEvents) {
-      if (
-        event.fromStage === "APPLIED" &&
-        event.toStage === "TECHNICAL" &&
-        !interviewApplicationIds.has(event.applicationId)
-      ) {
-        expectedAnomalies.push({
-          type: "ADVANCEMENT_WITHOUT_REVIEW",
-          entityId: event.applicationId,
-        });
-      }
-    }
-
-    // 9. Basic field and arithmetic validation.
-    const invalidSalaryBands = requisitions.filter(
-      (item) => Number(item.minSalary) > Number(item.maxSalary),
-    );
-
-    if (invalidSalaryBands.length > 0) {
+    if (duplicateApplications.size) {
       issues.push({
-        check: "Requisition salary band",
-        count: invalidSalaryBands.length,
-      });
-    }
-
-    const invalidInterviewDates = interviews.filter(
-      (item) => item.startTime >= item.endTime,
-    );
-
-    if (invalidInterviewDates.length > 0) {
-      issues.push({
-        check: "Interview date and time",
-        count: invalidInterviewDates.length,
+        check: "Duplicate candidate-requisition applications",
+        count: duplicateApplications.size,
       });
     }
 
@@ -350,96 +315,281 @@ const run = async () => {
         (item.status === "HIRED" && item.currentStage !== "HIRED") ||
         (item.status === "REJECTED" && item.currentStage !== "REJECTED"),
     );
-
-    if (invalidApplicationStates.length > 0) {
+    if (invalidApplicationStates.length) {
       issues.push({
         check: "Application lifecycle consistency",
         count: invalidApplicationStates.length,
+        examples: invalidApplicationStates
+          .slice(0, 5)
+          .map((item) => item.applicationId),
       });
     }
 
-    // 10. Compare detected anomalies with ground truth.
-    const truthPath = path.join(__dirname, "../../exports/ground_truth.json");
+    for (const [applicationId, events] of eventsByApplication) {
+      events.sort(
+        (left, right) =>
+          left.changedAt.getTime() - right.changedAt.getTime() ||
+          left.eventId.localeCompare(right.eventId),
+      );
+      let priorStage = null;
+      for (const event of events) {
+        if (event.fromStage === null && event.toStage !== "APPLIED") {
+          issues.push({
+            check: "Application initial stage history",
+            count: 1,
+            examples: [applicationId],
+          });
+        }
+        if (priorStage && event.fromStage !== priorStage) {
+          issues.push({
+            check: "Application stage event continuity",
+            count: 1,
+            examples: [applicationId],
+          });
+        }
+        if (
+          event.fromStage &&
+          !legalTransitions[event.fromStage]?.includes(event.toStage) &&
+          !expectedAnomalyIds.has(applicationId)
+        ) {
+          issues.push({
+            check: "Application stage transition",
+            count: 1,
+            examples: [`${applicationId}: ${event.fromStage} -> ${event.toStage}`],
+          });
+        }
+        priorStage = event.toStage;
+      }
 
-    let groundTruth = [];
+      const application = applications.find(
+        (item) => item.applicationId === applicationId,
+      );
+      if (application && priorStage !== application.currentStage) {
+        issues.push({
+          check: "Application state matches latest stage event",
+          count: 1,
+          examples: [applicationId],
+        });
+      }
+    }
 
-    if (fs.existsSync(truthPath)) {
-      groundTruth = JSON.parse(fs.readFileSync(truthPath, "utf8"));
-    } else {
+    const approvalIssues = records.Approval.filter((approval) => {
+      const targetCount = Number(Boolean(approval.offerId)) +
+        Number(Boolean(approval.requisitionId));
+      return (
+        targetCount !== 1 ||
+        (approval.approvalType === "OFFER" && !approval.offerId) ||
+        (approval.approvalType === "REQUISITION" && !approval.requisitionId) ||
+        (approval.status === "PENDING" && approval.decidedAt != null) ||
+        (approval.status !== "PENDING" && approval.decidedAt == null)
+      );
+    });
+    if (approvalIssues.length) {
       issues.push({
-        check: "Ground truth file",
-        message: "ground_truth.json not found",
+        check: "Approval target and lifecycle",
+        count: approvalIssues.length,
+        examples: approvalIssues.slice(0, 5).map((item) => item.approvalId),
       });
     }
 
-    const detectedTypes = new Set(expectedAnomalies.map((item) => item.type));
+    const employeeIds = new Set(
+      records.Employee.map((employee) => employee.employeeId),
+    );
+    const panelMembersByPanel = new Map();
+    for (const member of records.PanelMember) {
+      const members = panelMembersByPanel.get(member.panelId) || new Set();
+      members.add(member.employeeId);
+      panelMembersByPanel.set(member.panelId, members);
+    }
+    const interviewIssues = [];
+    for (const interview of records.Interview) {
+      const application = applications.find(
+        (item) => item.applicationId === interview.applicationId,
+      );
+      const panel = records.InterviewPanel.find(
+        (item) => item.panelId === interview.panelId,
+      );
+      if (
+        application &&
+        panel &&
+        application.requisitionId !== panel.requisitionId
+      ) {
+        interviewIssues.push(interview.interviewId);
+      }
+    }
+    for (const participant of records.InterviewParticipant) {
+      if (!employeeIds.has(participant.employeeId)) {
+        interviewIssues.push(participant.participantId);
+      }
+    }
+    if (interviewIssues.length) {
+      issues.push({
+        check: "Interview panel and participant joins",
+        count: interviewIssues.length,
+        examples: interviewIssues.slice(0, 5),
+      });
+    }
 
-    const groundTruthResults = groundTruth.map((item) => ({
-      anomalyId: item.anomalyId,
-      type: item.type,
-      detected: detectedTypes.has(item.type),
+    const scorecardJoinIssues = [];
+    for (const scorecard of records.Scorecard) {
+      const interview = records.Interview.find(
+        (item) => item.interviewId === scorecard.interviewId,
+      );
+      const assigned = records.InterviewParticipant.some(
+        (participant) =>
+          participant.interviewId === scorecard.interviewId &&
+          participant.employeeId === scorecard.reviewerId &&
+          participant.role !== "OBSERVER",
+      );
+      if (interview && !assigned) scorecardJoinIssues.push(scorecard.scorecardId);
+    }
+    for (const item of records.ScorecardItem) {
+      const criterion = records.EvaluationCriterion.find(
+        (entry) => entry.criterionId === item.criterionId,
+      );
+      const scorecard = records.Scorecard.find(
+        (entry) => entry.scorecardId === item.scorecardId,
+      );
+      const interview = scorecard
+        ? records.Interview.find(
+            (entry) => entry.interviewId === scorecard.interviewId,
+          )
+        : null;
+      const application = interview
+        ? applications.find(
+            (entry) => entry.applicationId === interview.applicationId,
+          )
+        : null;
+      if (
+        criterion &&
+        application &&
+        criterion.requisitionId !== application.requisitionId
+      ) {
+        scorecardJoinIssues.push(item.itemId);
+      }
+    }
+    if (scorecardJoinIssues.length) {
+      issues.push({
+        check: "Scorecard reviewer and criterion joins",
+        count: scorecardJoinIssues.length,
+        examples: scorecardJoinIssues.slice(0, 5),
+      });
+    }
+
+    const scorecardItemsByCard = new Map();
+    for (const item of records.ScorecardItem) {
+      const items = scorecardItemsByCard.get(item.scorecardId) || [];
+      items.push(item);
+      scorecardItemsByCard.set(item.scorecardId, items);
+    }
+    const criteriaById = new Map(
+      records.EvaluationCriterion.map((item) => [item.criterionId, item]),
+    );
+    const invalidScorecards = [];
+    for (const scorecard of records.Scorecard) {
+      const items = scorecardItemsByCard.get(scorecard.scorecardId) || [];
+      const activeItems = items.filter((item) =>
+        criteriaById.get(item.criterionId)?.isActive,
+      );
+      const weighted = activeItems.reduce((total, item) => {
+        const criterion = criteriaById.get(item.criterionId);
+        return total + Number(item.score) * Number(criterion?.weight || 0);
+      }, 0);
+      const totalWeight = activeItems.reduce(
+        (total, item) =>
+          total + Number(criteriaById.get(item.criterionId)?.weight || 0),
+        0,
+      );
+      const score = totalWeight > 0 ? weighted / totalWeight : -1;
+      const expectedRecommendation =
+        score >= 8
+          ? "STRONG_YES"
+          : score >= 7
+            ? "YES"
+            : score >= 5
+              ? "MAYBE"
+              : score >= 3
+                ? "NO"
+                : "STRONG_NO";
+      if (
+        activeItems.length === 0 ||
+        items.some(
+          (item) =>
+            Number(item.score) < 0 ||
+            Number(item.score) > 10 ||
+            !criteriaById.has(item.criterionId),
+        ) ||
+        scorecard.recommendation !== expectedRecommendation
+      ) {
+        invalidScorecards.push(scorecard.scorecardId);
+      }
+    }
+    if (invalidScorecards.length) {
+      issues.push({
+        check: "Scorecard rubric and derived recommendation",
+        count: invalidScorecards.length,
+        examples: invalidScorecards.slice(0, 5),
+      });
+    }
+
+    const detectedAnomalies = detectAnomalies(records);
+    const groundTruthResults = groundTruth.map((label) => ({
+      anomalyId: label.anomalyId,
+      type: label.type,
+      entityId: label.entityId,
+      relatedEntityId: label.relatedEntityId,
+      detected: groundTruthMatches(detectedAnomalies, label),
     }));
 
+    const recordCounts = Object.fromEntries(
+      Object.entries(records).map(([name, rows]) => [
+        name[0].toLowerCase() + name.slice(1),
+        rows.length,
+      ]),
+    );
+    const missedLabels = groundTruthResults.filter((item) => !item.detected);
     const report = {
       generatedAt: new Date().toISOString(),
-      recordCounts: {
-        employees: employees.length,
-        requisitions: requisitions.length,
-        candidates: candidates.length,
-        applications: applications.length,
-        interviewPanels: panels.length,
-        interviews: interviews.length,
-        participants: participants.length,
-        scorecards: scorecards.length,
-        scorecardItems: scorecardItems.length,
-        evaluationCriteria: criteria.length,
-        offers: offers.length,
-        approvals: approvals.length,
-        stageEvents: stageEvents.length,
-      },
+      recordCounts,
       integrityIssues: issues,
-      detectedAnomalies: expectedAnomalies,
+      detectedAnomalies,
       groundTruthResults,
       summary: {
         integrityChecksPassed: issues.length === 0,
         integrityIssueCount: issues.length,
-        detectedAnomalyTypes: detectedTypes.size,
+        detectedAnomalyTypes: new Set(
+          detectedAnomalies.map((item) => item.type),
+        ).size,
         groundTruthCases: groundTruth.length,
         groundTruthCasesDetected: groundTruthResults.filter(
           (item) => item.detected,
         ).length,
+        groundTruthCasesMissed: missedLabels.length,
       },
     };
 
-    const exportDir = path.join(__dirname, "../../exports");
-    fs.mkdirSync(exportDir, { recursive: true });
-
+    fs.mkdirSync(getExportDir(), { recursive: true });
     fs.writeFileSync(
-      path.join(exportDir, "validation_summary.json"),
+      require("path").join(getExportDir(), "validation_summary.json"),
       JSON.stringify(report, null, 2),
     );
 
     console.log("DATA VALIDATION COMPLETED\n");
-    console.log("Record counts:", report.recordCounts);
-    console.log("\nIntegrity issues:", issues.length);
-    console.log("Detected anomaly types:", detectedTypes.size);
+    console.log("Record counts:", recordCounts);
+    console.log("Integrity issues:", issues.length);
     console.log(
-      "Ground-truth cases detected:",
+      "Ground-truth entities matched:",
       `${report.summary.groundTruthCasesDetected}/${report.summary.groundTruthCases}`,
     );
-
-    if (issues.length > 0) {
-      console.log("\nIntegrity issue details:");
-      console.log(JSON.stringify(issues, null, 2));
-    }
-
-    console.log("\nValidation report: exports/validation_summary.json");
+    if (issues.length || missedLabels.length) process.exitCode = 1;
   } catch (error) {
-    console.error("Validation failed:", error);
+    console.error("Data validation failed:", error);
     process.exitCode = 1;
   } finally {
     await prisma.$disconnect();
   }
 };
 
-run();
+if (require.main === module) run();
+
+module.exports = { detectAnomalies };

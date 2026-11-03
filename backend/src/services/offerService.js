@@ -75,6 +75,7 @@ const createOffer = async (data) => {
             role: "APPROVER",
             isActive: true,
           },
+          orderBy: { employeeId: "asc" },
           select: { employeeId: true },
         });
 
@@ -100,6 +101,7 @@ const createOffer = async (data) => {
             status: "PENDING_APPROVAL",
             approvals: {
               create: approvers.map((approver) => ({
+                approvalId: `APR-OFF-${offerId}-${approver.employeeId}`,
                 approverId: approver.employeeId,
                 approvalType: "OFFER",
                 status: "PENDING",

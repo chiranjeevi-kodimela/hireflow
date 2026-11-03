@@ -165,8 +165,13 @@ const updateApplicationStage = async (applicationId, data) => {
       throw error;
     }
 
+    const eventCount = await tx.applicationStageEvent.count({
+      where: { applicationId },
+    });
+
     await tx.applicationStageEvent.create({
       data: {
+        eventId: `${applicationId}-EVT-${String(eventCount + 1).padStart(3, "0")}`,
         applicationId,
         fromStage: application.currentStage,
         toStage,

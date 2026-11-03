@@ -1,7 +1,8 @@
 const prisma = require("../../src/config/database");
 const { createRandom } = require("./random");
+const config = require("./config");
 
-const random = createRandom(20261022);
+const random = createRandom(config.seed);
 
 const departments = [
   "Engineering",
@@ -36,7 +37,9 @@ const generateEmployees = async () => {
           ? "APPROVER"
           : i <= 27
             ? "INTERVIEWER"
-            : "HR";
+            : i === 28
+              ? "OPERATIONS"
+              : "HR";
 
     const employee = await prisma.employee.upsert({
       where: {
@@ -71,6 +74,7 @@ const generateEmployees = async () => {
 
   console.log(`Employees generated: ${employees.length}`);
   console.log("Hiring managers generated: 10");
+  console.log("Operations partners generated: 1");
 };
 
 generateEmployees()

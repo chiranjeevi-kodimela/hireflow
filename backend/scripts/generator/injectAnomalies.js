@@ -2,10 +2,11 @@ const fs = require("fs");
 const path = require("path");
 const prisma = require("../../src/config/database");
 const { generateId } = require("../../src/utils/idGenerator");
+const { getExportDir } = require("./paths");
 
 const run = async () => {
   try {
-    const exportDir = path.join(__dirname, "../../exports");
+    const exportDir = getExportDir();
     const groundTruthPath = path.join(exportDir, "ground_truth.json");
 
     // Prevent accidental duplicate anomaly injection.
@@ -38,6 +39,7 @@ const run = async () => {
       },
       include: {
         participants: true,
+        scorecards: true,
         application: true,
       },
       orderBy: { startTime: "asc" },
@@ -68,8 +70,12 @@ const run = async () => {
         data: { currentStage: "TECHNICAL" },
       });
 
+      const eventCount = await tx.applicationStageEvent.count({
+        where: { applicationId: bypassApp.applicationId },
+      });
       await tx.applicationStageEvent.create({
         data: {
+          eventId: `${bypassApp.applicationId}-EVT-${String(eventCount + 1).padStart(3, "0")}`,
           applicationId: bypassApp.applicationId,
           fromStage: "APPLIED",
           toStage: "TECHNICAL",
@@ -240,8 +246,12 @@ const run = async () => {
         },
       });
 
+      const eventCount = await tx.applicationStageEvent.count({
+        where: { applicationId: withdrawnInterview.applicationId },
+      });
       await tx.applicationStageEvent.create({
         data: {
+          eventId: `${withdrawnInterview.applicationId}-EVT-${String(eventCount + 1).padStart(3, "0")}`,
           applicationId: withdrawnInterview.applicationId,
           fromStage: "SCREENING",
           toStage: "WITHDRAWN",
@@ -298,6 +308,7 @@ const run = async () => {
 
     const irrelevantCriterion = await prisma.evaluationCriterion.create({
       data: {
+        criterionId: `CRIT-${scorecard.interview.application.requisitionId}-ANOMALY-IRRELEVANT`,
         requisitionId: scorecard.interview.application.requisitionId,
         name: "Favorite Sports Team",
         description: "Personal preference unrelated to job performance.",
@@ -310,6 +321,7 @@ const run = async () => {
 
     await prisma.scorecardItem.create({
       data: {
+        itemId: `SCOREITEM-${scorecard.scorecardId}-${irrelevantCriterion.criterionId}`,
         scorecardId: scorecard.scorecardId,
         criterionId: irrelevantCriterion.criterionId,
         score: 9,
@@ -338,6 +350,40 @@ const run = async () => {
       description:
         "Scorecard includes a criterion unrelated to job performance.",
       expectedDetection: "Evaluation contains an irrelevant criterion.",
+    });
+
+    const incompleteInterview = interviews.find((interview) => {
+      const submitted = new Set(
+        interview.scorecards.map((item) => item.reviewerId),
+      );
+      return interview.participants.some(
+        (participant) =>
+          participant.role !== "OBSERVER" &&
+          !submitted.has(participant.employeeId),
+      );
+    });
+
+    if (!incompleteInterview) {
+      throw new Error("No incomplete scorecard fixture found.");
+    }
+
+    const missingReviewer = incompleteInterview.participants.find(
+      (participant) =>
+        participant.role !== "OBSERVER" &&
+        !incompleteInterview.scorecards.some(
+          (item) => item.reviewerId === participant.employeeId,
+        ),
+    );
+
+    truth.push({
+      anomalyId: "ANOMALY-006",
+      type: "INCOMPLETE_SCORECARD",
+      entityId: incompleteInterview.interviewId,
+      relatedEntityId: missingReviewer.employeeId,
+      description:
+        "A completed interview is missing a scorecard from an assigned interviewer.",
+      expectedDetection:
+        "Every assigned non-observer interviewer must submit a scorecard.",
     });
 
     // Export ground truth separately from operational records.

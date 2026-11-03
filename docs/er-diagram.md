@@ -25,6 +25,9 @@ erDiagram
 
     INTERVIEW ||--o{ SCORECARD : receives
     EMPLOYEE ||--o{ SCORECARD : reviews
+    REQUISITION ||--o{ EVALUATION_CRITERION : defines
+    SCORECARD ||--o{ SCORECARD_ITEM : contains
+    EVALUATION_CRITERION ||--o{ SCORECARD_ITEM : scores
 
     APPLICATION ||--o{ OFFER : receives
     OFFER ||--o{ APPROVAL : requires
@@ -52,9 +55,13 @@ erDiagram
 | Application → Interview | 1 : Many | An application can have multiple interviews |
 | Interview → InterviewParticipant | 1 : Many | An interview can include multiple interviewers |
 | Interview → Scorecard | 1 : Many | An interview can receive multiple reviews |
+| Requisition → EvaluationCriterion | 1 : Many | Evaluation criteria are defined for each role |
+| Scorecard → ScorecardItem | 1 : Many | A structured scorecard records criterion scores |
+| EvaluationCriterion → ScorecardItem | 1 : Many | A criterion may be scored across many scorecards |
 | Application → Offer | 1 : Many | An application can have multiple historical offers |
 | Offer → Approval | 1 : Many | An offer can require multiple approvals |
 | Application → ApplicationStageEvent | 1 : Many | An application has a history of stage changes |
+| Approval → Offer / Requisition | 1 : 0..1 target | Exactly one optional target is populated, matching approval type |
 
 ## 3. Important Database Design Decisions
 
@@ -64,6 +71,9 @@ erDiagram
 4. **Offer approval:** Multiple approvers can review an offer independently.
 5. **Audit history:** ApplicationStageEvent and AuditLog preserve historical changes rather than overwriting them.
 6. **Historical offers:** Multiple offers can exist for one application, but business rules must prevent multiple simultaneously active offers.
+7. **Evaluation rubric:** ScorecardItem bridges Scorecard and EvaluationCriterion; criteria are unique within each scorecard.
+8. **Effective dates:** Availability and Interview use UTC start/end intervals. Other lifecycle history uses timestamped events; master data is not effective-dated.
+9. **Operations role:** EmployeeRole includes HR, hiring manager, interviewer, approver, administrator, and operations partner.
 
 ## 4. Constraints to Enforce
 
@@ -79,3 +89,5 @@ erDiagram
 - Approval must reference exactly one target: an offer or a requisition.
 - Stage transitions must follow documented workflow rules.
 - Historical events must not be silently modified or deleted.
+- Availability and interview intervals must end after their start.
+- Compensation, rubric scores, skill weights, and requisition openings must satisfy documented numeric bounds.
