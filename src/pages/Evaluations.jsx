@@ -5,10 +5,15 @@ import {
     getEvaluationCriteria,
     createScorecard,
 } from "../services/scorecardService";
+import Pagination from "../components/Pagination";
 import "./Evaluations.css";
+
+const INTERVIEWS_PAGE_SIZE = 10;
 
 function Evaluations() {
     const [interviews, setInterviews] = useState([]);
+    const [interviewSearch, setInterviewSearch] = useState("");
+    const [interviewPage, setInterviewPage] = useState(1);
     const [selectedInterviewId, setSelectedInterviewId] = useState("");
     const [criteria, setCriteria] = useState([]);
     const [reviewerId, setReviewerId] = useState("");
@@ -72,6 +77,30 @@ function Evaluations() {
             "Candidate"
         );
     };
+
+    const matchingInterviews = interviews.filter((interview) => {
+        const query = interviewSearch.trim().toLowerCase();
+        if (!query) return true;
+        return [
+            getCandidateName(interview),
+            interview.interviewType,
+            interview.interviewId,
+        ]
+            .join(" ")
+            .toLowerCase()
+            .includes(query);
+    });
+    const interviewPageCount = Math.max(
+        1,
+        Math.ceil(matchingInterviews.length / INTERVIEWS_PAGE_SIZE),
+    );
+    const visibleInterviews = matchingInterviews.slice(
+        (interviewPage - 1) * INTERVIEWS_PAGE_SIZE,
+        interviewPage * INTERVIEWS_PAGE_SIZE,
+    );
+    const selectedInterviewIsVisible = visibleInterviews.some(
+        (interview) => interview.interviewId === selectedInterviewId,
+    );
 
     const getParticipantName = (participant) =>
         participant.employee?.fullName ||
@@ -246,6 +275,17 @@ function Evaluations() {
                     </p>
                 ) : (
                     <div className="evaluation-form-group">
+                        <label htmlFor="interview-search">Search completed interviews</label>
+                        <input
+                            id="interview-search"
+                            type="search"
+                            value={interviewSearch}
+                            onChange={(event) => {
+                                setInterviewSearch(event.target.value);
+                                setInterviewPage(1);
+                            }}
+                            placeholder="Candidate, type, or interview ID"
+                        />
                         <label htmlFor="interview">Completed Interview</label>
                         <select
                             id="interview"
@@ -253,7 +293,17 @@ function Evaluations() {
                             onChange={(event) => handleInterviewChange(event.target.value)}
                         >
                             <option value="">Choose an interview</option>
-                            {interviews.map((interview) => (
+                            {selectedInterview && !selectedInterviewIsVisible && (
+                                <option
+                                    key={selectedInterview.interviewId}
+                                    value={selectedInterview.interviewId}
+                                >
+                                    {getCandidateName(selectedInterview)} — {selectedInterview.interviewType}
+                                    {" — "}
+                                    {selectedInterview.interviewId}
+                                </option>
+                            )}
+                            {visibleInterviews.map((interview) => (
                                 <option
                                     key={interview.interviewId}
                                     value={interview.interviewId}
@@ -264,6 +314,13 @@ function Evaluations() {
                                 </option>
                             ))}
                         </select>
+                        <Pagination
+                            page={interviewPage}
+                            pageCount={interviewPageCount}
+                            pageSize={INTERVIEWS_PAGE_SIZE}
+                            totalItems={matchingInterviews.length}
+                            onPageChange={setInterviewPage}
+                        />
                     </div>
                 )}
             </section>

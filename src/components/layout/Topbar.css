@@ -71,10 +71,3 @@
   background: #e47a66;
   border-radius: 50%;
 }
-
-.topbar-date {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.7px;
-  color: var(--color-text-secondary);
-}

@@ -4,7 +4,10 @@ import {
     getCandidates,
     createCandidate,
 } from '../services/candidateService';
+import Pagination from '../components/Pagination';
 import './Candidates.css';
+
+const PAGE_SIZE = 10;
 
 const initialForm = {
     fullName: '',
@@ -20,6 +23,7 @@ function Candidates() {
     const [candidates, setCandidates] = useState([]);
     const [form, setForm] = useState(initialForm);
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -100,6 +104,11 @@ function Candidates() {
             (candidate.currentCompany || '').toLowerCase().includes(query)
         );
     });
+    const pageCount = Math.max(1, Math.ceil(filteredCandidates.length / PAGE_SIZE));
+    const visibleCandidates = filteredCandidates.slice(
+        (page - 1) * PAGE_SIZE,
+        page * PAGE_SIZE
+    );
 
     return (
         <div className="candidates-page">
@@ -240,7 +249,10 @@ function Candidates() {
                         className="candidate-search"
                         placeholder="Search candidates..."
                         value={search}
-                        onChange={(event) => setSearch(event.target.value)}
+                        onChange={(event) => {
+                            setSearch(event.target.value);
+                            setPage(1);
+                        }}
                     />
                 </div>
 
@@ -262,7 +274,7 @@ function Candidates() {
                             </thead>
 
                             <tbody>
-                                {filteredCandidates.map((candidate) => (
+                                {visibleCandidates.map((candidate) => (
                                     <tr key={candidate.candidateId}>
                                         <td>
                                             <strong>{candidate.fullName}</strong>
@@ -277,6 +289,15 @@ function Candidates() {
                             </tbody>
                         </table>
                     </div>
+                )}
+                {!loading && (
+                    <Pagination
+                        page={page}
+                        pageCount={pageCount}
+                        pageSize={PAGE_SIZE}
+                        totalItems={filteredCandidates.length}
+                        onPageChange={setPage}
+                    />
                 )}
             </section>
         </div>

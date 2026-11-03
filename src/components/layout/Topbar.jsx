@@ -40,9 +40,6 @@ function Topbar() {
                     <span className="notification-dot"></span>
                 </button>
 
-                <div className="topbar-date">
-                    MON, NOV 02
-                </div>
             </div>
         </header>
     );

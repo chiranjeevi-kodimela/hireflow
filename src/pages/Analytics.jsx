@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Activity, BriefcaseBusiness, Clock3, Users } from "lucide-react";
 
 import { getDashboardSummary } from "../services/dashboardService";
+import Pagination from "../components/Pagination";
 
 import "./Dashboard.css";
 import "./Analytics.css";
 
 const formatNumber = (value) => new Intl.NumberFormat("en-IN").format(value || 0);
+const MANAGERS_PAGE_SIZE = 10;
 
 const formatLabel = (value) =>
     value.replace(/([A-Z])/g, " $1").replace(/^./, (letter) => letter.toUpperCase());
@@ -54,6 +56,7 @@ function Analytics() {
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [managerPage, setManagerPage] = useState(1);
 
     useEffect(() => {
         let cancelled = false;
@@ -118,6 +121,15 @@ function Analytics() {
         : "0.0";
     const stagesForFunnel = analytics.hiringFunnel.filter(
         ({ stage }) => !["Rejected", "Withdrawn"].includes(stage),
+    );
+    const managers = analytics.hiringManagers || [];
+    const managerPageCount = Math.max(
+        1,
+        Math.ceil(managers.length / MANAGERS_PAGE_SIZE),
+    );
+    const visibleManagers = managers.slice(
+        (managerPage - 1) * MANAGERS_PAGE_SIZE,
+        managerPage * MANAGERS_PAGE_SIZE,
     );
 
     return (
@@ -308,7 +320,7 @@ function Analytics() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {analytics.hiringManagers.map((manager) => (
+                                {visibleManagers.map((manager) => (
                                     <tr key={manager.hiringManagerId}>
                                         <td>{manager.name}</td>
                                         <td>{formatNumber(manager.requisitions)}</td>
@@ -316,7 +328,7 @@ function Analytics() {
                                         <td>{formatNumber(manager.hires)}</td>
                                     </tr>
                                 ))}
-                                {analytics.hiringManagers.length === 0 && (
+                                {managers.length === 0 && (
                                     <tr>
                                         <td colSpan="4">No manager activity is available yet.</td>
                                     </tr>
@@ -324,6 +336,13 @@ function Analytics() {
                             </tbody>
                         </table>
                     </div>
+                    <Pagination
+                        page={managerPage}
+                        pageCount={managerPageCount}
+                        pageSize={MANAGERS_PAGE_SIZE}
+                        totalItems={managers.length}
+                        onPageChange={setManagerPage}
+                    />
                 </article>
             </section>
         </div>

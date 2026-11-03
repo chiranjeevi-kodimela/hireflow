@@ -9,9 +9,11 @@ import {
     rescheduleInterview,
 } from "../services/interviewService";
 import { getApplications } from "../services/applicationService";
+import Pagination from "../components/Pagination";
 import "./Interviews.css";
 
 const interviewTypes = ["SCREENING", "TECHNICAL", "MANAGERIAL", "HR"];
+const PAGE_SIZE = 10;
 
 function toLocalInput(value) {
     const date = new Date(value);
@@ -58,6 +60,7 @@ function Interviews() {
     });
 
     const [view, setView] = useState("list");
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -237,6 +240,7 @@ function Interviews() {
         };
 
         setFilters(updatedFilters);
+        setPage(1);
         setLoading(true);
         setError("");
 
@@ -444,8 +448,13 @@ function Interviews() {
         }
     };
 
+    const pageCount = Math.max(1, Math.ceil(interviews.length / PAGE_SIZE));
+    const visibleInterviews = interviews.slice(
+        (page - 1) * PAGE_SIZE,
+        page * PAGE_SIZE
+    );
     const groupedInterviews = useMemo(() => {
-        return interviews.reduce((groups, interview) => {
+        return visibleInterviews.reduce((groups, interview) => {
             const date = new Date(interview.startTime).toLocaleDateString();
 
             if (!groups[date]) groups[date] = [];
@@ -453,7 +462,7 @@ function Interviews() {
             groups[date].push(interview);
             return groups;
         }, {});
-    }, [interviews]);
+    }, [visibleInterviews]);
 
     const renderActions = (interview) => {
         if (interview.status !== "SCHEDULED") return null;
@@ -733,7 +742,7 @@ function Interviews() {
                                 </tr>
                             </thead>
 
-                            <tbody>{interviews.map(renderInterview)}</tbody>
+                            <tbody>{visibleInterviews.map(renderInterview)}</tbody>
                         </table>
                     </div>
                 ) : (
@@ -757,6 +766,15 @@ function Interviews() {
                             </div>
                         ))}
                     </div>
+                )}
+                {!loading && (
+                    <Pagination
+                        page={page}
+                        pageCount={pageCount}
+                        pageSize={PAGE_SIZE}
+                        totalItems={interviews.length}
+                        onPageChange={setPage}
+                    />
                 )}
             </section>
         </div>

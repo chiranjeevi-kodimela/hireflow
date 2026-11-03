@@ -5,7 +5,10 @@ import {
     createRequisition,
     submitRequisition,
 } from '../services/requisitionService';
+import Pagination from '../components/Pagination';
 import './Requisitions.css';
+
+const PAGE_SIZE = 10;
 
 const initialForm = {
     title: '',
@@ -20,6 +23,7 @@ const initialForm = {
 
 function Requisitions() {
     const [requisitions, setRequisitions] = useState([]);
+    const [page, setPage] = useState(1);
     const [managers, setManagers] = useState([]);
     const [form, setForm] = useState(initialForm);
     const [showForm, setShowForm] = useState(false);
@@ -148,6 +152,11 @@ function Requisitions() {
     const statusClass = (status) => {
         return `status-badge status-${status?.toLowerCase()}`;
     };
+    const pageCount = Math.max(1, Math.ceil(requisitions.length / PAGE_SIZE));
+    const visibleRequisitions = requisitions.slice(
+        (page - 1) * PAGE_SIZE,
+        page * PAGE_SIZE
+    );
 
     return (
         <div className="requisitions-page">
@@ -346,7 +355,7 @@ function Requisitions() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {requisitions.map((item) => (
+                                {visibleRequisitions.map((item) => (
                                     <tr key={item.requisitionId}>
                                         <td>
                                             <strong>{item.title}</strong>
@@ -387,6 +396,15 @@ function Requisitions() {
                             </tbody>
                         </table>
                     </div>
+                )}
+                {!loading && (
+                    <Pagination
+                        page={page}
+                        pageCount={pageCount}
+                        pageSize={PAGE_SIZE}
+                        totalItems={requisitions.length}
+                        onPageChange={setPage}
+                    />
                 )}
             </section>
         </div>

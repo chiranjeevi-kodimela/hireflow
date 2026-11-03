@@ -10,7 +10,10 @@ import {
     withdrawOffer,
 } from "../services/offerService";
 import { getApplications } from "../services/applicationService";
+import Pagination from "../components/Pagination";
 import "./Offers.css";
+
+const PAGE_SIZE = 10;
 
 const money = (value) =>
     new Intl.NumberFormat("en-IN", {
@@ -32,6 +35,7 @@ const ACTIVE_STATUSES = [
 
 export default function Offers() {
     const [offers, setOffers] = useState([]);
+    const [page, setPage] = useState(1);
     const [applications, setApplications] = useState([]);
     const [employees, setEmployees] = useState([]);
 
@@ -129,6 +133,11 @@ export default function Offers() {
 
     const createableApplications = eligibleApplications.filter(
         (application) => !existingApplicationIds.has(application.applicationId)
+    );
+    const pageCount = Math.max(1, Math.ceil(offers.length / PAGE_SIZE));
+    const visibleOffers = offers.slice(
+        (page - 1) * PAGE_SIZE,
+        page * PAGE_SIZE
     );
 
     const selectedApplication = eligibleApplications.find(
@@ -386,7 +395,7 @@ export default function Offers() {
                     <p className="offers-empty">No offers have been created yet.</p>
                 ) : (
                     <div className="offers-list">
-                        {offers.map((offer) => {
+                        {visibleOffers.map((offer) => {
                             const candidate =
                                 offer.application?.candidate?.fullName ||
                                 offer.application?.candidate?.name ||
@@ -550,6 +559,15 @@ export default function Offers() {
                             );
                         })}
                     </div>
+                )}
+                {!loading && (
+                    <Pagination
+                        page={page}
+                        pageCount={pageCount}
+                        pageSize={PAGE_SIZE}
+                        totalItems={offers.length}
+                        onPageChange={setPage}
+                    />
                 )}
             </section>
 

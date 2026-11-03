@@ -4,14 +4,17 @@ import {
     getAvailability,
     createAvailability,
 } from "../services/availabilityService";
+import Pagination from "../components/Pagination";
 import "./Availability.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const PAGE_SIZE = 10;
 
 function Availability() {
     const [employees, setEmployees] = useState([]);
     const [interviewerId, setInterviewerId] = useState("");
     const [slots, setSlots] = useState([]);
+    const [page, setPage] = useState(1);
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
     const [loading, setLoading] = useState(false);
@@ -170,6 +173,7 @@ function Availability() {
                                 onChange={(e) => {
                                     setInterviewerId(e.target.value);
                                     setSlots([]);
+                                    setPage(1);
                                     setError("");
                                     setSuccess("");
                                 }}
@@ -267,7 +271,7 @@ function Availability() {
                         </div>
                     ) : (
                         <div className="availability-slots">
-                            {slots.map((slot) => (
+                            {slots.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((slot) => (
                                 <div
                                     className="availability-slot"
                                     key={slot.availabilityId}
@@ -288,6 +292,15 @@ function Availability() {
                                 </div>
                             ))}
                         </div>
+                    )}
+                    {!loading && slots.length > 0 && (
+                        <Pagination
+                            page={page}
+                            pageCount={Math.max(1, Math.ceil(slots.length / PAGE_SIZE))}
+                            pageSize={PAGE_SIZE}
+                            totalItems={slots.length}
+                            onPageChange={setPage}
+                        />
                     )}
                 </section>
             </div>

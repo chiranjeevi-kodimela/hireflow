@@ -7,10 +7,14 @@ import {
 } from '../services/applicationService';
 import { getCandidates } from '../services/candidateService';
 import { getRequisitions } from '../services/requisitionService';
+import Pagination from '../components/Pagination';
 import './Applications.css';
+
+const PAGE_SIZE = 10;
 
 function Applications() {
     const [applications, setApplications] = useState([]);
+    const [page, setPage] = useState(1);
     const [candidates, setCandidates] = useState([]);
     const [requisitions, setRequisitions] = useState([]);
 
@@ -154,6 +158,11 @@ function Applications() {
         HR: ['OFFER', 'REJECTED', 'WITHDRAWN'],
         OFFER: ['HIRED', 'REJECTED', 'WITHDRAWN'],
     };
+    const pageCount = Math.max(1, Math.ceil(applications.length / PAGE_SIZE));
+    const visibleApplications = applications.slice(
+        (page - 1) * PAGE_SIZE,
+        page * PAGE_SIZE
+    );
 
     if (loading) {
         return <div className="applications-page">Loading applications...</div>;
@@ -305,7 +314,7 @@ function Applications() {
                         </thead>
 
                         <tbody>
-                            {applications.map((application) => (
+                            {visibleApplications.map((application) => (
                                 <tr key={application.applicationId}>
                                     <td>
                                         <strong>
@@ -363,6 +372,13 @@ function Applications() {
                         </tbody>
                     </table>
                 </div>
+                <Pagination
+                    page={page}
+                    pageCount={pageCount}
+                    pageSize={PAGE_SIZE}
+                    totalItems={applications.length}
+                    onPageChange={setPage}
+                />
             </div>
         </div>
     );
