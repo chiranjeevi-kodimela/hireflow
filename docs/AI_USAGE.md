@@ -1,136 +1,127 @@
-# HireFlow — AI Use & Prompt History
+# HireFlow — AI Usage Disclosure
 
+## Project
 
-## 1. Scope and Evidence Note
+**Repository:** [chiranjeevi-kodimela/hireflow](https://github.com/chiranjeevi-kodimela/hireflow)
 
-This report describes an AI-assisted development workflow for HireFlow, a recruitment workflow application.
+AI tools were used as development assistants during the implementation and documentation of HireFlow. The work covered a recruitment workflow application and a deterministic synthetic-data pipeline. AI assistance included requirement breakdown, code and test suggestions, debugging, review, and documentation. The repository history records the implementation over multiple commits; commit history alone does not establish that any individual change was authored by AI.
 
-**Repository:** https://github.com/chiranjeevi-kodimela/hireflow
+## Work areas where AI assisted
 
-## 2. Representative Prompt History
+The development work represented in the supplied commit history includes:
 
-### Planning and Requirements Decomposition
+- Core Prisma recruitment entities and relationships, deterministic ID generation, requisition and candidate APIs, and application-stage workflows.
+- Interview scheduling, interviewer availability, calendar conflict prevention, and interview lifecycle management.
+- Structured evaluation criteria and scorecards, offer creation, approval decisions, and audit history.
+- Live hiring dashboard and analytics, frontend workflow screens, and the later pagination and topbar cleanup.
+- Seeded synthetic employees, requisitions, candidates, applications, availability, panels, interviews, scorecards, offers, and anomaly fixtures.
+- Data integrity validation, anomaly detection and ground-truth exports, CSV/JSON/SQL export, data dictionaries, and workflow documentation.
 
-**Prompt:**
+Representative commits include:
 
-> Break this recruitment workflow specification into backend modules, entities, business rules, and an implementation sequence. Keep it aligned with the acceptance criteria.
+- `41cf055` — add interview scheduling with conflict prevention
+- `784cb5e` — add interviewer availability management API
+- `218ac07` — add application stage transition workflow
+- `6764af8` — add database-backed deterministic ID generation
+- `06c9773` — complete interview scheduling and conflict prevention
+- `1c45213` — complete structured candidate scorecards
+- `e772d62` — complete offer management and approval workflow
+- `b2d60eb` — complete live recruitment dashboard analytics
+- `d60568d` — expand synthetic hiring workflow dataset
+- `3af51ae` — add pagination to data views
 
-**How it helped:**
+This list is illustrative, not exhaustive. See the Git history for the complete sequence.
 
-AI helped structure the specification into smaller tasks and surface dependencies between requisitions, applications, interviews, evaluations, and offers.
+## Prompt and task themes
 
-### Schema and Relationships
+The following are summaries of the requests and task themes, not verbatim quotations:
 
-**Prompt:**
+- Break down the recruitment requirements into entities, relationships, workflows, rules, and validation criteria.
+- Compare the schema and implementation against the business workflow, identify missing requirements, and implement identified gaps.
+- Implement stage-transition rules, required-review gates, interview conflict checks, structured scorecards, offer-band checks, approvals, and traceable history.
+- Generate synthetic data in dependency order, use deterministic IDs and seeded randomness, inject labeled anomaly cases, validate records, and export separate ground truth.
+- Review frontend overview and analytics overlap; add pagination to data-heavy views and remove the hard-coded topbar date.
+- Update setup, data-dictionary, workflow, submission, and AI-use documentation to match implemented behavior and actual verification.
 
-> Review this Prisma schema against the recruitment requirements. Check primary keys, foreign keys, relations, lifecycle states, and support for traceable history.
+## Representative prompt history
 
-**How it helped:**
+These representative prompt summaries retain the intent of the earlier AI-use notes while avoiding presenting reconstructed wording as exact prompts.
 
-AI was used as a schema-review assistant. I needed to compare suggestions against the actual schema and application behavior instead of accepting them automatically.
+### Planning and requirements decomposition
 
-### Backend Module Implementation
+**Prompt theme:** Decompose the recruitment specification into backend modules, entities, business rules, dependencies, and an implementation sequence.
 
-**Prompt:**
+**How AI assisted:** Helped organize the scope and identify dependencies among requisitions, applications, interviews, evaluations, and offers.
 
-> Help implement this backend module using the current project structure and conventions. Identify the files to change and preserve existing API patterns.
+### Schema and relationships
 
-**How it helped:**
+**Prompt theme:** Review the Prisma schema against primary-key, foreign-key, relationship, lifecycle, and history requirements.
 
-AI accelerated repetitive scaffolding and helped reason about route/controller/service boundaries. I remained responsible for integration and resolving errors.
+**How AI assisted:** Offered a second perspective on the data model; suggestions were compared against the actual schema and application behavior.
 
-### Workflow Rules and Validation
+### Backend workflow implementation
 
-**Prompt:**
+**Prompt theme:** Implement backend modules following the existing project structure and API patterns, including stage gates, scheduling checks, evaluations, and approvals.
 
-> Help implement stage-transition validation and required-review gates. Identify invalid transitions and return useful errors without silently rewriting history.
+**How AI assisted:** Accelerated scaffolding and reasoning about route, controller, service, and validation boundaries.
 
-**How it helped:**
+### Interview scheduling and exceptions
 
-AI helped enumerate states and exception paths. The server-side guards and rejection behavior needed to be verified in the actual application.
+**Prompt theme:** Check interview scheduling against interviewer availability and overlapping bookings, and identify boundary cases.
 
-### Interview Scheduling
+**How AI assisted:** Helped reason about conflict detection and exception scenarios; runtime behavior still required verification.
 
-**Prompt:**
+### Frontend implementation
 
-> Review this interview scheduling logic for interviewer availability and overlapping bookings. Suggest a conflict check and edge cases to test.
+**Prompt theme:** Build React/Vite screens using existing components and APIs, with loading, empty, error, and workflow states.
 
-**How it helped:**
+**How AI assisted:** Suggested component structure and UI behavior, which was checked against the project data model and API contracts.
 
-AI accelerated reasoning about time overlap and boundary cases. I needed to validate scenarios and confirm that conflicting schedules could not be saved.
+### Debugging and tests
 
-### React Frontend
+**Prompt theme:** Analyze a specific error and surrounding code, suggest a focused correction, and identify tests for both normal and invalid workflow paths.
 
-**Prompt:**
+**How AI assisted:** Helped narrow debugging hypotheses and expand test checklists. Proposed tests were not treated as passing until run.
 
-> Help build this React/Vite screen with the existing components and API. Include loading, empty, and error states, and match the current data model.
+### Documentation
 
-**How it helped:**
+**Prompt theme:** Update setup instructions, business rules, schema dictionaries, submission notes, and AI-use disclosure to reflect the repository.
 
-AI assisted with component structure and UI states. I reviewed workflow fit and API request/response shapes.
+**How AI assisted:** Accelerated drafting; instructions and claims were checked against files and completed validation.
 
-### Debugging
+## Where AI accelerated the work
 
-**Prompt:**
+- Decomposing a broad business specification into implementation areas.
+- Drafting code patterns, validation approaches, documentation, and test scenarios.
+- Exploring exception paths and debugging errors across backend and frontend code.
+- Providing alternative perspectives on schema, workflow, and UI decisions.
 
-> Analyze this exact error and surrounding code. Explain likely causes, propose the smallest correction, and give verification steps.
+## Areas of substantial AI assistance
 
-**How it helped:**
+AI was used frequently for rapid iteration: code and documentation drafts, explanations of implementation details, debugging hypotheses, design alternatives, and checklists. AI output was treated as a proposal, not proof that behavior was correct, integrated, secure, or complete.
 
-AI helped narrow debugging hypotheses. I applied and tested fixes rather than treating a suggestion as confirmed.
+## Human review and responsibility
 
-### Test Design
+- Generated code and documentation were reviewed against repository structure, naming, and the data model.
+- API paths and payloads, relations, and frontend/backend integration were checked during implementation.
+- Business behavior considered included stage gates, interview conflicts, scorecard completeness, and offer approvals.
+- Verification claims below are limited to commands that were actually run; database-backed behavior remains identified as unverified.
+- The developer remains responsible for the final implementation, retained design choices, and project claims.
 
-**Prompt:**
+Synthetic candidate and employee records are generated for the project. No external candidate dataset is required by the generator. External data should only be used if its licensing, provenance, and redistribution terms are understood and documented.
 
-> Create test cases for valid and invalid workflow paths, including missing review, schedule overlap, incomplete scorecard, withdrawn candidate, and offer-band violations.
+## Verification status
 
-**How it helped:**
+The following checks were run during this work:
 
-AI helped create a broader test checklist. I needed to run tests against the implementation and not claim proposed tests as passed.
+- Frontend ESLint (`npm run lint`) — passed.
+- Frontend production build (`npm run build`) — passed.
+- Backend Node test suite (`npm test`) — 10 tests passed.
+- Prisma schema validation (`npx prisma validate`) — passed.
+- Generator syntax checks and Git whitespace checks — passed.
 
-### README and Setup
+The current generator was **not** run end-to-end against a disposable PostgreSQL database in the recorded work. The migration was not applied to such a database, and two fresh seeded exports were not generated and compared. The checked-in export and validation report predate the expanded generator and do not prove current end-to-end correctness or reproducibility.
 
-**Prompt:**
+## Responsible-use statement
 
-> Draft README instructions for environment setup, database preparation, running frontend/backend, and tests. Use only commands supported by this repository.
-
-**How it helped:**
-
-AI accelerated drafting. Commands, environment variable names, and setup steps had to be checked against project files.
-
-## 3. Where AI Accelerated My Work
-
-- Decomposing a large business specification into manageable implementation tasks.
-- Drafting repetitive code patterns, examples, validation approaches, and documentation.
-- Exploring exception paths and turning requirements into test scenarios.
-- Interpreting error messages and suggesting focused debugging experiments.
-- Providing a second perspective on code and data-model decisions.
-
-## 4. Where I Relied Heavily on AI
-
-I relied most on AI for rapid iteration: drafting code patterns, explaining unfamiliar implementation details, suggesting design alternatives, and preparing checklists.
-
-This reduced blank-page work and helped me move across backend, frontend, and documentation.
-
-AI output was a proposal, not proof that a feature was correct, secure, integrated, or complete.
-
-## 5. What I Personally Reviewed, Changed, or Validated
-
-- Reviewed generated code against the repository structure, naming, and data model.
-- Changed suggestions that did not fit requirements or existing implementation.
-- Checked API paths, payload shapes, database relations, and frontend/backend integration.
-- Investigated runtime or compile errors and confirmed fixes by rerunning relevant commands or workflows.
-- Reviewed business rules and exception behavior: stage gates, scheduling conflicts, scorecard completeness, and offer approvals.
-- Validated only tests and behavior actually run; unexecuted tests remain pending rather than being claimed as passed.
-- Checked README/setup claims against the repository before submission.
-
-## 6. Responsible-Use Statement
-
-I used LLMs as development assistants for planning, code suggestions, debugging, review, and documentation.
-
-I retained responsibility for the final implementation and for checking alignment with the business requirements. I did not treat generated output as authoritative without review.
-
-This report must be edited to reflect the exact tools, prompts, commits, and validation steps I personally used and completed.
-
-**Repository:** https://github.com/chiranjeevi-kodimela/hireflow
+LLMs were used as development assistants for planning, code suggestions, debugging, review, and documentation. Generated output was not treated as authoritative without review. This disclosure should be updated if additional implementation or validation is completed.
