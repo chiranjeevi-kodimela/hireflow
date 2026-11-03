@@ -1,6 +1,5 @@
 # HireFlow — AI Use & Prompt History
 
-*Project submission companion document*
 
 ## 1. Scope and Evidence Note
 
