@@ -136,20 +136,3 @@ The current solution may have limitations in areas such as:
 
 These areas can be expanded as the application’s requirements and deployment needs grow. The exact limitations depend on the current implementation and should be updated as features are completed.
 
-## 8. Future Improvements
-
-Potential improvements include:
-
-- More comprehensive automated tests for API endpoints and workflows.
-- Calendar integration for interviewer availability.
-- Notifications for interview scheduling and pending evaluations.
-- Expanded hiring metrics and reporting.
-- Configurable workflow stages.
-- Improved audit history for important recruitment decisions.
-- Performance and security testing before production use.
-
-## 9. Conclusion
-
-HireFlow addresses recruitment coordination by organizing hiring activities into a centralized, structured workflow. Its design emphasizes clear data relationships, explicit process states, role-based responsibilities, and separation between the frontend and backend.
-
-The solution’s reliability should be demonstrated through reproducible API tests, database verification, permission checks, and end-to-end workflow validation. This overview documents the reasoning behind the system and provides reviewers with a basis for evaluating its implementation.
